@@ -1,9 +1,64 @@
 import 'package:flutter/material.dart';
+import 'event_list_page.dart';
+import '../strategies/friend_search_context.dart';
+import '../strategies/search_by_name.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   final VoidCallback toggleTheme;
 
   HomePage({required this.toggleTheme});
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<String> friends = List.generate(10, (index) => 'Friend $index');
+  List<String> filteredFriends = [];
+  String searchQuery = "";
+  final SearchContext _searchContext = SearchContext();
+
+  @override
+  void initState() {
+    super.initState();
+    filteredFriends = friends;
+    _searchContext.setSearchStrategy(SearchByName());
+  }
+
+  void _searchFriends(String query) {
+    setState(() {
+      searchQuery = query;
+      if (query.isEmpty) {
+        filteredFriends = friends;
+      } else {
+        filteredFriends = _searchContext.performSearch(friends, query);
+      }
+    });
+  }
+
+  // Custom page transition with toggleTheme passed to the EventListPage
+  void _navigateToEventListPage(BuildContext context) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return EventListPage(toggleTheme: widget.toggleTheme); // Passing toggleTheme
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = 0.0;
+          const end = 1.0;
+          const curve = Curves.easeInOut;
+
+          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var fadeAnimation = animation.drive(tween);
+
+          return FadeTransition(
+            opacity: fadeAnimation,
+            child: child,
+          );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +70,7 @@ class HomePage extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.brightness_6),
-            onPressed: toggleTheme, // Toggle theme
+            onPressed: widget.toggleTheme, // Toggle theme
           ),
         ],
       ),
@@ -26,15 +81,17 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
                 onPressed: () {
-                  // Navigate to Create Event/List screen
+                  _navigateToEventListPage(context); // Navigate with custom transition
                 },
                 child: const Text("Create Your Own Event/List"),
               ),
             ),
 
+            // Search Bar
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: TextField(
+                onChanged: _searchFriends,
                 decoration: InputDecoration(
                   hintText: "Search friends...",
                   prefixIcon: const Icon(Icons.search),
@@ -52,9 +109,20 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
+            // Friend List or No Results Message
             Expanded(
-              child: ListView.builder(
-                itemCount: 10,
+              child: filteredFriends.isEmpty
+                  ? Center(
+                child: Text(
+                  'No friends found matching "$searchQuery".',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                    fontSize: 16,
+                  ),
+                ),
+              )
+                  : ListView.builder(
+                itemCount: filteredFriends.length,
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
@@ -66,7 +134,7 @@ class HomePage extends StatelessWidget {
                         leading: const CircleAvatar(
                           child: Icon(Icons.person),
                         ),
-                        title: Text('Friend $index'),
+                        title: Text(filteredFriends[index]),
                         subtitle: Row(
                           children: [
                             Container(
