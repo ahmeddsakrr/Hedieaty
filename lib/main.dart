@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hedieaty/screens/event_list_page.dart';
 import 'styles/app_theme.dart';
 import 'screens/home_page.dart';
 
@@ -24,7 +25,13 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: _isDarkTheme ? AppTheme.darkTheme : AppTheme.lightTheme,
-      home: HomePage(toggleTheme: _toggleTheme),
+      // home: HomePage(toggleTheme: _toggleTheme),
+
+
+      // testing the EventListPage
+      title: 'Gift List Manager',
+      // theme: AppTheme.darkTheme,
+      home: EventListPage(toggleTheme: _toggleTheme,),
     );
   }
 }
