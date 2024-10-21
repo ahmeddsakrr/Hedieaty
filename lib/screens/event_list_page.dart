@@ -54,7 +54,6 @@ class _EventListPageState extends State<EventListPage> {
     );
   }
 
-  // Reusable dialog for adding/editing events
   Future<void> _showEventDialog({Event? event, int? index}) async {
     final isEditMode = event != null;
     final TextEditingController nameController = TextEditingController(text: event?.name ?? '');
@@ -71,67 +70,69 @@ class _EventListPageState extends State<EventListPage> {
           builder: (context, setState) {
             return AlertDialog(
               title: Text(isEditMode ? 'Edit Event' : 'Add Event'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Event Name',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      focusedBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.purpleAccent,
-                          width: 2.0,
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: 'Event Name',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
-                      ),
-                      errorText: isNameValid ? null : 'Event name is required',
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: categoryController,
-                    decoration: InputDecoration(
-                      labelText: 'Category',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      focusedBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.purpleAccent,
-                          width: 2.0,
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.purpleAccent,
+                            width: 2.0,
+                          ),
                         ),
-                      ),
-                      errorText: isCategoryValid ? null : 'Category is required',
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<String>(
-                    value: selectedStatus,
-                    items: ['Upcoming', 'Current', 'Past']
-                        .map((status) => DropdownMenuItem(value: status, child: Text(status)))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedStatus = value!;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Status',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      focusedBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.purpleAccent,
-                          width: 2.0,
-                        ),
+                        errorText: isNameValid ? null : 'Event name is required',
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: categoryController,
+                      decoration: InputDecoration(
+                        labelText: 'Category',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.purpleAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        errorText: isCategoryValid ? null : 'Category is required',
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    DropdownButtonFormField<String>(
+                      value: selectedStatus,
+                      items: ['Upcoming', 'Current', 'Past']
+                          .map((status) => DropdownMenuItem(value: status, child: Text(status)))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedStatus = value!;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Status',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.purpleAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               actions: [
                 TextButton(
