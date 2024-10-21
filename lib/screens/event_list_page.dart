@@ -61,118 +61,135 @@ class _EventListPageState extends State<EventListPage> {
     final TextEditingController categoryController = TextEditingController(text: event?.category ?? '');
     String selectedStatus = event?.status ?? 'Upcoming';
 
+    bool isNameValid = true;
+    bool isCategoryValid = true;
+
     await showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(isEditMode ? 'Edit Event' : 'Add Event'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  labelText: 'Event Name',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.purpleAccent,
-                      width: 2.0,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(isEditMode ? 'Edit Event' : 'Add Event'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Event Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.purpleAccent,
+                          width: 2.0,
+                        ),
+                      ),
+                      errorText: isNameValid ? null : 'Event name is required',
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: categoryController,
-                decoration: InputDecoration(
-                  labelText: 'Category',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.purpleAccent,
-                      width: 2.0,
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: categoryController,
+                    decoration: InputDecoration(
+                      labelText: 'Category',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.purpleAccent,
+                          width: 2.0,
+                        ),
+                      ),
+                      errorText: isCategoryValid ? null : 'Category is required',
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                value: selectedStatus,
-                items: ['Upcoming', 'Current', 'Past']
-                    .map((status) => DropdownMenuItem(value: status, child: Text(status)))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedStatus = value!;
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Status',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.purpleAccent,
-                      width: 2.0,
+                  const SizedBox(height: 10),
+                  DropdownButtonFormField<String>(
+                    value: selectedStatus,
+                    items: ['Upcoming', 'Current', 'Past']
+                        .map((status) => DropdownMenuItem(value: status, child: Text(status)))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedStatus = value!;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Status',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.purpleAccent,
+                          width: 2.0,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (isEditMode && index != null) {
-                  // Edit existing event
-                  setState(() {
-                    _events[index] = Event(
-                      name: nameController.text,
-                      category: categoryController.text,
-                      status: selectedStatus,
-                    );
-                  });
-                } else {
-                  // Add new event
-                  setState(() {
-                    _events.add(Event(
-                      name: nameController.text,
-                      category: categoryController.text,
-                      status: selectedStatus,
-                    ));
-                    _listKey.currentState?.insertItem(_events.length - 1);
-                  });
-                }
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      isNameValid = nameController.text.isNotEmpty;
+                      isCategoryValid = categoryController.text.isNotEmpty;
+                    });
 
-                // Reapply the last used sorting strategy
-                if (_lastUsedSortStrategy != null) {
-                  _sortBy(_lastUsedSortStrategy!);
-                }
+                    if (isNameValid && isCategoryValid) {
+                      if (isEditMode && index != null) {
+                        // Edit existing event
+                        setState(() {
+                          _events[index] = Event(
+                            name: nameController.text,
+                            category: categoryController.text,
+                            status: selectedStatus,
+                          );
+                        });
+                      } else {
+                        // Add new event
+                        setState(() {
+                          _events.add(Event(
+                            name: nameController.text,
+                            category: categoryController.text,
+                            status: selectedStatus,
+                          ));
+                          _listKey.currentState?.insertItem(_events.length - 1);
+                        });
+                      }
 
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purpleAccent,
-              ),
-              child: Text(isEditMode ? 'Save' : 'Add'),
-            ),
-          ],
+                      // Reapply the last used sorting strategy
+                      if (_lastUsedSortStrategy != null) {
+                        _sortBy(_lastUsedSortStrategy!);
+                      }
+
+                      Navigator.of(context).pop(); // Close the dialog
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purpleAccent,
+                  ),
+                  child: Text(isEditMode ? 'Save' : 'Add'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
+
 
   Widget _buildEventItem(Event event, int index, Animation<double> animation) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
