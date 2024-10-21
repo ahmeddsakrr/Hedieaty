@@ -42,7 +42,7 @@ class _EventListPageState extends State<EventListPage> {
     setState(() {
       _sortContext.setSortStrategy(strategy);
       _events = _sortContext.sortEvents(_events);
-      _lastUsedSortStrategy = strategy;  // Store the last used strategy
+      _lastUsedSortStrategy = strategy; // Store the last used strategy
     });
   }
 
@@ -52,12 +52,18 @@ class _EventListPageState extends State<EventListPage> {
       index,
           (context, animation) => _buildEventItem(removedEvent, index, animation),
     );
+    // If the list becomes empty after removing, update the UI
+    if (_events.isEmpty) {
+      setState(() {});
+    }
   }
 
   Future<void> _showEventDialog({Event? event, int? index}) async {
     final isEditMode = event != null;
-    final TextEditingController nameController = TextEditingController(text: event?.name ?? '');
-    final TextEditingController categoryController = TextEditingController(text: event?.category ?? '');
+    final TextEditingController nameController =
+    TextEditingController(text: event?.name ?? '');
+    final TextEditingController categoryController =
+    TextEditingController(text: event?.category ?? '');
     String selectedStatus = event?.status ?? 'Upcoming';
 
     bool isNameValid = true;
@@ -87,7 +93,8 @@ class _EventListPageState extends State<EventListPage> {
                             width: 2.0,
                           ),
                         ),
-                        errorText: isNameValid ? null : 'Event name is required',
+                        errorText:
+                        isNameValid ? null : 'Event name is required',
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -104,14 +111,16 @@ class _EventListPageState extends State<EventListPage> {
                             width: 2.0,
                           ),
                         ),
-                        errorText: isCategoryValid ? null : 'Category is required',
+                        errorText:
+                        isCategoryValid ? null : 'Category is required',
                       ),
                     ),
                     const SizedBox(height: 10),
                     DropdownButtonFormField<String>(
                       value: selectedStatus,
                       items: ['Upcoming', 'Current', 'Past']
-                          .map((status) => DropdownMenuItem(value: status, child: Text(status)))
+                          .map((status) =>
+                          DropdownMenuItem(value: status, child: Text(status)))
                           .toList(),
                       onChanged: (value) {
                         setState(() {
@@ -191,7 +200,6 @@ class _EventListPageState extends State<EventListPage> {
     );
   }
 
-
   Widget _buildEventItem(Event event, int index, Animation<double> animation) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
@@ -239,7 +247,7 @@ class _EventListPageState extends State<EventListPage> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.edit),
-                  onPressed: () => _showEventDialog(event: event, index: index),  // Open edit dialog
+                  onPressed: () => _showEventDialog(event: event, index: index), // Open edit dialog
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete),
@@ -250,6 +258,19 @@ class _EventListPageState extends State<EventListPage> {
             splashColor: Colors.purpleAccent.withOpacity(0.3),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyMessage() {
+    return Center(
+      child: Text(
+        'No events available. Add a new event to get started!',
+        style: TextStyle(
+          fontSize: 18,
+          color: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.7),
+        ),
+        textAlign: TextAlign.center, // Center the text
       ),
     );
   }
@@ -275,16 +296,14 @@ class _EventListPageState extends State<EventListPage> {
               onSortByStatus: () => _sortBy(SortByStatus()),
             ),
             Expanded(
-              child: AnimatedList(
+              child: _events.isEmpty
+                  ? _buildEmptyMessage() // Show empty message if no events
+                  : AnimatedList(
                 key: _listKey,
                 controller: _scrollController,
                 initialItemCount: _events.length,
                 itemBuilder: (context, index, animation) {
-                  if (index < _events.length) {
-                    return _buildEventItem(_events[index], index, animation);
-                  } else {
-                    return const SizedBox();
-                  }
+                  return _buildEventItem(_events[index], index, animation);
                 },
               ),
             ),
