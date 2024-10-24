@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'event_list_page.dart';
+import '../components/custom_search_bar.dart';
+import '../widgets/friend_list_item.dart';
+import '../screens/event_list_page.dart';
 import '../strategies/friend_search_context.dart';
 import '../strategies/search_by_name.dart';
 
 class HomePage extends StatefulWidget {
   final VoidCallback toggleTheme;
 
-  HomePage({required this.toggleTheme});
+  const HomePage({required this.toggleTheme});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -36,25 +38,15 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // Custom page transition with toggleTheme passed to the EventListPage
   void _navigateToEventListPage(BuildContext context) {
     Navigator.of(context).push(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) {
-          return EventListPage(toggleTheme: widget.toggleTheme); // Passing toggleTheme
+          return EventListPage(toggleTheme: widget.toggleTheme);
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = 0.0;
-          const end = 1.0;
-          const curve = Curves.easeInOut;
-
-          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-          var fadeAnimation = animation.drive(tween);
-
-          return FadeTransition(
-            opacity: fadeAnimation,
-            child: child,
-          );
+          var fadeAnimation = animation.drive(Tween(begin: 0.0, end: 1.0));
+          return FadeTransition(opacity: fadeAnimation, child: child);
         },
       ),
     );
@@ -69,8 +61,8 @@ class _HomePageState extends State<HomePage> {
         title: const Text("Gift List Manager"),
         actions: [
           IconButton(
-            icon: Icon(Icons.brightness_6),
-            onPressed: widget.toggleTheme, // Toggle theme
+            icon: const Icon(Icons.brightness_6),
+            onPressed: widget.toggleTheme,
           ),
         ],
       ),
@@ -80,36 +72,16 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: () {
-                  _navigateToEventListPage(context); // Navigate with custom transition
-                },
+                onPressed: () => _navigateToEventListPage(context),
                 child: const Text("Create Your Own Event/List"),
               ),
             ),
-
-            // Search Bar
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                onChanged: _searchFriends,
-                decoration: InputDecoration(
-                  hintText: "Search friends...",
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: const BorderSide(
-                      color: Colors.purpleAccent,
-                      width: 2.0,
-                    ),
-                  ),
-                ),
-              ),
+            // Reusable Search Bar Component
+            CustomSearchBar(
+              onSearch: _searchFriends,
+              hintText: "Search friends...",
             ),
-
-            // Friend List or No Results Message
+            // Reusable Friend List Item
             Expanded(
               child: filteredFriends.isEmpty
                   ? Center(
@@ -124,45 +96,9 @@ class _HomePageState extends State<HomePage> {
                   : ListView.builder(
                 itemCount: filteredFriends.length,
                 itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
-                    child: Material(
-                      elevation: 2,
-                      borderRadius: BorderRadius.circular(8),
-                      color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
-                      child: ListTile(
-                        leading: const CircleAvatar(
-                          child: Icon(Icons.person),
-                        ),
-                        title: Text(filteredFriends[index]),
-                        subtitle: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.purpleAccent,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 4,
-                                    offset: const Offset(2, 2), // Shadow position
-                                  ),
-                                ],
-                              ),
-                              child: Text(
-                                'Upcoming Events: ${index % 2 == 0 ? 1 : 0}',
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                        onTap: () {
-                          // Navigate to friend’s gift lists
-                        },
-                        splashColor: Colors.purpleAccent.withOpacity(0.3),
-                      ),
-                    ),
+                  return FriendListItem(
+                    friendName: filteredFriends[index],
+                    eventsCount: index % 2 == 0 ? 1 : 0,
                   );
                 },
               ),
@@ -170,7 +106,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Add Friends action
