@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../components/sort_buttons.dart';
-import '../widgets/event_item.dart';
-import '../widgets/event_dialog.dart';
+import '../../widgets/event_item.dart';
+import '../../widgets/event_dialog.dart';
 import '../../models/event.dart';
 import '../../strategies/event_sort_strategy.dart';
 import '../../strategies/sort_by_name.dart';
 import '../../strategies/sort_by_category.dart';
 import '../../strategies/sort_by_status.dart';
 import '../../strategies/event_sort_context.dart';
+import '../../screens/gift/gift_list_page.dart';
 
 class EventListPage extends StatefulWidget {
   final VoidCallback toggleTheme;
@@ -73,8 +74,24 @@ class _EventListPageState extends State<EventListPage> {
         animation: animation,
         onEdit: () {},
         onDelete: () {},
+        onTap: () {},
       );
     });
+    setState(() {});
+  }
+
+  void _navigateToGiftListPage(BuildContext context, Event event) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return GiftListPage(event: event);
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          var fadeAnimation = animation.drive(Tween(begin: 0.0, end: 1.0));
+          return FadeTransition(opacity: fadeAnimation, child: child);
+        },
+      ),
+    );
   }
 
   @override
@@ -109,6 +126,7 @@ class _EventListPageState extends State<EventListPage> {
                     animation: animation,
                     onEdit: () => _showEventDialog(event: _events[index], index: index),
                     onDelete: () => _removeEvent(index),
+                    onTap: () => _navigateToGiftListPage(context, _events[index]),
                   );
                 },
               ),

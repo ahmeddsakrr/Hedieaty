@@ -3,15 +3,18 @@ import '../models/event.dart';
 
 class EventItem extends StatelessWidget {
   final Event event;
-  final Animation<double> animation; // Add animation parameter
+  final Animation<double> animation;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback onTap;
 
-  const EventItem({super.key,
+  const EventItem({
+    super.key,
     required this.event,
-    required this.animation, // Accept the animation parameter
+    required this.animation,
     required this.onEdit,
     required this.onDelete,
+    required this.onTap,
   });
 
   @override
@@ -28,6 +31,7 @@ class EventItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
           child: ListTile(
+            onTap: onTap, // Trigger the onTap callback to navigate
             leading: const Icon(Icons.event),
             title: Text(event.name),
             subtitle: Column(
