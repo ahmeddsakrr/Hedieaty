@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-import '../../components/sort_buttons.dart';
-import '../../widgets/event_item.dart';
-import '../../widgets/event_dialog.dart';
-import '../../models/event.dart';
-import '../../strategies/event_sort_strategy.dart';
-import '../../strategies/sort_by_name.dart';
-import '../../strategies/sort_by_category.dart';
-import '../../strategies/sort_by_status.dart';
-import '../../strategies/event_sort_context.dart';
-import '../../screens/gift/gift_list_page.dart';
+import '../../../components/sort_buttons.dart';
+import '../../widgets/event/event_item.dart';
+import '../../widgets/event/event_dialog.dart';
+import '../../../models/event.dart';
+import '../../../strategies/event_sort_strategy.dart';
+import '../../../strategies/sort_by_name.dart';
+import '../../../strategies/sort_by_category.dart';
+import '../../../strategies/sort_by_status.dart';
+import '../../../strategies/event_sort_context.dart';
+import '../../../screens/gift/gift_list_page.dart';
 
 class EventListPage extends StatefulWidget {
-  final VoidCallback toggleTheme;
-
-  const EventListPage({super.key, required this.toggleTheme});
+  const EventListPage({super.key});
 
   @override
   _EventListPageState createState() => _EventListPageState();
@@ -54,7 +52,7 @@ class _EventListPageState extends State<EventListPage> {
               _events[index] = savedEvent;
             } else {
               _events.add(savedEvent);
-              _listKey.currentState?.insertItem(_events.length - 1); // Insert with animation
+              _listKey.currentState?.insertItem(_events.length - 1);
             }
 
             if (_lastUsedSortStrategy != null) {
@@ -96,13 +94,15 @@ class _EventListPageState extends State<EventListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Event List"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.brightness_6),
-            onPressed: widget.toggleTheme,
+            icon: const Icon(Icons.add),
+            onPressed: () => _showEventDialog(),
           ),
         ],
       ),
@@ -116,7 +116,14 @@ class _EventListPageState extends State<EventListPage> {
             ),
             Expanded(
               child: _events.isEmpty
-                  ? const Center(child: Text('No events available. Add a new event to get started!'))
+                  ? Center(
+                child: Text(
+                  'No events available. Add a new event to get started!',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                  ),
+                ),
+              )
                   : AnimatedList(
                 key: _listKey,
                 initialItemCount: _events.length,
@@ -133,10 +140,6 @@ class _EventListPageState extends State<EventListPage> {
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showEventDialog(),
-        child: const Icon(Icons.add),
       ),
     );
   }
