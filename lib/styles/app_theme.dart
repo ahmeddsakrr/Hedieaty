@@ -17,7 +17,7 @@ class AppTheme {
       backgroundColor: Colors.purple,
     ),
     textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: Colors.black), // Updated from bodyText1
+      bodyLarge: TextStyle(color: Colors.black),
     ),
   );
 
@@ -37,7 +37,7 @@ class AppTheme {
       backgroundColor: Colors.deepPurple,
     ),
     textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: Colors.white), // Updated from bodyText1
+      bodyLarge: TextStyle(color: Colors.white),
     ),
   );
 }

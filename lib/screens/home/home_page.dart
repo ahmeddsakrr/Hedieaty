@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../components/custom_search_bar.dart';
 import '../../widgets/friend_list_item.dart';
 import '../event/event_list_page.dart';
+import '../profile/profile_page.dart'; // Import ProfilePage
 import '../../strategies/friend_search_context.dart';
 import '../../strategies/search_by_name.dart';
 
@@ -52,6 +53,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _navigateToProfilePage(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const ProfilePage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -60,6 +67,10 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text("Gift List Manager"),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () => _navigateToProfilePage(context),
+          ),
           IconButton(
             icon: const Icon(Icons.brightness_6),
             onPressed: widget.toggleTheme,
@@ -76,12 +87,10 @@ class _HomePageState extends State<HomePage> {
                 child: const Text("Create Your Own Event/List"),
               ),
             ),
-            // Reusable Search Bar Component
             CustomSearchBar(
               onSearch: _searchFriends,
               hintText: "Search friends...",
             ),
-            // Reusable Friend List Item
             Expanded(
               child: filteredFriends.isEmpty
                   ? Center(
