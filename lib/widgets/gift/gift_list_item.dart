@@ -7,7 +7,7 @@ class GiftListItem extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
-  const GiftListItem({
+  const GiftListItem({super.key,
     required this.gift,
     required this.animation,
     required this.onEdit,
@@ -34,12 +34,29 @@ class GiftListItem extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
         color: backgroundColor,
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 8,
-              height: 80,
-              color: statusColor,
-            ),
+            if (gift.imageUrl != null)
+              Container(
+                width: 80,
+                height: 80,
+                margin: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  image: DecorationImage(
+                    image: NetworkImage(gift.imageUrl!),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              )
+            else
+              Container(
+                width: 80,
+                height: 80,
+                margin: const EdgeInsets.all(8.0),
+                color: Colors.grey[300],
+                child: Icon(Icons.image_not_supported, color: Colors.grey[500]),
+              ),
             Expanded(
               child: ListTile(
                 title: Text(
@@ -56,9 +73,28 @@ class GiftListItem extends StatelessWidget {
                       'Category: ${gift.category}',
                       style: TextStyle(
                         color: textColor.withOpacity(0.8),
+                        fontSize: 13,
                       ),
                     ),
                     const SizedBox(height: 4),
+                    Text(
+                      'Description: ${gift.description ?? ''}',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: textColor.withOpacity(0.7),
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Price: \$${gift.price?.toStringAsFixed(2) ?? 'N/A'}',
+                      style: TextStyle(
+                        color: textColor.withOpacity(0.8),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
                     Row(
                       children: [
                         Icon(
