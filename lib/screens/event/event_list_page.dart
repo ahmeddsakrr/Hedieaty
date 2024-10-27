@@ -26,11 +26,14 @@ class _EventListPageState extends State<EventListPage> {
   @override
   void initState() {
     super.initState();
-    _events = List.generate(10, (index) => Event(
-      name: 'Event $index',
-      category: 'Category $index',
-      status: index % 3 == 0 ? 'Upcoming' : (index % 3 == 1 ? 'Current' : 'Past'),
-    ));
+    _events = List.generate(10, (index) {
+      return Event(
+        name: 'Event $index',
+        category: 'Category $index',
+        status: index % 3 == 0 ? 'Upcoming' : (index % 3 == 1 ? 'Current' : 'Past'),
+        date: DateTime.now().add(Duration(days: index * 7)), // Sample date calculation
+      );
+    });
   }
 
   void _sortBy(EventSortStrategy strategy) {

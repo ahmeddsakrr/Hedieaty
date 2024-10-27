@@ -19,128 +19,134 @@ class GiftListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final statusColor = gift.status == 'Pledged'
-        ? (isDarkMode ? Colors.greenAccent : Colors.teal[400])
-        : Colors.orangeAccent;
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
-    final backgroundColor = isDarkMode ? Colors.grey[900] : Colors.white;
-    final textColor = isDarkMode ? Colors.white : Colors.black;
+    Color getStatusColor() {
+      switch (gift.status) {
+        case 'Pledged':
+          return isDarkMode ? Colors.tealAccent : Colors.teal;
+        case 'Available':
+          return isDarkMode ? Colors.lightGreenAccent : Colors.lightGreen;
+        default:
+          return theme.colorScheme.surfaceContainerHighest;
+      }
+    }
 
-    final listItemContent = Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      color: backgroundColor,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (gift.imageUrl != null)
-            Container(
-              width: 80,
-              height: 80,
-              margin: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
-                  image: NetworkImage(gift.imageUrl!),
+    final listItemContent = Material(
+      elevation: 6,
+      borderRadius: BorderRadius.circular(16),
+      color: theme.colorScheme.surface,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {},
+        splashColor: theme.colorScheme.primary.withOpacity(0.2),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              gift.imageUrl != null
+                  ? ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  gift.imageUrl!,
+                  width: 80,
+                  height: 80,
                   fit: BoxFit.cover,
                 ),
-              ),
-            )
-          else
-            Container(
-              width: 80,
-              height: 80,
-              margin: const EdgeInsets.all(8.0),
-              color: Colors.grey[300],
-              child: Icon(Icons.image_not_supported, color: Colors.grey[500]),
-            ),
-          Expanded(
-            child: ListTile(
-              title: Text(
-                gift.name,
-                style: TextStyle(
-                  color: textColor,
-                  fontWeight: FontWeight.bold,
+              )
+                  : Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.card_giftcard,
+                  color: theme.colorScheme.primary,
+                  size: 40,
                 ),
               ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Category: ${gift.category}',
-                    style: TextStyle(
-                      color: textColor.withOpacity(0.8),
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Description: ${gift.description ?? ''}',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: textColor.withOpacity(0.7),
-                      fontSize: 12,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Price: \$${gift.price?.toStringAsFixed(2) ?? 'N/A'}',
-                    style: TextStyle(
-                      color: textColor.withOpacity(0.8),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.circle,
-                        size: 12,
-                        color: statusColor,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      gift.name,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Status: ${gift.status}',
-                        style: TextStyle(
-                          color: statusColor,
-                          fontWeight: FontWeight.bold,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Category: ${gift.category}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.8),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Price: \$${gift.price?.toStringAsFixed(2) ?? 'N/A'}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.8),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          size: 12,
+                          color: getStatusColor(),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        const SizedBox(width: 6),
+                        Text(
+                          'Status: ${gift.status}',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: getStatusColor(),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              trailing: showActions
-                  ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: onEdit,
-                    color: textColor,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: onDelete,
-                    color: textColor,
-                  ),
-                ],
-              )
-                  : null,
-            ),
+              if (showActions) const SizedBox(width: 16),
+              if (showActions)
+                Column(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.edit, color: theme.colorScheme.onSurface),
+                      onPressed: onEdit,
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete, color: theme.colorScheme.onSurface),
+                      onPressed: onDelete,
+                    ),
+                  ],
+                ),
+            ],
           ),
-        ],
+        ),
       ),
     );
 
     return animation != null
-        ? SlideTransition(
-      position: Tween<Offset>(
-        begin: const Offset(1, 0),
-        end: Offset.zero,
-      ).animate(animation!),
-      child: listItemContent,
+        ? FadeTransition(
+      opacity: animation!,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(1, 0),
+          end: Offset.zero,
+        ).animate(animation!),
+        child: listItemContent,
+      ),
     )
         : listItemContent;
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../components/custom_search_bar.dart';
 import '../../widgets/friend/friend_list_item.dart';
 import '../event/event_list_page.dart';
-import '../profile/profile_page.dart'; // Import ProfilePage
+import '../profile/profile_page.dart';
 import '../../strategies/friend_search_context.dart';
 import '../../strategies/search_by_name.dart';
 
@@ -42,12 +42,22 @@ class _HomePageState extends State<HomePage> {
   void _navigateToEventListPage(BuildContext context) {
     Navigator.of(context).push(
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) {
-          return const EventListPage();
-        },
+        transitionDuration: const Duration(milliseconds: 400),
+        reverseTransitionDuration: const Duration(milliseconds: 400),
+        pageBuilder: (context, animation, secondaryAnimation) => const EventListPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          var fadeAnimation = animation.drive(Tween(begin: 0.0, end: 1.0));
-          return FadeTransition(opacity: fadeAnimation, child: child);
+          const beginOffset = Offset(0.0, 0.1);
+          const endOffset = Offset.zero;
+          const curve = Curves.easeInOut;
+          final tween = Tween(begin: beginOffset, end: endOffset).chain(CurveTween(curve: curve));
+          final fadeTween = Tween<double>(begin: 0.0, end: 1.0).chain(CurveTween(curve: curve));
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: FadeTransition(
+              opacity: animation.drive(fadeTween),
+              child: child,
+            ),
+          );
         },
       ),
     );
@@ -61,7 +71,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -84,6 +95,11 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
                 onPressed: () => _navigateToEventListPage(context),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: theme.colorScheme.onPrimary,
+                  backgroundColor: theme.colorScheme.primary,
+                  textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 child: const Text("Create Your Own Event/List"),
               ),
             ),
@@ -108,6 +124,7 @@ class _HomePageState extends State<HomePage> {
                   return FriendListItem(
                     friendName: filteredFriends[index],
                     eventsCount: index % 2 == 0 ? 1 : 0,
+                    onTap: () => _navigateToEventListPage(context),
                   );
                 },
               ),

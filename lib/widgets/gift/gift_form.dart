@@ -63,10 +63,21 @@ class _GiftFormState extends State<GiftForm> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final statusColor = isPledged
-        ? (isDarkMode ? Colors.greenAccent : Colors.teal[400])
-        : Colors.orangeAccent;
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
+    Color getStatusColor() {
+      switch (widget.gift.status) {
+        case 'Pledged':
+          return isDarkMode ? Colors.tealAccent : Colors.teal;
+        case 'Available':
+          return isDarkMode ? Colors.lightGreenAccent : Colors.lightGreen;
+        default:
+          return theme.colorScheme.surfaceContainerHighest;
+      }
+    }
+
+    final statusColor = getStatusColor();
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -126,15 +137,15 @@ class _GiftFormState extends State<GiftForm> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 decoration: BoxDecoration(
-                  color: statusColor?.withOpacity(0.3),
+                  color: getStatusColor().withOpacity(0.3),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: Row(
                   children: [
                     Icon(
-                      Icons.circle,
-                      size: 12,
-                      color: statusColor,
+                        Icons.circle,
+                        size: 12,
+                        color: getStatusColor()
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -145,16 +156,16 @@ class _GiftFormState extends State<GiftForm> {
                       ),
                     ),
                     Switch.adaptive(
-                      value: isPledged,
-                      onChanged: widget.isEditable
-                          ? (value) {
-                        setState(() {
-                          isPledged = value;
-                        });
-                        _notifyGiftChanged();
-                      }
-                          : null,
-                      activeColor: statusColor,
+                        value: isPledged,
+                        onChanged: widget.isEditable
+                            ? (value) {
+                          setState(() {
+                            isPledged = value;
+                          });
+                          _notifyGiftChanged();
+                        }
+                            : null,
+                        activeColor: getStatusColor()
                     ),
                   ],
                 ),

@@ -15,9 +15,11 @@ class _EventDialogState extends State<EventDialog> {
   late TextEditingController nameController;
   late TextEditingController categoryController;
   String selectedStatus = 'Upcoming';
+  DateTime? selectedDate;
 
   bool isNameValid = true;
   bool isCategoryValid = true;
+  bool isDateValid = true;
 
   @override
   void initState() {
@@ -25,6 +27,7 @@ class _EventDialogState extends State<EventDialog> {
     nameController = TextEditingController(text: widget.event?.name ?? '');
     categoryController = TextEditingController(text: widget.event?.category ?? '');
     selectedStatus = widget.event?.status ?? 'Upcoming';
+    selectedDate = widget.event?.date;
   }
 
   @override
@@ -38,15 +41,32 @@ class _EventDialogState extends State<EventDialog> {
     setState(() {
       isNameValid = nameController.text.isNotEmpty;
       isCategoryValid = categoryController.text.isNotEmpty;
+      isDateValid = selectedDate != null;
     });
 
-    if (isNameValid && isCategoryValid) {
+    if (isNameValid && isCategoryValid && isDateValid) {
       widget.onSave(Event(
         name: nameController.text,
         category: categoryController.text,
         status: selectedStatus,
+        date: selectedDate!,
       ));
       Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> _selectDate() async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate != null) {
+      setState(() {
+        selectedDate = pickedDate;
+        isDateValid = true;
+      });
     }
   }
 
@@ -96,6 +116,24 @@ class _EventDialogState extends State<EventDialog> {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
               ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  selectedDate == null
+                      ? 'No date selected'
+                      : 'Date: ${selectedDate!.toLocal().toString().split(' ')[0]}',
+                  style: TextStyle(
+                    color: isDateValid ? Colors.grey[600] : Colors.red,
+                  ),
+                ),
+                TextButton(
+                  onPressed: _selectDate,
+                  child: const Text("Select Date"),
+                ),
+              ],
             ),
           ],
         ),

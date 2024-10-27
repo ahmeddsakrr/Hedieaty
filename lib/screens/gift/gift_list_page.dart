@@ -28,7 +28,6 @@ class _GiftListPageState extends State<GiftListPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize with more complete data
     _gifts = List.generate(
       10,
           (index) => Gift(
@@ -80,11 +79,14 @@ class _GiftListPageState extends State<GiftListPage> {
     _listKey.currentState?.removeItem(
       index,
           (context, animation) {
-        return GiftListItem(
-          gift: removedGift,
-          animation: animation,
-          onEdit: () => _navigateToGiftDetails(gift: removedGift, index: index),
-          onDelete: () {},
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: GiftListItem(
+            gift: removedGift,
+            animation: animation,
+            onEdit: () => _navigateToGiftDetails(gift: removedGift, index: index),
+            onDelete: () {},
+          ),
         );
       },
     );
@@ -126,11 +128,14 @@ class _GiftListPageState extends State<GiftListPage> {
               key: _listKey,
               initialItemCount: _gifts.length,
               itemBuilder: (context, index, animation) {
-                return GiftListItem(
-                  gift: _gifts[index],
-                  animation: animation,
-                  onEdit: () => _navigateToGiftDetails(gift: _gifts[index], index: index),
-                  onDelete: () => _removeGift(index),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: GiftListItem(
+                    gift: _gifts[index],
+                    animation: animation,
+                    onEdit: () => _navigateToGiftDetails(gift: _gifts[index], index: index),
+                    onDelete: () => _removeGift(index),
+                  ),
                 );
               },
             ),
