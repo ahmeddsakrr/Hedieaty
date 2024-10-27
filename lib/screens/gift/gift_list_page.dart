@@ -9,6 +9,7 @@ import '../../strategies/sort_by_gift_category.dart';
 import '../../strategies/sort_by_gift_status.dart';
 import '../../strategies/gift_sort_context.dart';
 import 'gift_details_page.dart';
+import '../../utils/navigation_utils.dart';
 
 class GiftListPage extends StatefulWidget {
   final Event event;
@@ -50,15 +51,7 @@ class _GiftListPageState extends State<GiftListPage> {
   }
 
   void _navigateToGiftDetails({Gift? gift, int? index}) async {
-    final result = await Navigator.of(context).push<Gift>(
-      MaterialPageRoute(
-        builder: (context) => GiftDetailsPage(
-          gift: gift,
-          isEditMode: gift != null,
-        ),
-      ),
-    );
-
+    final result = await navigateWithAnimation(context, GiftDetailsPage(gift: gift, isEditMode: gift != null));
     if (result != null) {
       setState(() {
         if (index != null) {
@@ -80,7 +73,7 @@ class _GiftListPageState extends State<GiftListPage> {
       index,
           (context, animation) {
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
           child: GiftListItem(
             gift: removedGift,
             animation: animation,
@@ -109,35 +102,40 @@ class _GiftListPageState extends State<GiftListPage> {
       ),
       body: Column(
         children: [
+          const SizedBox(height: 16.0),
           SortButtons(
             onSortByName: () => _sortBy(SortByGiftName()),
             onSortByCategory: () => _sortBy(SortByGiftCategory()),
             onSortByStatus: () => _sortBy(SortByGiftStatus()),
           ),
+          const SizedBox(height: 10.0),
           Expanded(
-            child: _gifts.isEmpty
-                ? Center(
-              child: Text(
-                'No gifts available.',
-                style: TextStyle(
-                  color: isDarkMode ? Colors.white70 : Colors.black87,
-                ),
-              ),
-            )
-                : AnimatedList(
-              key: _listKey,
-              initialItemCount: _gifts.length,
-              itemBuilder: (context, index, animation) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: GiftListItem(
-                    gift: _gifts[index],
-                    animation: animation,
-                    onEdit: () => _navigateToGiftDetails(gift: _gifts[index], index: index),
-                    onDelete: () => _removeGift(index),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: _gifts.isEmpty
+                  ? Center(
+                child: Text(
+                  'No gifts available.',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white70 : Colors.black87,
                   ),
-                );
-              },
+                ),
+              )
+                  : AnimatedList(
+                key: _listKey,
+                initialItemCount: _gifts.length,
+                itemBuilder: (context, index, animation) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: GiftListItem(
+                      gift: _gifts[index],
+                      animation: animation,
+                      onEdit: () => _navigateToGiftDetails(gift: _gifts[index], index: index),
+                      onDelete: () => _removeGift(index),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ],
