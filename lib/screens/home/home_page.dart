@@ -5,6 +5,7 @@ import '../event/event_list_page.dart';
 import '../profile/profile_page.dart';
 import '../../strategies/friend_search_context.dart';
 import '../../strategies/search_by_name.dart';
+import '../../utils/navigation_utils.dart';
 
 class HomePage extends StatefulWidget {
   final VoidCallback toggleTheme;
@@ -39,36 +40,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _navigateToEventListPage(BuildContext context) {
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 400),
-        reverseTransitionDuration: const Duration(milliseconds: 400),
-        pageBuilder: (context, animation, secondaryAnimation) => const EventListPage(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const beginOffset = Offset(0.0, 0.1);
-          const endOffset = Offset.zero;
-          const curve = Curves.easeInOut;
-          final tween = Tween(begin: beginOffset, end: endOffset).chain(CurveTween(curve: curve));
-          final fadeTween = Tween<double>(begin: 0.0, end: 1.0).chain(CurveTween(curve: curve));
-          return SlideTransition(
-            position: animation.drive(tween),
-            child: FadeTransition(
-              opacity: animation.drive(fadeTween),
-              child: child,
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  void _navigateToProfilePage(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const ProfilePage()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -80,7 +51,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
-            onPressed: () => _navigateToProfilePage(context),
+            onPressed: () => navigateWithAnimation(context, const ProfilePage()),
           ),
           IconButton(
             icon: const Icon(Icons.brightness_6),
@@ -94,7 +65,7 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: () => _navigateToEventListPage(context),
+                onPressed: () => navigateWithAnimation(context, const EventListPage()),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: theme.colorScheme.onPrimary,
                   backgroundColor: theme.colorScheme.primary,
@@ -124,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                   return FriendListItem(
                     friendName: filteredFriends[index],
                     eventsCount: index % 2 == 0 ? 1 : 0,
-                    onTap: () => _navigateToEventListPage(context),
+                    onTap: () => navigateWithAnimation(context, const EventListPage()),
                   );
                 },
               ),

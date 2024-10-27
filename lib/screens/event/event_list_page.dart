@@ -9,6 +9,7 @@ import '../../../strategies/sort_by_category.dart';
 import '../../../strategies/sort_by_status.dart';
 import '../../../strategies/event_sort_context.dart';
 import '../../../screens/gift/gift_list_page.dart';
+import '../../utils/navigation_utils.dart';
 
 class EventListPage extends StatefulWidget {
   const EventListPage({super.key});
@@ -81,20 +82,6 @@ class _EventListPageState extends State<EventListPage> {
     setState(() {});
   }
 
-  void _navigateToGiftListPage(BuildContext context, Event event) {
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) {
-          return GiftListPage(event: event);
-        },
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          var fadeAnimation = animation.drive(Tween(begin: 0.0, end: 1.0));
-          return FadeTransition(opacity: fadeAnimation, child: child);
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -136,7 +123,7 @@ class _EventListPageState extends State<EventListPage> {
                     animation: animation,
                     onEdit: () => _showEventDialog(event: _events[index], index: index),
                     onDelete: () => _removeEvent(index),
-                    onTap: () => _navigateToGiftListPage(context, _events[index]),
+                    onTap: () => navigateWithAnimation(context, GiftListPage(event: _events[index])),
                   );
                 },
               ),
