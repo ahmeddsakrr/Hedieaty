@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../components/custom_search_bar.dart';
-import '../../widgets/friend_list_item.dart';
+import '../../widgets/friend/friend_list_item.dart';
 import '../event/event_list_page.dart';
 import '../profile/profile_page.dart'; // Import ProfilePage
 import '../../strategies/friend_search_context.dart';
@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
     Navigator.of(context).push(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) {
-          return EventListPage();
+          return const EventListPage();
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           var fadeAnimation = animation.drive(Tween(begin: 0.0, end: 1.0));

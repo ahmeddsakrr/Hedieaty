@@ -5,7 +5,7 @@ class SortButtons extends StatelessWidget {
   final VoidCallback onSortByCategory;
   final VoidCallback onSortByStatus;
 
-  SortButtons({
+  const SortButtons({super.key,
     required this.onSortByName,
     required this.onSortByCategory,
     required this.onSortByStatus,
@@ -21,17 +21,17 @@ class SortButtons extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: onSortByName,
-              child: Text("Sort by Name"),
+              child: const Text("Sort by Name"),
             ),
-            SizedBox(width: 10), // Spacing between buttons
+            const SizedBox(width: 10), // Spacing between buttons
             ElevatedButton(
               onPressed: onSortByCategory,
-              child: Text("Sort by Category"),
+              child: const Text("Sort by Category"),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             ElevatedButton(
               onPressed: onSortByStatus,
-              child: Text("Sort by Status"),
+              child: const Text("Sort by Status"),
             ),
           ],
         ),

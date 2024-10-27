@@ -4,7 +4,7 @@ class CustomSearchBar extends StatelessWidget {
   final ValueChanged<String> onSearch;
   final String hintText;
 
-  CustomSearchBar({required this.onSearch, required this.hintText});
+  const CustomSearchBar({super.key, required this.onSearch, required this.hintText});
 
   @override
   Widget build(BuildContext context) {

@@ -4,7 +4,7 @@ class FriendListItem extends StatelessWidget {
   final String friendName;
   final int eventsCount;
 
-  FriendListItem({required this.friendName, required this.eventsCount});
+  const FriendListItem({super.key, required this.friendName, required this.eventsCount});
 
   @override
   Widget build(BuildContext context) {

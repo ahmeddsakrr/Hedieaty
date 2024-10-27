@@ -3,10 +3,12 @@ import 'styles/app_theme.dart';
 import 'screens/home/home_page.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
   _MyAppState createState() => _MyAppState();
 }

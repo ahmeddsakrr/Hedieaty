@@ -6,6 +6,8 @@ class ProfileHeader extends StatelessWidget {
   final TextEditingController phoneController = TextEditingController(text: "123-456-7890");
   final TextEditingController emailController = TextEditingController(text: "johndoe@example.com");
 
+  ProfileHeader({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
