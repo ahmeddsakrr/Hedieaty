@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/gift.dart';
+import '../../old_models/gift.dart';
 
 class GiftDialog extends StatefulWidget {
   final Gift? gift;

@@ -1,4 +1,4 @@
-import '../models/event.dart';
+import '../old_models/event.dart';
 import 'event_sort_strategy.dart';
 
 class SortByCategory implements EventSortStrategy {

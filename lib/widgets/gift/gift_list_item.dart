@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/gift.dart';
+import '../../old_models/gift.dart';
 import '../../utils/date_utils.dart';
 
 class GiftListItem extends StatelessWidget {

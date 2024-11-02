@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/event.dart';
+import '../../old_models/event.dart';
 
 class EventDialog extends StatefulWidget {
   final Event? event;

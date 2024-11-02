@@ -1,4 +1,4 @@
-import '../../models/gift.dart';
+import '../../old_models/gift.dart';
 import 'gift_sort_strategy.dart';
 
 class SortByGiftName implements GiftSortStrategy {

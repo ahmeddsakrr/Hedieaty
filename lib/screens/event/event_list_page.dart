@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../components/sort_buttons.dart';
 import '../../widgets/event/event_item.dart';
 import '../../widgets/event/event_dialog.dart';
-import '../../../models/event.dart';
+import '../../../old_models/event.dart';
 import '../../../strategies/event_sort_strategy.dart';
 import '../../../strategies/sort_by_name.dart';
 import '../../../strategies/sort_by_category.dart';

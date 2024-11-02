@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/gift.dart';
+import '../../old_models/gift.dart';
 import '../../components/custom_search_bar.dart';
 import '../../widgets/gift/gift_list_item.dart';
 

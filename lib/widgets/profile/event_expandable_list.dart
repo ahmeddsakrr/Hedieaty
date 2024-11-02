@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../gift/gift_list_item.dart';
-import '../../models/gift.dart';
+import '../../old_models/gift.dart';
 
 class EventExpandableList extends StatelessWidget {
   const EventExpandableList({super.key});

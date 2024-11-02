@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../components/sort_buttons.dart';
 import '../../widgets/gift/gift_list_item.dart';
-import '../../models/event.dart';
-import '../../models/gift.dart';
+import '../../old_models/event.dart';
+import '../../old_models/gift.dart';
 import '../../strategies/gift_sort_strategy.dart';
 import '../../strategies/sort_by_gift_name.dart';
 import '../../strategies/sort_by_gift_category.dart';
