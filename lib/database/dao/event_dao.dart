@@ -18,8 +18,8 @@ class EventDao {
     return (_db.select(_db.events)..where((e) => e.id.equals(id))).getSingleOrNull();
   }
 
-  Future<List<Event>> findEventsByUserId(String userId) {
-    return (_db.select(_db.events)..where((e) => e.userId.equals(userId))).get();
+  Future<List<Event>> findEventsByUserPhoneNumber(String phoneNumber) {
+    return (_db.select(_db.events)..where((e) => e.userId.equals(phoneNumber))).get();
   }
 
 }

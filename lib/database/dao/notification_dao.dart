@@ -14,7 +14,7 @@ class NotificationDao {
     return _db.select(_db.notifications).watch();
   }
 
-  Future<List<Notification>> getNotificationsForUser(String userId) {
-    return (_db.select(_db.notifications)..where((n) => n.userId.equals(userId))).get();
+  Future<List<Notification>> getNotificationsForUser(String phoneNumber) {
+    return (_db.select(_db.notifications)..where((n) => n.userId.equals(phoneNumber))).get();
   }
 }

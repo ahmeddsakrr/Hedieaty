@@ -14,7 +14,7 @@ class FriendDao {
     return _db.select(_db.friends).watch();
   }
 
-  Future<List<Friend>> findFriendsByUserId(String userId) {
-    return (_db.select(_db.friends)..where((f) => f.userId.equals(userId))).get();
+  Future<List<Friend>> findFriendsByUserPhoneNumber(String phoneNumber) {
+    return (_db.select(_db.friends)..where((f) => f.userId.equals(phoneNumber))).get();
   }
 }
