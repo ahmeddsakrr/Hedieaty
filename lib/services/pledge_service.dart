@@ -1,0 +1,12 @@
+import '../database/app_database.dart';
+import '../repositories/pledge_repository.dart';
+
+class PledgeService {
+  final PledgeRepository _pledgeRepository;
+
+  PledgeService(this._pledgeRepository);
+
+  Future<List<Pledge>> getPledgedGiftsForUser(String phoneNumber) async {
+    return await _pledgeRepository.getPledgesForUser(phoneNumber);
+  }
+}
