@@ -17,4 +17,12 @@ class GiftRepository {
   Future<List<Gift>> getGiftsForEvent(int eventId) {
     return _giftDao.getGiftsForEvent(eventId);
   }
+
+  Future<void> updateGift(Gift updatedGift) async {
+    await _giftDao.updateGift(updatedGift);
+  }
+
+  Future<void> deleteGift(int giftId) async {
+    await _giftDao.deleteGift(giftId);
+  }
 }
