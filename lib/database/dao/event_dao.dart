@@ -22,4 +22,16 @@ class EventDao {
     return (_db.select(_db.events)..where((e) => e.userId.equals(phoneNumber))).get();
   }
 
+  Future<void> updateEvent(Event updatedEvent) async {
+    await _db.update(_db.events).replace(updatedEvent);
+  }
+
+  Future<void> deleteEvent(int eventId) async {
+    await (_db.delete(_db.events)..where((e) => e.id.equals(eventId))).go();
+  }
+
+  Future<List<Event>> getAllEvents() {
+    return _db.select(_db.events).get();
+  }
+
 }

@@ -17,4 +17,12 @@ class EventRepository {
   Future<List<Event>> getEventsForUser(String phoneNumber) {
     return _eventDao.findEventsByUserPhoneNumber(phoneNumber);
   }
+
+  Future<void> updateEvent(Event updatedEvent) async {
+    await _eventDao.updateEvent(updatedEvent);
+  }
+
+  Future<void> deleteEvent(int eventId) async {
+    await _eventDao.deleteEvent(eventId);
+  }
 }

@@ -13,4 +13,20 @@ class EventService {
     final eventsForFriend = await getEventsForUser(phoneNumber);
     return eventsForFriend.where((event) => event.eventDate.isAfter(DateTime.now())).length;
   }
+
+  Future<void> addEvent(Event event) async {
+    await _eventRepository.addEvent(event);
+  }
+
+  Future<void> updateEvent(Event updatedEvent) async {
+    await _eventRepository.updateEvent(updatedEvent);
+  }
+
+  Future<void> deleteEvent(int eventId) async {
+    await _eventRepository.deleteEvent(eventId);
+  }
+
+  Stream<List<Event>> getAllEvents() {
+    return _eventRepository.getAllEvents();
+  }
 }
