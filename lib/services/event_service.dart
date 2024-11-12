@@ -5,12 +5,12 @@ class EventService {
   final EventRepository _eventRepository;
   EventService(this._eventRepository);
 
-  Future<List<Event>> getEventsForFriend(String friendPhoneNumber) async {
-    return await _eventRepository.getEventsForUser(friendPhoneNumber);
+  Future<List<Event>> getEventsForUser(String phoneNumber) async {
+    return await _eventRepository.getEventsForUser(phoneNumber);
   }
 
-  Future<int> getEventCountForFriend(String friendPhoneNumber) async {
-    final eventsForFriend = await getEventsForFriend(friendPhoneNumber);
+  Future<int> getEventCountForUser(String phoneNumber) async {
+    final eventsForFriend = await getEventsForUser(phoneNumber);
     return eventsForFriend.where((event) => event.eventDate.isAfter(DateTime.now())).length;
   }
 }
