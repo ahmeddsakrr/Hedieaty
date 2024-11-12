@@ -17,4 +17,8 @@ class UserDao {
   Future<User?> findUserByPhoneNumber(String phoneNumber) {
     return (_db.select(_db.users)..where((u) => u.phoneNumber.equals(phoneNumber))).getSingleOrNull();
   }
+
+  Future<void> updateUser(User updatedUser) async {
+    await _db.update(_db.users).replace(updatedUser);
+  }
 }

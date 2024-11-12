@@ -17,4 +17,8 @@ class UserRepository {
   Future<User?> getUserByPhoneNumber(String phoneNumber) {
     return _userDao.findUserByPhoneNumber(phoneNumber);
   }
+
+  Future<void> updateUser(User updatedUser) async {
+    await _userDao.updateUser(updatedUser);
+  }
 }
