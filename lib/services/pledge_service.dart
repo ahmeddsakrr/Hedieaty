@@ -9,4 +9,6 @@ class PledgeService {
   Future<List<Pledge>> getPledgedGiftsForUser(String phoneNumber) async {
     return await _pledgeRepository.getPledgesForUser(phoneNumber);
   }
+
+  // TODO: Implement the unpledgeGift method and update the state of the gift to available
 }
