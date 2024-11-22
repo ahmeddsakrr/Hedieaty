@@ -28,11 +28,14 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: _isDarkTheme ? AppTheme.darkTheme : AppTheme.lightTheme,
-      home: AuthPage(
-        onAuthComplete: () {
-          navigateWithAnimation(context, HomePage(toggleTheme: _toggleTheme));
-        },
+      home: Builder(
+        builder: (context) => AuthPage(
+          onAuthComplete: () {
+            navigateWithAnimation(context, HomePage(toggleTheme: _toggleTheme));
+          },
+        ),
       ),
+
     );
   }
 }
