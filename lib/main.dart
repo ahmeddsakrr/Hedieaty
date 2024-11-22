@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'view/styles/app_theme.dart';
 import 'view/screens/home/home_page.dart';
+import 'view/screens/auth/auth_page.dart';
+import 'controller/utils/navigation_utils.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,7 +28,11 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: _isDarkTheme ? AppTheme.darkTheme : AppTheme.lightTheme,
-      home: HomePage(toggleTheme: _toggleTheme),
+      home: AuthPage(
+        onAuthComplete: () {
+          navigateWithAnimation(context, HomePage(toggleTheme: _toggleTheme));
+        },
+      ),
     );
   }
 }
