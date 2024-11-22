@@ -7,7 +7,7 @@ import 'signup_form.dart';
 class AuthPage extends StatefulWidget {
   final VoidCallback onAuthComplete;
 
-  const AuthPage({Key? key, required this.onAuthComplete}) : super(key: key);
+  const AuthPage({super.key, required this.onAuthComplete});
 
   @override
   _AuthPageState createState() => _AuthPageState();
@@ -27,7 +27,6 @@ class _AuthPageState extends State<AuthPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Gradient
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -42,21 +41,30 @@ class _AuthPageState extends State<AuthPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Auth Title
                   const AuthTitle(
                     title: "Gift It, Track It, Love It!",
                     subtitle: "Manage your gifts like a pro",
                   ),
-
                   const SizedBox(height: 30),
-                  // Form Container
-                  FormContainer(
-                    child: isLogin
-                        ? LoginForm(onAuthComplete: widget.onAuthComplete)
-                        : SignupForm(onAuthComplete: widget.onAuthComplete),
+
+                  AnimatedCrossFade(
+                    firstChild: FormContainer(
+                      child: LoginForm(onAuthComplete: widget.onAuthComplete),
+                    ),
+                    secondChild: FormContainer(
+                      child: SignupForm(onAuthComplete: widget.onAuthComplete),
+                    ),
+                    crossFadeState: isLogin
+                        ? CrossFadeState.showFirst
+                        : CrossFadeState.showSecond,
+                    duration: const Duration(milliseconds: 500),
+                    firstCurve: Curves.easeInOut,
+                    secondCurve: Curves.easeInOut,
+                    sizeCurve: Curves.easeInOut,
                   ),
-                  const SizedBox(height: 10),
-                  // Toggle Button
+
+                  const SizedBox(height: 20),
+
                   TextButton(
                     onPressed: toggleAuthMode,
                     child: Text(
