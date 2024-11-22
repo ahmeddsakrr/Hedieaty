@@ -5,6 +5,8 @@ class CustomTextField extends StatelessWidget {
   final IconData icon;
   final bool obscureText;
   final TextInputType? keyboardType;
+  final String? Function(String?)? validator;
+  final TextEditingController controller;
 
   const CustomTextField({
     super.key,
@@ -12,13 +14,17 @@ class CustomTextField extends StatelessWidget {
     required this.icon,
     this.obscureText = false,
     this.keyboardType,
+    this.validator,
+    required this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
+      controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      validator: validator,
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white,
@@ -28,9 +34,6 @@ class CustomTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-      onTap: () {
-        print('Tapped on field: $label');
-      },
     );
   }
 }
