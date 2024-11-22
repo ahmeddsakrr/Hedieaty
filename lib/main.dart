@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
       home: Builder(
         builder: (context) => AuthPage(
           onAuthComplete: () {
-            navigateWithAnimation(context, HomePage(toggleTheme: _toggleTheme));
+            navigateWithAnimation(context, HomePage(toggleTheme: _toggleTheme), replace: true);
           },
         ),
       ),
