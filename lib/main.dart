@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'data/local/database/app_database.dart';
+import 'data/local/database/database_seeder.dart';
 import 'view/styles/app_theme.dart';
 import 'view/screens/home/home_page.dart';
 import 'view/screens/auth/auth_page.dart';
 import 'controller/utils/navigation_utils.dart';
 
-void main() {
+void main() async {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // final db = AppDatabase();
+  //
+  // final seeder = DatabaseSeeder(db);
+  // await seeder.seed(); // Run this only in debug mode or for testing
+
   runApp(const MyApp());
 }
 

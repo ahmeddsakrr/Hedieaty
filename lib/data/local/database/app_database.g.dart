@@ -13,9 +13,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   @override
   late final GeneratedColumn<String> phoneNumber = GeneratedColumn<String>(
       'phone_number', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'PRIMARY KEY NOT NULL');
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -307,7 +305,7 @@ class $FriendsTable extends Friends with TableInfo<$FriendsTable, Friend> {
       'user_id', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: true,
-      $customConstraints: 'REFERENCES users(phoneNumber) NOT NULL');
+      $customConstraints: 'REFERENCES users(phone_number) NOT NULL');
   static const VerificationMeta _friendUserIdMeta =
       const VerificationMeta('friendUserId');
   @override
@@ -315,7 +313,7 @@ class $FriendsTable extends Friends with TableInfo<$FriendsTable, Friend> {
       'friend_user_id', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: true,
-      $customConstraints: 'REFERENCES users(phoneNumber) NOT NULL');
+      $customConstraints: 'REFERENCES users(phone_number) NOT NULL');
   @override
   List<GeneratedColumn> get $columns => [id, userId, friendUserId];
   @override
@@ -529,7 +527,7 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
       'user_id', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: true,
-      $customConstraints: 'REFERENCES users(phoneNumber) NOT NULL');
+      $customConstraints: 'REFERENCES users(phone_number) NOT NULL');
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -1247,7 +1245,7 @@ class $PledgesTable extends Pledges with TableInfo<$PledgesTable, Pledge> {
       'user_id', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: true,
-      $customConstraints: 'REFERENCES users(phoneNumber) NOT NULL');
+      $customConstraints: 'REFERENCES users(phone_number) NOT NULL');
   static const VerificationMeta _pledgeDateMeta =
       const VerificationMeta('pledgeDate');
   @override
@@ -1503,7 +1501,7 @@ class $NotificationsTable extends Notifications
       'user_id', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: true,
-      $customConstraints: 'REFERENCES users(phoneNumber) NOT NULL');
+      $customConstraints: 'REFERENCES users(phone_number) NOT NULL');
   static const VerificationMeta _typeMeta = const VerificationMeta('type');
   @override
   late final GeneratedColumn<String> type = GeneratedColumn<String>(
@@ -1850,6 +1848,86 @@ typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
   Value<int> rowid,
 });
 
+final class $$UsersTableReferences
+    extends BaseReferences<_$AppDatabase, $UsersTable, User> {
+  $$UsersTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$FriendsTable, List<Friend>> _userFriendsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.friends,
+          aliasName:
+              $_aliasNameGenerator(db.users.phoneNumber, db.friends.userId));
+
+  $$FriendsTableProcessedTableManager get userFriends {
+    final manager = $$FriendsTableTableManager($_db, $_db.friends)
+        .filter((f) => f.userId.phoneNumber($_item.phoneNumber));
+
+    final cache = $_typedResult.readTableOrNull(_userFriendsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$FriendsTable, List<Friend>> _friendFriendsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.friends,
+          aliasName: $_aliasNameGenerator(
+              db.users.phoneNumber, db.friends.friendUserId));
+
+  $$FriendsTableProcessedTableManager get friendFriends {
+    final manager = $$FriendsTableTableManager($_db, $_db.friends)
+        .filter((f) => f.friendUserId.phoneNumber($_item.phoneNumber));
+
+    final cache = $_typedResult.readTableOrNull(_friendFriendsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$EventsTable, List<Event>> _eventsRefsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.events,
+          aliasName:
+              $_aliasNameGenerator(db.users.phoneNumber, db.events.userId));
+
+  $$EventsTableProcessedTableManager get eventsRefs {
+    final manager = $$EventsTableTableManager($_db, $_db.events)
+        .filter((f) => f.userId.phoneNumber($_item.phoneNumber));
+
+    final cache = $_typedResult.readTableOrNull(_eventsRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$PledgesTable, List<Pledge>> _pledgesRefsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.pledges,
+          aliasName:
+              $_aliasNameGenerator(db.users.phoneNumber, db.pledges.userId));
+
+  $$PledgesTableProcessedTableManager get pledgesRefs {
+    final manager = $$PledgesTableTableManager($_db, $_db.pledges)
+        .filter((f) => f.userId.phoneNumber($_item.phoneNumber));
+
+    final cache = $_typedResult.readTableOrNull(_pledgesRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$NotificationsTable, List<Notification>>
+      _notificationsRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.notifications,
+              aliasName: $_aliasNameGenerator(
+                  db.users.phoneNumber, db.notifications.userId));
+
+  $$NotificationsTableProcessedTableManager get notificationsRefs {
+    final manager = $$NotificationsTableTableManager($_db, $_db.notifications)
+        .filter((f) => f.userId.phoneNumber($_item.phoneNumber));
+
+    final cache = $_typedResult.readTableOrNull(_notificationsRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
 class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
   $$UsersTableFilterComposer({
     required super.$db,
@@ -1870,6 +1948,111 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
   ColumnFilters<String> get profilePictureUrl => $composableBuilder(
       column: $table.profilePictureUrl,
       builder: (column) => ColumnFilters(column));
+
+  Expression<bool> userFriends(
+      Expression<bool> Function($$FriendsTableFilterComposer f) f) {
+    final $$FriendsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.phoneNumber,
+        referencedTable: $db.friends,
+        getReferencedColumn: (t) => t.userId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$FriendsTableFilterComposer(
+              $db: $db,
+              $table: $db.friends,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> friendFriends(
+      Expression<bool> Function($$FriendsTableFilterComposer f) f) {
+    final $$FriendsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.phoneNumber,
+        referencedTable: $db.friends,
+        getReferencedColumn: (t) => t.friendUserId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$FriendsTableFilterComposer(
+              $db: $db,
+              $table: $db.friends,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> eventsRefs(
+      Expression<bool> Function($$EventsTableFilterComposer f) f) {
+    final $$EventsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.phoneNumber,
+        referencedTable: $db.events,
+        getReferencedColumn: (t) => t.userId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EventsTableFilterComposer(
+              $db: $db,
+              $table: $db.events,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> pledgesRefs(
+      Expression<bool> Function($$PledgesTableFilterComposer f) f) {
+    final $$PledgesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.phoneNumber,
+        referencedTable: $db.pledges,
+        getReferencedColumn: (t) => t.userId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$PledgesTableFilterComposer(
+              $db: $db,
+              $table: $db.pledges,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> notificationsRefs(
+      Expression<bool> Function($$NotificationsTableFilterComposer f) f) {
+    final $$NotificationsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.phoneNumber,
+        referencedTable: $db.notifications,
+        getReferencedColumn: (t) => t.userId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$NotificationsTableFilterComposer(
+              $db: $db,
+              $table: $db.notifications,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$UsersTableOrderingComposer
@@ -1915,6 +2098,111 @@ class $$UsersTableAnnotationComposer
 
   GeneratedColumn<String> get profilePictureUrl => $composableBuilder(
       column: $table.profilePictureUrl, builder: (column) => column);
+
+  Expression<T> userFriends<T extends Object>(
+      Expression<T> Function($$FriendsTableAnnotationComposer a) f) {
+    final $$FriendsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.phoneNumber,
+        referencedTable: $db.friends,
+        getReferencedColumn: (t) => t.userId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$FriendsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.friends,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<T> friendFriends<T extends Object>(
+      Expression<T> Function($$FriendsTableAnnotationComposer a) f) {
+    final $$FriendsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.phoneNumber,
+        referencedTable: $db.friends,
+        getReferencedColumn: (t) => t.friendUserId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$FriendsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.friends,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<T> eventsRefs<T extends Object>(
+      Expression<T> Function($$EventsTableAnnotationComposer a) f) {
+    final $$EventsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.phoneNumber,
+        referencedTable: $db.events,
+        getReferencedColumn: (t) => t.userId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EventsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.events,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<T> pledgesRefs<T extends Object>(
+      Expression<T> Function($$PledgesTableAnnotationComposer a) f) {
+    final $$PledgesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.phoneNumber,
+        referencedTable: $db.pledges,
+        getReferencedColumn: (t) => t.userId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$PledgesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.pledges,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<T> notificationsRefs<T extends Object>(
+      Expression<T> Function($$NotificationsTableAnnotationComposer a) f) {
+    final $$NotificationsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.phoneNumber,
+        referencedTable: $db.notifications,
+        getReferencedColumn: (t) => t.userId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$NotificationsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.notifications,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$UsersTableTableManager extends RootTableManager<
@@ -1926,9 +2214,14 @@ class $$UsersTableTableManager extends RootTableManager<
     $$UsersTableAnnotationComposer,
     $$UsersTableCreateCompanionBuilder,
     $$UsersTableUpdateCompanionBuilder,
-    (User, BaseReferences<_$AppDatabase, $UsersTable, User>),
+    (User, $$UsersTableReferences),
     User,
-    PrefetchHooks Function()> {
+    PrefetchHooks Function(
+        {bool userFriends,
+        bool friendFriends,
+        bool eventsRefs,
+        bool pledgesRefs,
+        bool notificationsRefs})> {
   $$UsersTableTableManager(_$AppDatabase db, $UsersTable table)
       : super(TableManagerState(
           db: db,
@@ -1968,9 +2261,87 @@ class $$UsersTableTableManager extends RootTableManager<
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map((e) =>
+                  (e.readTable(table), $$UsersTableReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: (
+              {userFriends = false,
+              friendFriends = false,
+              eventsRefs = false,
+              pledgesRefs = false,
+              notificationsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (userFriends) db.friends,
+                if (friendFriends) db.friends,
+                if (eventsRefs) db.events,
+                if (pledgesRefs) db.pledges,
+                if (notificationsRefs) db.notifications
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (userFriends)
+                    await $_getPrefetchedData(
+                        currentTable: table,
+                        referencedTable:
+                            $$UsersTableReferences._userFriendsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$UsersTableReferences(db, table, p0).userFriends,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.userId == item.phoneNumber),
+                        typedResults: items),
+                  if (friendFriends)
+                    await $_getPrefetchedData(
+                        currentTable: table,
+                        referencedTable:
+                            $$UsersTableReferences._friendFriendsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$UsersTableReferences(db, table, p0).friendFriends,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems.where(
+                                (e) => e.friendUserId == item.phoneNumber),
+                        typedResults: items),
+                  if (eventsRefs)
+                    await $_getPrefetchedData(
+                        currentTable: table,
+                        referencedTable:
+                            $$UsersTableReferences._eventsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$UsersTableReferences(db, table, p0).eventsRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.userId == item.phoneNumber),
+                        typedResults: items),
+                  if (pledgesRefs)
+                    await $_getPrefetchedData(
+                        currentTable: table,
+                        referencedTable:
+                            $$UsersTableReferences._pledgesRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$UsersTableReferences(db, table, p0).pledgesRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.userId == item.phoneNumber),
+                        typedResults: items),
+                  if (notificationsRefs)
+                    await $_getPrefetchedData(
+                        currentTable: table,
+                        referencedTable:
+                            $$UsersTableReferences._notificationsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$UsersTableReferences(db, table, p0)
+                                .notificationsRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.userId == item.phoneNumber),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
         ));
 }
 
@@ -1983,9 +2354,14 @@ typedef $$UsersTableProcessedTableManager = ProcessedTableManager<
     $$UsersTableAnnotationComposer,
     $$UsersTableCreateCompanionBuilder,
     $$UsersTableUpdateCompanionBuilder,
-    (User, BaseReferences<_$AppDatabase, $UsersTable, User>),
+    (User, $$UsersTableReferences),
     User,
-    PrefetchHooks Function()>;
+    PrefetchHooks Function(
+        {bool userFriends,
+        bool friendFriends,
+        bool eventsRefs,
+        bool pledgesRefs,
+        bool notificationsRefs})>;
 typedef $$FriendsTableCreateCompanionBuilder = FriendsCompanion Function({
   Value<int> id,
   required String userId,
@@ -1996,6 +2372,38 @@ typedef $$FriendsTableUpdateCompanionBuilder = FriendsCompanion Function({
   Value<String> userId,
   Value<String> friendUserId,
 });
+
+final class $$FriendsTableReferences
+    extends BaseReferences<_$AppDatabase, $FriendsTable, Friend> {
+  $$FriendsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $UsersTable _userIdTable(_$AppDatabase db) => db.users.createAlias(
+      $_aliasNameGenerator(db.friends.userId, db.users.phoneNumber));
+
+  $$UsersTableProcessedTableManager? get userId {
+    if ($_item.userId == null) return null;
+    final manager = $$UsersTableTableManager($_db, $_db.users)
+        .filter((f) => f.phoneNumber($_item.userId!));
+    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static $UsersTable _friendUserIdTable(_$AppDatabase db) =>
+      db.users.createAlias(
+          $_aliasNameGenerator(db.friends.friendUserId, db.users.phoneNumber));
+
+  $$UsersTableProcessedTableManager? get friendUserId {
+    if ($_item.friendUserId == null) return null;
+    final manager = $$UsersTableTableManager($_db, $_db.users)
+        .filter((f) => f.phoneNumber($_item.friendUserId!));
+    final item = $_typedResult.readTableOrNull(_friendUserIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
 
 class $$FriendsTableFilterComposer
     extends Composer<_$AppDatabase, $FriendsTable> {
@@ -2009,11 +2417,45 @@ class $$FriendsTableFilterComposer
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get userId => $composableBuilder(
-      column: $table.userId, builder: (column) => ColumnFilters(column));
+  $$UsersTableFilterComposer get userId {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableFilterComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 
-  ColumnFilters<String> get friendUserId => $composableBuilder(
-      column: $table.friendUserId, builder: (column) => ColumnFilters(column));
+  $$UsersTableFilterComposer get friendUserId {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.friendUserId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableFilterComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 }
 
 class $$FriendsTableOrderingComposer
@@ -2028,12 +2470,45 @@ class $$FriendsTableOrderingComposer
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get userId => $composableBuilder(
-      column: $table.userId, builder: (column) => ColumnOrderings(column));
+  $$UsersTableOrderingComposer get userId {
+    final $$UsersTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableOrderingComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 
-  ColumnOrderings<String> get friendUserId => $composableBuilder(
-      column: $table.friendUserId,
-      builder: (column) => ColumnOrderings(column));
+  $$UsersTableOrderingComposer get friendUserId {
+    final $$UsersTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.friendUserId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableOrderingComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 }
 
 class $$FriendsTableAnnotationComposer
@@ -2048,11 +2523,45 @@ class $$FriendsTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get userId =>
-      $composableBuilder(column: $table.userId, builder: (column) => column);
+  $$UsersTableAnnotationComposer get userId {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableAnnotationComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 
-  GeneratedColumn<String> get friendUserId => $composableBuilder(
-      column: $table.friendUserId, builder: (column) => column);
+  $$UsersTableAnnotationComposer get friendUserId {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.friendUserId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableAnnotationComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 }
 
 class $$FriendsTableTableManager extends RootTableManager<
@@ -2064,9 +2573,9 @@ class $$FriendsTableTableManager extends RootTableManager<
     $$FriendsTableAnnotationComposer,
     $$FriendsTableCreateCompanionBuilder,
     $$FriendsTableUpdateCompanionBuilder,
-    (Friend, BaseReferences<_$AppDatabase, $FriendsTable, Friend>),
+    (Friend, $$FriendsTableReferences),
     Friend,
-    PrefetchHooks Function()> {
+    PrefetchHooks Function({bool userId, bool friendUserId})> {
   $$FriendsTableTableManager(_$AppDatabase db, $FriendsTable table)
       : super(TableManagerState(
           db: db,
@@ -2098,9 +2607,54 @@ class $$FriendsTableTableManager extends RootTableManager<
             friendUserId: friendUserId,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map((e) =>
+                  (e.readTable(table), $$FriendsTableReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({userId = false, friendUserId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (userId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.userId,
+                    referencedTable: $$FriendsTableReferences._userIdTable(db),
+                    referencedColumn:
+                        $$FriendsTableReferences._userIdTable(db).phoneNumber,
+                  ) as T;
+                }
+                if (friendUserId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.friendUserId,
+                    referencedTable:
+                        $$FriendsTableReferences._friendUserIdTable(db),
+                    referencedColumn: $$FriendsTableReferences
+                        ._friendUserIdTable(db)
+                        .phoneNumber,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
         ));
 }
 
@@ -2113,9 +2667,9 @@ typedef $$FriendsTableProcessedTableManager = ProcessedTableManager<
     $$FriendsTableAnnotationComposer,
     $$FriendsTableCreateCompanionBuilder,
     $$FriendsTableUpdateCompanionBuilder,
-    (Friend, BaseReferences<_$AppDatabase, $FriendsTable, Friend>),
+    (Friend, $$FriendsTableReferences),
     Friend,
-    PrefetchHooks Function()>;
+    PrefetchHooks Function({bool userId, bool friendUserId})>;
 typedef $$EventsTableCreateCompanionBuilder = EventsCompanion Function({
   Value<int> id,
   required String userId,
@@ -2134,6 +2688,19 @@ typedef $$EventsTableUpdateCompanionBuilder = EventsCompanion Function({
 final class $$EventsTableReferences
     extends BaseReferences<_$AppDatabase, $EventsTable, Event> {
   $$EventsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $UsersTable _userIdTable(_$AppDatabase db) => db.users.createAlias(
+      $_aliasNameGenerator(db.events.userId, db.users.phoneNumber));
+
+  $$UsersTableProcessedTableManager? get userId {
+    if ($_item.userId == null) return null;
+    final manager = $$UsersTableTableManager($_db, $_db.users)
+        .filter((f) => f.phoneNumber($_item.userId!));
+    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
 
   static MultiTypedResultKey<$GiftsTable, List<Gift>> _giftsRefsTable(
           _$AppDatabase db) =>
@@ -2162,9 +2729,6 @@ class $$EventsTableFilterComposer
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get userId => $composableBuilder(
-      column: $table.userId, builder: (column) => ColumnFilters(column));
-
   ColumnFilters<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnFilters(column));
 
@@ -2173,6 +2737,26 @@ class $$EventsTableFilterComposer
 
   ColumnFilters<DateTime> get eventDate => $composableBuilder(
       column: $table.eventDate, builder: (column) => ColumnFilters(column));
+
+  $$UsersTableFilterComposer get userId {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableFilterComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 
   Expression<bool> giftsRefs(
       Expression<bool> Function($$GiftsTableFilterComposer f) f) {
@@ -2208,9 +2792,6 @@ class $$EventsTableOrderingComposer
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get userId => $composableBuilder(
-      column: $table.userId, builder: (column) => ColumnOrderings(column));
-
   ColumnOrderings<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnOrderings(column));
 
@@ -2219,6 +2800,26 @@ class $$EventsTableOrderingComposer
 
   ColumnOrderings<DateTime> get eventDate => $composableBuilder(
       column: $table.eventDate, builder: (column) => ColumnOrderings(column));
+
+  $$UsersTableOrderingComposer get userId {
+    final $$UsersTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableOrderingComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 }
 
 class $$EventsTableAnnotationComposer
@@ -2233,9 +2834,6 @@ class $$EventsTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get userId =>
-      $composableBuilder(column: $table.userId, builder: (column) => column);
-
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
 
@@ -2244,6 +2842,26 @@ class $$EventsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get eventDate =>
       $composableBuilder(column: $table.eventDate, builder: (column) => column);
+
+  $$UsersTableAnnotationComposer get userId {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableAnnotationComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 
   Expression<T> giftsRefs<T extends Object>(
       Expression<T> Function($$GiftsTableAnnotationComposer a) f) {
@@ -2278,7 +2896,7 @@ class $$EventsTableTableManager extends RootTableManager<
     $$EventsTableUpdateCompanionBuilder,
     (Event, $$EventsTableReferences),
     Event,
-    PrefetchHooks Function({bool giftsRefs})> {
+    PrefetchHooks Function({bool userId, bool giftsRefs})> {
   $$EventsTableTableManager(_$AppDatabase db, $EventsTable table)
       : super(TableManagerState(
           db: db,
@@ -2321,11 +2939,35 @@ class $$EventsTableTableManager extends RootTableManager<
               .map((e) =>
                   (e.readTable(table), $$EventsTableReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({giftsRefs = false}) {
+          prefetchHooksCallback: ({userId = false, giftsRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [if (giftsRefs) db.gifts],
-              addJoins: null,
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (userId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.userId,
+                    referencedTable: $$EventsTableReferences._userIdTable(db),
+                    referencedColumn:
+                        $$EventsTableReferences._userIdTable(db).phoneNumber,
+                  ) as T;
+                }
+
+                return state;
+              },
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (giftsRefs)
@@ -2357,7 +2999,7 @@ typedef $$EventsTableProcessedTableManager = ProcessedTableManager<
     $$EventsTableUpdateCompanionBuilder,
     (Event, $$EventsTableReferences),
     Event,
-    PrefetchHooks Function({bool giftsRefs})>;
+    PrefetchHooks Function({bool userId, bool giftsRefs})>;
 typedef $$GiftsTableCreateCompanionBuilder = GiftsCompanion Function({
   Value<int> id,
   required int eventId,
@@ -2761,6 +3403,19 @@ final class $$PledgesTableReferences
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: [item]));
   }
+
+  static $UsersTable _userIdTable(_$AppDatabase db) => db.users.createAlias(
+      $_aliasNameGenerator(db.pledges.userId, db.users.phoneNumber));
+
+  $$UsersTableProcessedTableManager? get userId {
+    if ($_item.userId == null) return null;
+    final manager = $$UsersTableTableManager($_db, $_db.users)
+        .filter((f) => f.phoneNumber($_item.userId!));
+    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
 }
 
 class $$PledgesTableFilterComposer
@@ -2774,9 +3429,6 @@ class $$PledgesTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get userId => $composableBuilder(
-      column: $table.userId, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get pledgeDate => $composableBuilder(
       column: $table.pledgeDate, builder: (column) => ColumnFilters(column));
@@ -2800,6 +3452,26 @@ class $$PledgesTableFilterComposer
             ));
     return composer;
   }
+
+  $$UsersTableFilterComposer get userId {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableFilterComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 }
 
 class $$PledgesTableOrderingComposer
@@ -2813,9 +3485,6 @@ class $$PledgesTableOrderingComposer
   });
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get userId => $composableBuilder(
-      column: $table.userId, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<DateTime> get pledgeDate => $composableBuilder(
       column: $table.pledgeDate, builder: (column) => ColumnOrderings(column));
@@ -2839,6 +3508,26 @@ class $$PledgesTableOrderingComposer
             ));
     return composer;
   }
+
+  $$UsersTableOrderingComposer get userId {
+    final $$UsersTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableOrderingComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 }
 
 class $$PledgesTableAnnotationComposer
@@ -2852,9 +3541,6 @@ class $$PledgesTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get userId =>
-      $composableBuilder(column: $table.userId, builder: (column) => column);
 
   GeneratedColumn<DateTime> get pledgeDate => $composableBuilder(
       column: $table.pledgeDate, builder: (column) => column);
@@ -2878,6 +3564,26 @@ class $$PledgesTableAnnotationComposer
             ));
     return composer;
   }
+
+  $$UsersTableAnnotationComposer get userId {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableAnnotationComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 }
 
 class $$PledgesTableTableManager extends RootTableManager<
@@ -2891,7 +3597,7 @@ class $$PledgesTableTableManager extends RootTableManager<
     $$PledgesTableUpdateCompanionBuilder,
     (Pledge, $$PledgesTableReferences),
     Pledge,
-    PrefetchHooks Function({bool giftId})> {
+    PrefetchHooks Function({bool giftId, bool userId})> {
   $$PledgesTableTableManager(_$AppDatabase db, $PledgesTable table)
       : super(TableManagerState(
           db: db,
@@ -2930,7 +3636,7 @@ class $$PledgesTableTableManager extends RootTableManager<
               .map((e) =>
                   (e.readTable(table), $$PledgesTableReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({giftId = false}) {
+          prefetchHooksCallback: ({giftId = false, userId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -2956,6 +3662,15 @@ class $$PledgesTableTableManager extends RootTableManager<
                         $$PledgesTableReferences._giftIdTable(db).id,
                   ) as T;
                 }
+                if (userId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.userId,
+                    referencedTable: $$PledgesTableReferences._userIdTable(db),
+                    referencedColumn:
+                        $$PledgesTableReferences._userIdTable(db).phoneNumber,
+                  ) as T;
+                }
 
                 return state;
               },
@@ -2978,7 +3693,7 @@ typedef $$PledgesTableProcessedTableManager = ProcessedTableManager<
     $$PledgesTableUpdateCompanionBuilder,
     (Pledge, $$PledgesTableReferences),
     Pledge,
-    PrefetchHooks Function({bool giftId})>;
+    PrefetchHooks Function({bool giftId, bool userId})>;
 typedef $$NotificationsTableCreateCompanionBuilder = NotificationsCompanion
     Function({
   Value<int> id,
@@ -2998,6 +3713,25 @@ typedef $$NotificationsTableUpdateCompanionBuilder = NotificationsCompanion
   Value<DateTime> createdAt,
 });
 
+final class $$NotificationsTableReferences
+    extends BaseReferences<_$AppDatabase, $NotificationsTable, Notification> {
+  $$NotificationsTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static $UsersTable _userIdTable(_$AppDatabase db) => db.users.createAlias(
+      $_aliasNameGenerator(db.notifications.userId, db.users.phoneNumber));
+
+  $$UsersTableProcessedTableManager? get userId {
+    if ($_item.userId == null) return null;
+    final manager = $$UsersTableTableManager($_db, $_db.users)
+        .filter((f) => f.phoneNumber($_item.userId!));
+    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
 class $$NotificationsTableFilterComposer
     extends Composer<_$AppDatabase, $NotificationsTable> {
   $$NotificationsTableFilterComposer({
@@ -3010,9 +3744,6 @@ class $$NotificationsTableFilterComposer
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get userId => $composableBuilder(
-      column: $table.userId, builder: (column) => ColumnFilters(column));
-
   ColumnFilters<String> get type => $composableBuilder(
       column: $table.type, builder: (column) => ColumnFilters(column));
 
@@ -3024,6 +3755,26 @@ class $$NotificationsTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  $$UsersTableFilterComposer get userId {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableFilterComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 }
 
 class $$NotificationsTableOrderingComposer
@@ -3038,9 +3789,6 @@ class $$NotificationsTableOrderingComposer
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get userId => $composableBuilder(
-      column: $table.userId, builder: (column) => ColumnOrderings(column));
-
   ColumnOrderings<String> get type => $composableBuilder(
       column: $table.type, builder: (column) => ColumnOrderings(column));
 
@@ -3052,6 +3800,26 @@ class $$NotificationsTableOrderingComposer
 
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  $$UsersTableOrderingComposer get userId {
+    final $$UsersTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableOrderingComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 }
 
 class $$NotificationsTableAnnotationComposer
@@ -3066,9 +3834,6 @@ class $$NotificationsTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get userId =>
-      $composableBuilder(column: $table.userId, builder: (column) => column);
-
   GeneratedColumn<String> get type =>
       $composableBuilder(column: $table.type, builder: (column) => column);
 
@@ -3080,6 +3845,26 @@ class $$NotificationsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$UsersTableAnnotationComposer get userId {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.phoneNumber,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableAnnotationComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 }
 
 class $$NotificationsTableTableManager extends RootTableManager<
@@ -3091,12 +3876,9 @@ class $$NotificationsTableTableManager extends RootTableManager<
     $$NotificationsTableAnnotationComposer,
     $$NotificationsTableCreateCompanionBuilder,
     $$NotificationsTableUpdateCompanionBuilder,
-    (
-      Notification,
-      BaseReferences<_$AppDatabase, $NotificationsTable, Notification>
-    ),
+    (Notification, $$NotificationsTableReferences),
     Notification,
-    PrefetchHooks Function()> {
+    PrefetchHooks Function({bool userId})> {
   $$NotificationsTableTableManager(_$AppDatabase db, $NotificationsTable table)
       : super(TableManagerState(
           db: db,
@@ -3140,9 +3922,47 @@ class $$NotificationsTableTableManager extends RootTableManager<
             createdAt: createdAt,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map((e) => (
+                    e.readTable(table),
+                    $$NotificationsTableReferences(db, table, e)
+                  ))
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({userId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (userId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.userId,
+                    referencedTable:
+                        $$NotificationsTableReferences._userIdTable(db),
+                    referencedColumn: $$NotificationsTableReferences
+                        ._userIdTable(db)
+                        .phoneNumber,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
         ));
 }
 
@@ -3155,12 +3975,9 @@ typedef $$NotificationsTableProcessedTableManager = ProcessedTableManager<
     $$NotificationsTableAnnotationComposer,
     $$NotificationsTableCreateCompanionBuilder,
     $$NotificationsTableUpdateCompanionBuilder,
-    (
-      Notification,
-      BaseReferences<_$AppDatabase, $NotificationsTable, Notification>
-    ),
+    (Notification, $$NotificationsTableReferences),
     Notification,
-    PrefetchHooks Function()>;
+    PrefetchHooks Function({bool userId})>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
