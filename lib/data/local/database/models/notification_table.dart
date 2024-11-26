@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-import 'user_table.dart';
 
 class Notifications extends Table {
   IntColumn get id => integer().autoIncrement()();

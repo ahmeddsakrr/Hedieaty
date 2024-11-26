@@ -4,8 +4,7 @@ class AuthTitle extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const AuthTitle({Key? key, required this.title, required this.subtitle})
-      : super(key: key);
+  const AuthTitle({super.key, required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {

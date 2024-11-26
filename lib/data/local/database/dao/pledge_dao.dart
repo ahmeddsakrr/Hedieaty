@@ -1,6 +1,4 @@
-import 'package:drift/drift.dart';
 import '../app_database.dart';
-import '../models/pledge_table.dart';
 
 class PledgeDao {
   final AppDatabase _db;

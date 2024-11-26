@@ -1,6 +1,4 @@
-import 'package:drift/drift.dart';
 import '../app_database.dart';
-import '../models/user_table.dart';
 
 class UserDao {
   final AppDatabase _db;

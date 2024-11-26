@@ -1,6 +1,5 @@
 import '../local/database/app_database.dart';
 import '../local/database/dao/friend_dao.dart';
-import '../local/database/models/friend_table.dart';
 
 class FriendRepository {
   final FriendDao _friendDao;

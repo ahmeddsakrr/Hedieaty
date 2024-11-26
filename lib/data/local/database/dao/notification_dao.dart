@@ -1,6 +1,4 @@
-import 'package:drift/drift.dart';
 import '../app_database.dart';
-import '../models/notification_table.dart';
 
 class NotificationDao {
   final AppDatabase _db;

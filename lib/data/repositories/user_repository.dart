@@ -1,6 +1,5 @@
 import '../local/database/app_database.dart';
 import '../local/database/dao/user_dao.dart';
-import '../local/database/models/user_table.dart';
 
 class UserRepository {
   final UserDao _userDao;

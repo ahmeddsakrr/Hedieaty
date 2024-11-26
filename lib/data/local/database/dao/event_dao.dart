@@ -1,6 +1,4 @@
-import 'package:drift/drift.dart';
 import '../app_database.dart';
-import '../models/event_table.dart';
 
 class EventDao {
   final AppDatabase _db;

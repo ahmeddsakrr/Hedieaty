@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class FormContainer extends StatelessWidget {
   final Widget child;
 
-  const FormContainer({Key? key, required this.child}) : super(key: key);
+  const FormContainer({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

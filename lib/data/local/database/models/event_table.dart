@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-import 'user_table.dart';
 
 class Events extends Table {
   IntColumn get id => integer().autoIncrement()();

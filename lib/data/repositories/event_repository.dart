@@ -1,6 +1,5 @@
 import '../local/database/app_database.dart';
 import '../local/database/dao/event_dao.dart';
-import '../local/database/models/event_table.dart';
 
 class EventRepository {
   final EventDao _eventDao;

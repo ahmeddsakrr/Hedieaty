@@ -1,6 +1,5 @@
 import '../local/database/app_database.dart';
 import '../local/database/dao/notification_dao.dart';
-import '../local/database/models/notification_table.dart';
 
 class NotificationRepository {
   final NotificationDao _notificationDao;

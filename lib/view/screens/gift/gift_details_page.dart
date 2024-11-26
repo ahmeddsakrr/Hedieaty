@@ -73,7 +73,7 @@ class _GiftDetailsPageState extends State<GiftDetailsPage> {
                 isEditable: !isLocked,
                 onGiftChanged: (updatedGift) {
                   setState(() {
-                    editableGift = updatedGift as Gift;
+                    editableGift = updatedGift;
                   });
                 },
               ),

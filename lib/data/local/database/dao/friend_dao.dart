@@ -1,6 +1,4 @@
-import 'package:drift/drift.dart';
 import '../app_database.dart';
-import '../models/friend_table.dart';
 
 class FriendDao {
   final AppDatabase _db;

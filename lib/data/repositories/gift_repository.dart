@@ -1,6 +1,5 @@
 import '../local/database/app_database.dart';
 import '../local/database/dao/gift_dao.dart';
-import '../local/database/models/gift_table.dart';
 
 class GiftRepository {
   final GiftDao _giftDao;

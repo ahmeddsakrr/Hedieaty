@@ -1,6 +1,4 @@
 import 'package:drift/drift.dart';
-import 'gift_table.dart';
-import 'user_table.dart';
 
 class Pledges extends Table {
   IntColumn get id => integer().autoIncrement()();

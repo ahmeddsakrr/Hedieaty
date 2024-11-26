@@ -1,6 +1,5 @@
 import '../local/database/app_database.dart';
 import '../local/database/dao/pledge_dao.dart';
-import '../local/database/models/pledge_table.dart';
 
 class PledgeRepository {
   final PledgeDao _pledgeDao;

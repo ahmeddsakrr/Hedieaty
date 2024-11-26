@@ -53,9 +53,9 @@ class _EventListPageState extends State<EventListPage> {
         onSave: (savedEvent) {
           setState(() {
             if (event != null && index != null) {
-              _events[index] = savedEvent as Event;
+              _events[index] = savedEvent;
             } else {
-              _events.add(savedEvent as Event);
+              _events.add(savedEvent);
               _listKey.currentState?.insertItem(_events.length - 1);
             }
 

@@ -1,6 +1,4 @@
-import 'package:drift/drift.dart';
 import '../app_database.dart';
-import '../models/gift_table.dart';
 
 class GiftDao {
   final AppDatabase _db;
