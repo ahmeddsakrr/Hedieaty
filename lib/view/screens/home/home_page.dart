@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hedieaty/controller/services/event_service.dart';
 import '../../../data/local/database/app_database.dart';
 import '../../../controller/services/friend_service.dart';
 import '../../components/custom_search_bar.dart';
@@ -20,6 +21,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FriendService _friendService = FriendService(AppDatabase());
+  final EventService _eventService = EventService(AppDatabase());
   List<User> friends = [];
   List<User> filteredFriends = [];
   String searchQuery = "";
@@ -60,6 +62,10 @@ class _HomePageState extends State<HomePage> {
         }).toList();
       }
     });
+  }
+
+  Future<int> _getEventCountForFriend(String phoneNumber) async {
+    return await _eventService.getEventCountForUser(phoneNumber);
   }
 
   @override
@@ -117,10 +123,24 @@ class _HomePageState extends State<HomePage> {
                 itemCount: filteredFriends.length,
                 itemBuilder: (context, index) {
                   final friend = filteredFriends[index];
-                  return FriendListItem(
-                    friendName: friend.name,
-                    eventsCount: index % 2 == 0 ? 1 : 0, // Placeholder logic for eventsCount
-                    onTap: () => navigateWithAnimation(context, const EventListPage()),
+                  return FutureBuilder<int>(
+                    future: _getEventCountForFriend(friend.phoneNumber),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting || snapshot.hasError) {
+                        return FriendListItem(
+                          friendName: friend.name,
+                          eventsCount: 0,
+                          onTap: () => navigateWithAnimation(context, const EventListPage()),
+                        );
+                      }
+                      final eventsCount = snapshot.data ?? 0;
+
+                      return FriendListItem(
+                        friendName: friend.name,
+                        eventsCount: eventsCount,
+                        onTap: () => navigateWithAnimation(context, const EventListPage()),
+                      );
+                    },
                   );
                 },
               ),

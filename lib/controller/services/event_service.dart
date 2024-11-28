@@ -3,7 +3,7 @@ import '../../data/repositories/event_repository.dart';
 
 class EventService {
   final EventRepository _eventRepository;
-  EventService(this._eventRepository);
+  EventService(AppDatabase db) : _eventRepository = EventRepository(db);
 
   Future<List<Event>> getEventsForUser(String phoneNumber) async {
     return await _eventRepository.getEventsForUser(phoneNumber);
