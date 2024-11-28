@@ -49,19 +49,21 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _searchFriends(String query) {
+  void _searchFriends(String query) async {
     setState(() {
       searchQuery = query;
-      if (query.isEmpty) {
-        filteredFriends = friends;
-      } else {
-        filteredFriends = friends.where((user) {
-          final name = user.name.toLowerCase();
-          final phoneNumber = user.phoneNumber.toLowerCase();
-          return name.contains(query.toLowerCase()) || phoneNumber.contains(query.toLowerCase());
-        }).toList();
-      }
     });
+
+    if (query.isEmpty) {
+      setState(() {
+        filteredFriends = friends;
+      });
+    } else {
+      final searchedFriends = await _friendService.searchFriends(placeholderUserId, query);
+      setState(() {
+        filteredFriends = searchedFriends;
+      });
+    }
   }
 
   Future<int> _getEventCountForFriend(String phoneNumber) async {
