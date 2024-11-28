@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../old_models/gift.dart';
+import '../../../old_models/old_gift.dart';
 
 class GiftForm extends StatefulWidget {
-  final Gift gift;
+  final OldGift gift;
   final bool isEditable;
-  final ValueChanged<Gift> onGiftChanged;
+  final ValueChanged<OldGift> onGiftChanged;
 
   const GiftForm({
     super.key,

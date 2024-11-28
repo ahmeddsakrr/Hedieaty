@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../old_models/gift.dart';
+import '../../../old_models/old_gift.dart';
 
 class GiftDialog extends StatefulWidget {
-  final Gift? gift;
-  final void Function(Gift) onSave;
+  final OldGift? gift;
+  final void Function(OldGift) onSave;
 
   const GiftDialog({super.key, this.gift, required this.onSave});
 
@@ -41,7 +41,7 @@ class _GiftDialogState extends State<GiftDialog> {
     });
 
     if (isNameValid && isCategoryValid) {
-      widget.onSave(Gift(
+      widget.onSave(OldGift(
         name: nameController.text,
         category: categoryController.text,
         status: selectedStatus,

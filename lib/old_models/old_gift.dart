@@ -1,4 +1,4 @@
-class Gift {
+class OldGift {
   final String name;
   final String category;
   final String status; // either pledged or available
@@ -6,7 +6,7 @@ class Gift {
   final double? price;
   final String? imageUrl;
 
-  Gift({
+  OldGift({
     required this.name,
     required this.category,
     required this.status,
@@ -15,7 +15,7 @@ class Gift {
     this.imageUrl,
   });
 
-  Gift copyWith({
+  OldGift copyWith({
     String? name,
     String? category,
     String? status,
@@ -23,7 +23,7 @@ class Gift {
     double? price,
     String? imageUrl,
   }) {
-    return Gift(
+    return OldGift(
       name: name ?? this.name,
       category: category ?? this.category,
       status: status ?? this.status,

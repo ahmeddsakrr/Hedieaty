@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../gift/gift_list_item.dart';
-import '../../../old_models/gift.dart';
+import '../../../old_models/old_gift.dart';
 
 class EventExpandableList extends StatelessWidget {
   const EventExpandableList({super.key});
@@ -20,7 +20,7 @@ class EventExpandableList extends StatelessWidget {
             eventDate: '2023-12-31',
             gifts: List.generate(
               3,
-                  (giftIndex) => Gift(
+                  (giftIndex) => OldGift(
                 name: 'Gift $giftIndex',
                 category: 'Category ${giftIndex % 3}',
                 status: giftIndex % 2 == 0 ? 'Available' : 'Pledged',
@@ -39,7 +39,7 @@ class EventExpandableList extends StatelessWidget {
 class EventItem extends StatefulWidget {
   final String eventName;
   final String eventDate;
-  final List<Gift> gifts;
+  final List<OldGift> gifts;
 
   const EventItem({
     super.key,

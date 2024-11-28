@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../widgets/gift/gift_header.dart';
 import '../../widgets/gift/gift_form.dart';
-import '../../../old_models/gift.dart';
+import '../../../old_models/old_gift.dart';
 
 class GiftDetailsPage extends StatefulWidget {
-  final Gift? gift;
+  final OldGift? gift;
   final bool isEditMode;
 
   const GiftDetailsPage({super.key, this.gift, required this.isEditMode});
@@ -14,14 +14,14 @@ class GiftDetailsPage extends StatefulWidget {
 }
 
 class _GiftDetailsPageState extends State<GiftDetailsPage> {
-  late Gift editableGift;
+  late OldGift editableGift;
   bool isLocked = false;
 
   @override
   void initState() {
     super.initState();
     editableGift = widget.gift ??
-        Gift(
+        OldGift(
           name: '',
           category: 'Electronics',
           status: 'Available',

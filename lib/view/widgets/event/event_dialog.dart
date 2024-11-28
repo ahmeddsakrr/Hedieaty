@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../old_models/event.dart';
+import 'package:hedieaty/controller/enums/event_status.dart';
+
+import '../../../data/local/database/app_database.dart';
 
 class EventDialog extends StatefulWidget {
   final Event? event;
@@ -14,7 +16,7 @@ class EventDialog extends StatefulWidget {
 class _EventDialogState extends State<EventDialog> {
   late TextEditingController nameController;
   late TextEditingController categoryController;
-  String selectedStatus = 'Upcoming';
+  String selectedStatus = EventStatus.upcoming.name;
   DateTime? selectedDate;
 
   bool isNameValid = true;
@@ -26,8 +28,8 @@ class _EventDialogState extends State<EventDialog> {
     super.initState();
     nameController = TextEditingController(text: widget.event?.name ?? '');
     categoryController = TextEditingController(text: widget.event?.category ?? '');
-    selectedStatus = widget.event?.status ?? 'Upcoming';
-    selectedDate = widget.event?.date;
+    selectedStatus = EventStatus.fromDateTime(widget.event!.eventDate).name;
+    selectedDate = widget.event?.eventDate;
   }
 
   @override
@@ -48,8 +50,9 @@ class _EventDialogState extends State<EventDialog> {
       widget.onSave(Event(
         name: nameController.text,
         category: categoryController.text,
-        status: selectedStatus,
-        date: selectedDate!,
+        eventDate: selectedDate!,
+        id: widget.event!.id,
+        userId: widget.event!.userId,
       ));
       Navigator.of(context).pop();
     }

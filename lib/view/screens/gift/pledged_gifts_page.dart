@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../old_models/gift.dart';
+import '../../../old_models/old_gift.dart';
 import '../../components/custom_search_bar.dart';
 import '../../widgets/gift/gift_list_item.dart';
 
@@ -11,18 +11,18 @@ class PledgedGiftsPage extends StatefulWidget {
 }
 
 class _PledgedGiftsPageState extends State<PledgedGiftsPage> {
-  List<Gift> pledgedGifts = [
-    Gift(name: 'Book', category: 'Books', status: 'Pledged', price: 12.99),
-    Gift(name: 'Headphones', category: 'Electronics', status: 'Pledged', price: 49.99),
-    Gift(name: 'Smartwatch', category: 'Electronics', status: 'Pledged', price: 99.99),
-    Gift(name: 'Sneakers', category: 'Fashion', status: 'Pledged', price: 59.99),
-    Gift(name: 'Sunglasses', category: 'Fashion', status: 'Pledged', price: 29.99),
-    Gift(name: 'Backpack', category: 'Fashion', status: 'Pledged', price: 39.99),
-    Gift(name: 'Coffee Maker', category: 'Home & Kitchen', status: 'Pledged', price: 24.99),
-    Gift(name: 'Blender', category: 'Home & Kitchen', status: 'Pledged', price: 34.99),
+  List<OldGift> pledgedGifts = [
+    OldGift(name: 'Book', category: 'Books', status: 'Pledged', price: 12.99),
+    OldGift(name: 'Headphones', category: 'Electronics', status: 'Pledged', price: 49.99),
+    OldGift(name: 'Smartwatch', category: 'Electronics', status: 'Pledged', price: 99.99),
+    OldGift(name: 'Sneakers', category: 'Fashion', status: 'Pledged', price: 59.99),
+    OldGift(name: 'Sunglasses', category: 'Fashion', status: 'Pledged', price: 29.99),
+    OldGift(name: 'Backpack', category: 'Fashion', status: 'Pledged', price: 39.99),
+    OldGift(name: 'Coffee Maker', category: 'Home & Kitchen', status: 'Pledged', price: 24.99),
+    OldGift(name: 'Blender', category: 'Home & Kitchen', status: 'Pledged', price: 34.99),
   ];
 
-  List<Gift> filteredGifts = [];
+  List<OldGift> filteredGifts = [];
   String searchQuery = "";
 
   @override
@@ -40,14 +40,14 @@ class _PledgedGiftsPageState extends State<PledgedGiftsPage> {
     });
   }
 
-  void _removePledgedGift(Gift gift) {
+  void _removePledgedGift(OldGift gift) {
     setState(() {
       pledgedGifts.remove(gift);
       filteredGifts = pledgedGifts.where((g) => g.name.toLowerCase().contains(searchQuery.toLowerCase())).toList();
     });
   }
 
-  Future<void> _confirmUnpledge(Gift gift) async {
+  Future<void> _confirmUnpledge(OldGift gift) async {
     final shouldUnpledge = await showDialog<bool>(
       context: context,
       builder: (context) {

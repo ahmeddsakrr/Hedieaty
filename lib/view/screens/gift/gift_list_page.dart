@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../data/local/database/app_database.dart';
 import '../../components/sort_buttons.dart';
 import '../../widgets/gift/gift_list_item.dart';
-import '../../../old_models/event.dart';
-import '../../../old_models/gift.dart';
+import '../../../old_models/old_gift.dart';
 import '../../../controller/strategies/gift_sort_strategy.dart';
 import '../../../controller/strategies/sort_by_gift_name.dart';
 import '../../../controller/strategies/sort_by_gift_category.dart';
@@ -22,7 +22,7 @@ class GiftListPage extends StatefulWidget {
 
 class _GiftListPageState extends State<GiftListPage> {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
-  List<Gift> _gifts = [];
+  List<OldGift> _gifts = [];
   final GiftSortContext _sortContext = GiftSortContext();
   GiftSortStrategy? _lastUsedSortStrategy;
 
@@ -31,7 +31,7 @@ class _GiftListPageState extends State<GiftListPage> {
     super.initState();
     _gifts = List.generate(
       10,
-          (index) => Gift(
+          (index) => OldGift(
         name: '${widget.event.name} Gift $index',
         category: 'Category ${index % 3}',
         status: index % 2 == 0 ? 'Pledged' : 'Available',
@@ -50,7 +50,7 @@ class _GiftListPageState extends State<GiftListPage> {
     });
   }
 
-  void _navigateToGiftDetails({Gift? gift, int? index}) async {
+  void _navigateToGiftDetails({OldGift? gift, int? index}) async {
     final result = await navigateWithAnimation(context, GiftDetailsPage(gift: gift, isEditMode: gift != null));
     if (result != null) {
       setState(() {

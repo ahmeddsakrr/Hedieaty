@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../old_models/gift.dart';
+import '../../../old_models/old_gift.dart';
 import '../../../controller/utils/date_utils.dart';
 
 class GiftListItem extends StatelessWidget {
-  final Gift gift;
+  final OldGift gift;
   final Animation<double>? animation;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;

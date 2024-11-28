@@ -29,4 +29,7 @@ class EventService {
   Stream<List<Event>> getAllEvents() {
     return _eventRepository.getAllEvents();
   }
+
+  // get even status for a given event
+
 }

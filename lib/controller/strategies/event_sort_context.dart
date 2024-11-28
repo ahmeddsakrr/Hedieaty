@@ -1,4 +1,4 @@
-import '../../old_models/event.dart';
+import '../../data/local/database/app_database.dart';
 import 'event_sort_strategy.dart';
 
 class EventSortContext {

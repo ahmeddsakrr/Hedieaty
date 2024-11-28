@@ -1,9 +1,9 @@
-import '../../old_models/gift.dart';
+import '../../old_models/old_gift.dart';
 import 'gift_sort_strategy.dart';
 
 class SortByGiftCategory implements GiftSortStrategy {
   @override
-  List<Gift> sort(List<Gift> gifts) {
+  List<OldGift> sort(List<OldGift> gifts) {
     gifts.sort((a, b) => a.category.compareTo(b.category));
     return gifts;
   }

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:hedieaty/controller/services/event_service.dart';
+import '../../../data/local/database/app_database.dart';
 import '../../components/sort_buttons.dart';
 import '../../widgets/event/event_item.dart';
 import '../../widgets/event/event_dialog.dart';
-import '../../../old_models/event.dart';
 import '../../../controller/strategies/event_sort_strategy.dart';
-import '../../../controller/strategies/sort_by_name.dart';
-import '../../../controller/strategies/sort_by_category.dart';
-import '../../../controller/strategies/sort_by_status.dart';
+import '../../../controller/strategies/sort_by_event_name.dart';
+import '../../../controller/strategies/sort_by_event_category.dart';
+import '../../../controller/strategies/sort_by_event_status.dart';
 import '../../../controller/strategies/event_sort_context.dart';
 import '../../screens/gift/gift_list_page.dart';
 import '../../../controller/utils/navigation_utils.dart';
+
+const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
 class EventListPage extends StatefulWidget {
   const EventListPage({super.key});
@@ -19,22 +22,32 @@ class EventListPage extends StatefulWidget {
 }
 
 class _EventListPageState extends State<EventListPage> {
+  final EventService _eventService = EventService(AppDatabase());
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   List<Event> _events = [];
   final EventSortContext _sortContext = EventSortContext();
   EventSortStrategy? _lastUsedSortStrategy;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _events = List.generate(10, (index) {
-      return Event(
-        name: 'Event $index',
-        category: 'Category $index',
-        status: index % 3 == 0 ? 'Upcoming' : (index % 3 == 1 ? 'Current' : 'Past'),
-        date: DateTime.now().add(Duration(days: index * 7)), // Sample date calculation
-      );
-    });
+    _fetchEvents();
+  }
+
+  Future<void> _fetchEvents() async {
+    try {
+      final eventList = await _eventService.getEventsForUser(placeholderUserId);
+      setState(() {
+        _events = eventList;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error fetching events: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void _sortBy(EventSortStrategy strategy) {
@@ -100,9 +113,9 @@ class _EventListPageState extends State<EventListPage> {
         child: Column(
           children: [
             SortButtons(
-              onSortByName: () => _sortBy(SortByName()),
-              onSortByCategory: () => _sortBy(SortByCategory()),
-              onSortByStatus: () => _sortBy(SortByStatus()),
+              onSortByName: () => _sortBy(SortByEventName()),
+              onSortByCategory: () => _sortBy(SortByEventCategory()),
+              onSortByStatus: () => _sortBy(SortByEventStatus()),
             ),
             Expanded(
               child: _events.isEmpty

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../old_models/event.dart';
 import 'package:intl/intl.dart';
+
+import '../../../data/local/database/app_database.dart';
+import '../../../controller/enums/event_status.dart';
 
 class EventItem extends StatelessWidget {
   final Event event;
@@ -24,12 +26,12 @@ class EventItem extends StatelessWidget {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     Color getStatusColor() {
-      switch (event.status) {
-        case 'Upcoming':
+      switch (EventStatus.fromDateTime(event.eventDate)) {
+        case EventStatus.upcoming:
           return isDarkMode ? Colors.amber.shade500 : Colors.amber.shade200;
-        case 'Current':
+        case EventStatus.current:
           return isDarkMode ? Colors.amber.shade700 : Colors.amber.shade400;
-        case 'Past':
+        case EventStatus.past:
           return isDarkMode ? Colors.amber.shade900 : Colors.amber.shade600;
         default:
           return theme.colorScheme.surfaceContainerHighest;
@@ -82,7 +84,7 @@ class EventItem extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  getFormattedDate(event.date),
+                                  getFormattedDate(event.eventDate),
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: theme.colorScheme.onSurfaceVariant,
                                   ),
@@ -119,7 +121,7 @@ class EventItem extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            event.status,
+                            EventStatus.fromDateTime(event.eventDate).name,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onPrimary,
                               fontWeight: FontWeight.w600,

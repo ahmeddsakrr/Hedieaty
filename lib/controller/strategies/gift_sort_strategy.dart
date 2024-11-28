@@ -1,5 +1,5 @@
-import '../../old_models/gift.dart';
+import '../../old_models/old_gift.dart';
 
 abstract class GiftSortStrategy {
-  List<Gift> sort(List<Gift> gifts);
+  List<OldGift> sort(List<OldGift> gifts);
 }
