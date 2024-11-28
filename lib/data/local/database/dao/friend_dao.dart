@@ -5,14 +5,15 @@ class FriendDao {
   FriendDao(this._db);
 
   Future<void> insertFriend(Friend friend) async {
-    await _db.into(_db.friends).insert(friend);
+    await _db.into(_db.friends).insertOnConflictUpdate(friend);
   }
 
   Stream<List<Friend>> watchAllFriends() {
     return _db.select(_db.friends).watch();
   }
 
-  Future<List<Friend>> findFriendsByUserPhoneNumber(String phoneNumber) {
-    return (_db.select(_db.friends)..where((f) => f.userId.equals(phoneNumber))).get();
+  /// Find all friends for a specific user by their phone number
+  Stream<List<Friend>> findFriendsByUserPhoneNumber(String phoneNumber) {
+    return (_db.select(_db.friends)..where((f) => f.userId.equals(phoneNumber))).watch();
   }
 }

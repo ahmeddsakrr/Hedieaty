@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../../data/local/database/app_database.dart';
+import '../../../controller/services/friend_service.dart';
 import '../../components/custom_search_bar.dart';
 import '../../widgets/friend/friend_list_item.dart';
 import '../event/event_list_page.dart';
 import '../profile/profile_page.dart';
-import '../../../controller/strategies/friend_search_context.dart';
-import '../../../controller/strategies/search_by_name.dart';
 import '../../../controller/utils/navigation_utils.dart';
+
+const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
 class HomePage extends StatefulWidget {
   final VoidCallback toggleTheme;
@@ -17,16 +19,32 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<String> friends = List.generate(10, (index) => 'Friend $index');
-  List<String> filteredFriends = [];
+  final FriendService _friendService = FriendService(AppDatabase());
+  List<User> friends = [];
+  List<User> filteredFriends = [];
   String searchQuery = "";
-  final SearchContext _searchContext = SearchContext();
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    filteredFriends = friends;
-    _searchContext.setSearchStrategy(SearchByName());
+    _fetchFriends();
+  }
+
+  Future<void> _fetchFriends() async {
+    try {
+      final friendList = await _friendService.getFriendsForUser(placeholderUserId);
+      setState(() {
+        friends = friendList;
+        filteredFriends = friends;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error fetching friends: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void _searchFriends(String query) {
@@ -35,7 +53,11 @@ class _HomePageState extends State<HomePage> {
       if (query.isEmpty) {
         filteredFriends = friends;
       } else {
-        filteredFriends = _searchContext.performSearch(friends, query);
+        filteredFriends = friends.where((user) {
+          final name = user.name.toLowerCase();
+          final phoneNumber = user.phoneNumber.toLowerCase();
+          return name.contains(query.toLowerCase()) || phoneNumber.contains(query.toLowerCase());
+        }).toList();
       }
     });
   }
@@ -60,7 +82,9 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: SafeArea(
-        child: Column(
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -92,9 +116,10 @@ class _HomePageState extends State<HomePage> {
                   : ListView.builder(
                 itemCount: filteredFriends.length,
                 itemBuilder: (context, index) {
+                  final friend = filteredFriends[index];
                   return FriendListItem(
-                    friendName: filteredFriends[index],
-                    eventsCount: index % 2 == 0 ? 1 : 0,
+                    friendName: friend.name,
+                    eventsCount: index % 2 == 0 ? 1 : 0, // Placeholder logic for eventsCount
                     onTap: () => navigateWithAnimation(context, const EventListPage()),
                   );
                 },

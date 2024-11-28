@@ -6,32 +6,28 @@ class FriendService {
   final FriendRepository _friendRepository;
   final UserRepository _userRepository;
 
-  FriendService(this._friendRepository, this._userRepository);
+  FriendService(AppDatabase db)
+      : _friendRepository = FriendRepository(db),
+        _userRepository = UserRepository(db);
 
-  Future<List<Friend>> getFriends() async {
-    return await _friendRepository.getAllFriends().first;
+  /// Fetch all friends for a specific user ID.
+  Future<List<User>> getFriendsForUser(String userId) async {
+    final friends = await _friendRepository.getAllFriendsForUser(userId);
+    final users = await Future.wait(
+      friends.map((friend) => _userRepository.getUserByPhoneNumber(friend.friendUserId)),
+    );
+    return users.whereType<User>().toList(); // Exclude null users
   }
 
-  Future<void> addFriend(Friend friend) async {
-    await _friendRepository.addFriend(friend);
-  }
-
-  Future<List<Friend>> searchFriends(String query) async {
-    final friends = await getFriends();
+  /// Search friends by name or phone number.
+  Future<List<User>> searchFriends(String userId, String query) async {
+    final friends = await getFriendsForUser(userId);
     final lowerQuery = query.toLowerCase();
 
-    final matchingFriends = await Future.wait(
-      friends.map((friend) async {
-        final user = await _userRepository.getUserByPhoneNumber(friend.friendUserId);
-        final name = user?.name.toLowerCase() ?? '';
-        final phoneNumber = friend.friendUserId.toLowerCase();
-
-        if (name.contains(lowerQuery) || phoneNumber.contains(lowerQuery)) {
-          return friend;
-        }
-        return null;
-      }),
-    );
-    return matchingFriends.whereType<Friend>().toList();
+    return friends.where((user) {
+      final name = user.name.toLowerCase();
+      final phoneNumber = user.phoneNumber.toLowerCase();
+      return name.contains(lowerQuery) || phoneNumber.contains(lowerQuery);
+    }).toList();
   }
 }

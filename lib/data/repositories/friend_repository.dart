@@ -9,11 +9,11 @@ class FriendRepository {
     await _friendDao.insertFriend(friend);
   }
 
-  Stream<List<Friend>> getAllFriends() {
+  Stream<List<Friend>> watchAllFriends() {
     return _friendDao.watchAllFriends();
   }
 
-  Future<List<Friend>> getFriendsForUser(String phoneNumber) {
-    return _friendDao.findFriendsByUserPhoneNumber(phoneNumber);
+  Future<List<Friend>> getAllFriendsForUser(String phoneNumber) async {
+    return await _friendDao.findFriendsByUserPhoneNumber(phoneNumber).first;
   }
 }
