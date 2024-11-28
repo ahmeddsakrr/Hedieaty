@@ -14,7 +14,15 @@ part 'app_database.g.dart';
 
 @DriftDatabase(tables: [Users, Friends, Events, Gifts, Pledges, Notifications])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  // static instance for the singleton pattern
+  static AppDatabase? _instance;
+  // private constructor
+  AppDatabase._() : super(_openConnection());
+  // factory constructor to return the singleton instance
+  factory AppDatabase() {
+    _instance ??= AppDatabase._();
+    return _instance!;
+  }
 
   @override
   int get schemaVersion => 1;
