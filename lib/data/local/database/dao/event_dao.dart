@@ -32,4 +32,7 @@ class EventDao {
     return _db.select(_db.events).get();
   }
 
+  Future<Event> getEvent(int eventId) async {
+    return (_db.select(_db.events)..where((e) => e.id.equals(eventId))).getSingle();
+  }
 }

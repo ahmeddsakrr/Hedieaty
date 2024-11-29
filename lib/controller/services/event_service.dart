@@ -30,4 +30,8 @@ class EventService {
     return _eventRepository.getAllEvents();
   }
 
+  Future<Event> getEvent(int eventId) async {
+    return await _eventRepository.getEvent(eventId);
+  }
+
 }

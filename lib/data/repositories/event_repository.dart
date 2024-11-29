@@ -24,4 +24,8 @@ class EventRepository {
   Future<void> deleteEvent(int eventId) async {
     await _eventDao.deleteEvent(eventId);
   }
+
+  Future<Event> getEvent(int eventId) async {
+    return await _eventDao.getEvent(eventId);
+  }
 }
