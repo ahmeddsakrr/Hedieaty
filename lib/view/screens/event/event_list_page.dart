@@ -70,19 +70,33 @@ class _EventListPageState extends State<EventListPage> {
       context: context,
       builder: (context) => EventDialog(
         event: event,
-        onSave: (savedEvent) {
-          setState(() {
-            if (event != null && index != null) {
-              _events[index] = savedEvent;
+        onSave: (savedEvent) async {
+          try {
+            if (event == null) {
+              // Adding new event
+              await _eventService.addEvent(savedEvent);
+              setState(() {
+                _events.add(savedEvent);
+                _listKey.currentState?.insertItem(_events.length - 1);
+              });
             } else {
-              _events.add(savedEvent);
-              _listKey.currentState?.insertItem(_events.length - 1);
+              // Editing existing event
+              await _eventService.updateEvent(savedEvent);
+              setState(() {
+                _events[index!] = savedEvent;
+              });
             }
-
             if (_lastUsedSortStrategy != null) {
               _sortBy(_lastUsedSortStrategy!);
             }
-          });
+          } catch (e) {
+            if (kDebugMode) {
+              print("Error saving event: $e");
+            }
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Failed to save event")),
+            );
+          }
         },
       ),
     );

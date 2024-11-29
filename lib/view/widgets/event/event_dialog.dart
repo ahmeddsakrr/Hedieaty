@@ -3,6 +3,9 @@ import 'package:hedieaty/controller/enums/event_status.dart';
 
 import '../../../data/local/database/app_database.dart';
 
+const String placeholderUserId = '1234567890'; // Placeholder for current user ID
+
+
 class EventDialog extends StatefulWidget {
   final Event? event;
   final void Function(Event) onSave;
@@ -47,13 +50,29 @@ class _EventDialogState extends State<EventDialog> {
     });
 
     if (isNameValid && isCategoryValid && isDateValid) {
-      widget.onSave(Event(
-        name: nameController.text,
-        category: categoryController.text,
-        eventDate: selectedDate!,
-        id: widget.event!.id,
-        userId: widget.event!.userId,
-      ));
+      Event newEvent;
+
+      if (widget.event != null) {
+        // Editing an existing event
+        newEvent = Event(
+          name: nameController.text,
+          category: categoryController.text,
+          eventDate: selectedDate!,
+          id: widget.event!.id,
+          userId: widget.event!.userId,
+        );
+      } else {
+        // Adding a new event
+        newEvent = Event(
+          name: nameController.text,
+          category: categoryController.text,
+          eventDate: selectedDate!,
+          id: 0,
+          userId: placeholderUserId,
+        );
+      }
+
+      widget.onSave(newEvent);
       Navigator.of(context).pop();
     }
   }
