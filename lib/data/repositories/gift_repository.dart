@@ -24,4 +24,8 @@ class GiftRepository {
   Future<void> deleteGift(int giftId) async {
     await _giftDao.deleteGift(giftId);
   }
+
+  Future<Gift> getGift(int giftId) async {
+    return await _giftDao.getGift(giftId);
+  }
 }

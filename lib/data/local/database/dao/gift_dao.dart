@@ -23,4 +23,8 @@ class GiftDao {
   Future<void> deleteGift(int giftId) async {
     await (_db.delete(_db.gifts)..where((g) => g.id.equals(giftId))).go();
   }
+
+  Future<Gift> getGift(int giftId) async {
+    return (_db.select(_db.gifts)..where((g) => g.id.equals(giftId))).getSingle();
+  }
 }
