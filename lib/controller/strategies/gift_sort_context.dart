@@ -1,4 +1,5 @@
-import '../../old_models/old_gift.dart';
+import 'package:hedieaty/data/local/database/app_database.dart';
+
 import 'gift_sort_strategy.dart';
 
 class GiftSortContext {
@@ -8,7 +9,7 @@ class GiftSortContext {
     _strategy = strategy;
   }
 
-  List<OldGift> sortGifts(List<OldGift> gifts) {
+  List<Gift> sortGifts(List<Gift> gifts) {
     return _strategy != null ? _strategy!.sort(gifts) : gifts;
   }
 }

@@ -1,5 +1,6 @@
-import '../../old_models/old_gift.dart';
+import 'package:hedieaty/data/local/database/app_database.dart';
+
 
 abstract class GiftSortStrategy {
-  List<OldGift> sort(List<OldGift> gifts);
+  List<Gift> sort(List<Gift> gifts);
 }
