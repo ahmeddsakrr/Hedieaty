@@ -4,7 +4,7 @@ import '../../data/repositories/user_repository.dart';
 class UserService {
   final UserRepository _userRepository;
 
-  UserService(this._userRepository);
+  UserService(AppDatabase db) : _userRepository = UserRepository(db);
 
   Future<User?> getUser(String phoneNumber) async {
     return await _userRepository.getUserByPhoneNumber(phoneNumber);
