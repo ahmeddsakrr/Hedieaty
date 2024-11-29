@@ -30,6 +30,4 @@ class EventService {
     return _eventRepository.getAllEvents();
   }
 
-  // get even status for a given event
-
 }

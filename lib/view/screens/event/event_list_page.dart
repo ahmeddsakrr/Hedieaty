@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/services/event_service.dart';
 import '../../../data/local/database/app_database.dart';
@@ -36,6 +37,9 @@ class _EventListPageState extends State<EventListPage> {
   }
 
   Future<void> _fetchEvents() async {
+    setState(() {
+      isLoading = true;
+    });
     try {
       final eventList = await _eventService.getEventsForUser(placeholderUserId);
       setState(() {
@@ -43,10 +47,13 @@ class _EventListPageState extends State<EventListPage> {
         isLoading = false;
       });
     } catch (e) {
-      print("Error fetching events: $e");
+      if (kDebugMode) {
+        print("Error fetching events: $e");
+      }
       setState(() {
         isLoading = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to load events")));
     }
   }
 
