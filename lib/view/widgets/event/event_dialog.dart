@@ -31,7 +31,9 @@ class _EventDialogState extends State<EventDialog> {
     super.initState();
     nameController = TextEditingController(text: widget.event?.name ?? '');
     categoryController = TextEditingController(text: widget.event?.category ?? '');
-    selectedStatus = EventStatus.fromDateTime(widget.event!.eventDate).name;
+    selectedStatus = widget.event?.eventDate != null
+        ? EventStatus.fromDateTime(widget.event!.eventDate).name
+        : EventStatus.upcoming.name;
     selectedDate = widget.event?.eventDate;
   }
 
