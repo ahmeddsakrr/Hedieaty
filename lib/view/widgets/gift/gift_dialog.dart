@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../old_models/old_gift.dart';
+
+import '../../../data/local/database/app_database.dart';
 
 class GiftDialog extends StatefulWidget {
-  final OldGift? gift;
-  final void Function(OldGift) onSave;
+  final Gift? gift;
+  final void Function(Gift) onSave;
 
   const GiftDialog({super.key, this.gift, required this.onSave});
 
@@ -41,11 +42,25 @@ class _GiftDialogState extends State<GiftDialog> {
     });
 
     if (isNameValid && isCategoryValid) {
-      widget.onSave(OldGift(
-        name: nameController.text,
-        category: categoryController.text,
-        status: selectedStatus,
-      ));
+      Gift newGift;
+      if (widget.gift != null) {
+        // Update existing gift
+        newGift = widget.gift!.copyWith(
+          name: nameController.text,
+          category: categoryController.text,
+          status: selectedStatus,
+        );
+      } else {
+        // Add new gift
+        newGift = Gift(
+          name: nameController.text,
+          category: categoryController.text,
+          status: selectedStatus,
+          id: 0,
+          eventId: widget.gift!.eventId,
+        );
+      }
+      widget.onSave(newGift);
       Navigator.of(context).pop();
     }
   }
