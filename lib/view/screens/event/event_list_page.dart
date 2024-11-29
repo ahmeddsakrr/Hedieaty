@@ -82,6 +82,7 @@ class _EventListPageState extends State<EventListPage> {
   }
 
   void _removeEvent(int index) {
+    _eventService.deleteEvent(_events[index].id);
     final removedEvent = _events.removeAt(index);
     _listKey.currentState?.removeItem(index, (context, animation) {
       return EventItem(
