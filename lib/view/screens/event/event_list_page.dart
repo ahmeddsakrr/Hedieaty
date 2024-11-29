@@ -102,6 +102,33 @@ class _EventListPageState extends State<EventListPage> {
     );
   }
 
+  void _showDeleteConfirmationDialog(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Event'),
+          content: const Text('Are you sure you want to delete this event?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _removeEvent(index); // Call delete action
+                Navigator.of(context).pop();
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _removeEvent(int index) async {
     try {
       await _eventService.deleteEvent(_events[index].id);
@@ -164,7 +191,7 @@ class _EventListPageState extends State<EventListPage> {
                     event: _events[index],
                     animation: animation,
                     onEdit: () => _showEventDialog(event: _events[index], index: index),
-                    onDelete: () => _removeEvent(index),
+                    onDelete: () => _showDeleteConfirmationDialog(index),
                     onTap: () => navigateWithAnimation(context, GiftListPage(event: _events[index])),
                   );
                 },
