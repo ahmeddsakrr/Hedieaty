@@ -1,14 +1,43 @@
+import 'package:hedieaty/controller/services/gift_service.dart';
+
 import '../../data/local/database/app_database.dart';
 import '../../data/repositories/pledge_repository.dart';
 
 class PledgeService {
   final PledgeRepository _pledgeRepository;
+  final GiftService _giftService;
 
-  PledgeService(this._pledgeRepository);
+  PledgeService(AppDatabase db) : _pledgeRepository = PledgeRepository(db), _giftService = GiftService(db);
 
-  Future<List<Pledge>> getPledgedGiftsForUser(String phoneNumber) async {
-    return await _pledgeRepository.getPledgesForUser(phoneNumber);
+  Future<List<Gift>> getPledgedGiftsForUser(String phoneNumber) async {
+    final pledges = await _pledgeRepository.getPledgesForUser(phoneNumber);
+    final gifts = await Future.wait(pledges.map((pledge) => _giftService.getGift(pledge.giftId)));
+    return gifts.whereType<Gift>().toList(); // Exclude null gifts
   }
 
-  // TODO: Implement the unpledgeGift method and update the state of the gift to available
+  Future<List<Gift>> searchPledgedGifts(String phoneNumber, String query) async {
+    final pledgedGifts = await getPledgedGiftsForUser(phoneNumber);
+    final lowerQuery = query.toLowerCase();
+
+    return pledgedGifts.where((gift) {
+      final name = gift.name.toLowerCase();
+      final description = gift.description?.toLowerCase() ?? '';
+      final category = gift.category.toLowerCase();
+      final price = gift.price?.toString() ?? '';
+      final status = gift.status.toLowerCase();
+
+      return name.contains(lowerQuery) ||
+          description.contains(lowerQuery) ||
+          category.contains(lowerQuery) ||
+          price.contains(lowerQuery) ||
+          status.contains(lowerQuery);
+    }).toList();
+  }
+
+  Future<void> unpledgeGift(String phoneNumber, int giftId) async {
+    await _pledgeRepository.deletePledge(phoneNumber, giftId);
+    // Update the status of the gift to available
+    final gift = await _giftService.getGift(giftId);
+    await _giftService.updateGift(gift.copyWith(status: 'Available'));
+  }
 }
