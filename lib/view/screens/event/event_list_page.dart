@@ -88,19 +88,26 @@ class _EventListPageState extends State<EventListPage> {
     );
   }
 
-  void _removeEvent(int index) {
-    _eventService.deleteEvent(_events[index].id);
-    final removedEvent = _events.removeAt(index);
-    _listKey.currentState?.removeItem(index, (context, animation) {
-      return EventItem(
-        event: removedEvent,
-        animation: animation,
-        onEdit: () {},
-        onDelete: () {},
-        onTap: () {},
-      );
-    });
-    setState(() {});
+  void _removeEvent(int index) async {
+    try {
+      await _eventService.deleteEvent(_events[index].id);
+      final removedEvent = _events.removeAt(index);
+      _listKey.currentState?.removeItem(index, (context, animation) {
+        return EventItem(
+          event: removedEvent,
+          animation: animation,
+          onEdit: () {},
+          onDelete: () {},
+          onTap: () {},
+        );
+      });
+      setState(() {});
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error deleting event: $e");
+      }
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to delete event")));
+    }
   }
 
   @override
