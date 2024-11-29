@@ -16,4 +16,8 @@ class PledgeRepository {
   Future<List<Pledge>> getPledgesForUser(String phoneNumber) {
     return _pledgeDao.getPledgesForUser(phoneNumber);
   }
+
+  Future<void> deletePledge(String phoneNumber, int giftId) async {
+    await _pledgeDao.deletePledge(phoneNumber, giftId);
+  }
 }

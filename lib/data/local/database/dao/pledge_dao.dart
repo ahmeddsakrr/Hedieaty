@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart';
+
 import '../app_database.dart';
 
 class PledgeDao {
@@ -14,5 +16,9 @@ class PledgeDao {
 
   Future<List<Pledge>> getPledgesForUser(String phoneNumber) {
     return (_db.select(_db.pledges)..where((p) => p.userId.equals(phoneNumber))).get();
+  }
+
+  Future<void> deletePledge(String phoneNumber, int giftId) async {
+    await (_db.delete(_db.pledges)..where((p) => p.userId.equals(phoneNumber) & p.giftId.equals(giftId))).go();
   }
 }
