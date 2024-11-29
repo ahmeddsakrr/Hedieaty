@@ -1,34 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:hedieaty/controller/services/event_service.dart';
+import 'package:hedieaty/controller/services/gift_service.dart';
+import 'package:hedieaty/controller/utils/date_utils.dart';
+import '../../../data/local/database/app_database.dart';
 import '../gift/gift_list_item.dart';
-import '../../../old_models/old_gift.dart';
+
+const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
 class EventExpandableList extends StatelessWidget {
   const EventExpandableList({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final GiftService _giftService = GiftService(AppDatabase());
+    final EventService _eventService = EventService(AppDatabase());
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ListView.builder(
-        itemCount: 5,
-        shrinkWrap: false,
-        physics: const ClampingScrollPhysics(),
-        itemBuilder: (context, index) {
-          return EventItem(
-            eventName: 'Event $index',
-            eventDate: '2023-12-31',
-            gifts: List.generate(
-              3,
-                  (giftIndex) => OldGift(
-                name: 'Gift $giftIndex',
-                category: 'Category ${giftIndex % 3}',
-                status: giftIndex % 2 == 0 ? 'Available' : 'Pledged',
-                description: 'Description for Gift $giftIndex',
-                price: 20.0 + giftIndex * 5,
-                imageUrl: null,
-              ),
-            ),
+      child: FutureBuilder<List<Event>>(
+        future: _eventService.getEventsForUser(placeholderUserId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No events found.'));
+          }
+          final events = snapshot.data!;
+          return ListView.builder(
+            itemCount: events.length,
+            shrinkWrap: false,
+            physics: const ClampingScrollPhysics(),
+            itemBuilder: (context, index) {
+              final event = events[index];
+              return FutureBuilder<List<Gift>>(
+                future: _giftService.getGiftsForEvent(event.id),
+                builder: (context, giftSnapshot) {
+                  if (giftSnapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
+                  if (giftSnapshot.hasError) {
+                    return Text('Error fetching gifts: ${giftSnapshot.error}');
+                  }
+                  final gifts = giftSnapshot.data ?? [];
+                  return EventItem(
+                    eventName: event.name,
+                    eventDate: getFormattedDate(event.eventDate),
+                    gifts: gifts,
+                  );
+                },
+              );
+            },
           );
         },
       ),
@@ -39,7 +64,7 @@ class EventExpandableList extends StatelessWidget {
 class EventItem extends StatefulWidget {
   final String eventName;
   final String eventDate;
-  final List<OldGift> gifts;
+  final List<Gift> gifts;
 
   const EventItem({
     super.key,

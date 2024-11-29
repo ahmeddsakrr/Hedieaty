@@ -4,12 +4,14 @@ class ProfileInfoField extends StatefulWidget {
   final String label;
   final TextEditingController controller;
   final String? Function(String?)? validator;
+  final Future<void> Function()? onSaved;
 
   const ProfileInfoField({
     super.key,
     required this.label,
     required this.controller,
     this.validator,
+    this.onSaved,
   });
 
   @override
@@ -27,6 +29,9 @@ class _ProfileInfoFieldState extends State<ProfileInfoField> {
         setState(() {
           isEditable = false;
         });
+        if (widget.onSaved != null) {
+          widget.onSaved!();
+        }
       }
     } else {
       // Switch to edit mode
