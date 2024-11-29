@@ -1,35 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:hedieaty/controller/enums/gift_status.dart';
+import '../../../data/local/database/app_database.dart';
 import '../../widgets/gift/gift_header.dart';
 import '../../widgets/gift/gift_form.dart';
-import '../../../old_models/old_gift.dart';
 
 class GiftDetailsPage extends StatefulWidget {
-  final OldGift? gift;
+  final Gift? gift;
   final bool isEditMode;
+  final eventId;
 
-  const GiftDetailsPage({super.key, this.gift, required this.isEditMode});
+  const GiftDetailsPage({super.key, this.gift, required this.isEditMode, required this.eventId});
 
   @override
   _GiftDetailsPageState createState() => _GiftDetailsPageState();
 }
 
 class _GiftDetailsPageState extends State<GiftDetailsPage> {
-  late OldGift editableGift;
+  late Gift editableGift;
   bool isLocked = false;
+  bool isLockedStatus = false;
+
 
   @override
   void initState() {
     super.initState();
     editableGift = widget.gift ??
-        OldGift(
+        Gift(
           name: '',
           category: 'Electronics',
           status: 'Available',
           description: '',
           price: 0.0,
           imageUrl: null,
+          id: 0, // database will assign an ID
+          eventId: widget.eventId
         );
-    isLocked = widget.isEditMode && editableGift.status == 'Pledged';
+    GiftStatus status = GiftStatus.fromString(editableGift.status);
+    isLockedStatus = status == GiftStatus.pledged;
+    isLocked = widget.isEditMode && isLockedStatus;
   }
 
   void _saveGift() {
@@ -40,7 +48,9 @@ class _GiftDetailsPageState extends State<GiftDetailsPage> {
     }
 
     setState(() {
-      isLocked = editableGift.status == 'Pledged';
+      GiftStatus status = GiftStatus.fromString(editableGift.status);
+      isLockedStatus = status == GiftStatus.pledged;
+      isLocked = isLockedStatus;
     });
     Navigator.of(context).pop(editableGift);
   }

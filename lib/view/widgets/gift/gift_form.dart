@@ -1,10 +1,12 @@
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
-import '../../../old_models/old_gift.dart';
+import 'package:hedieaty/controller/enums/gift_status.dart';
+import 'package:hedieaty/data/local/database/app_database.dart';
 
 class GiftForm extends StatefulWidget {
-  final OldGift gift;
+  final Gift gift;
   final bool isEditable;
-  final ValueChanged<OldGift> onGiftChanged;
+  final ValueChanged<Gift> onGiftChanged;
 
   const GiftForm({
     super.key,
@@ -36,7 +38,8 @@ class _GiftFormState extends State<GiftForm> {
     priceController = TextEditingController(text: widget.gift.price?.toString() ?? '');
 
     category = categories.contains(widget.gift.category) ? widget.gift.category : 'Electronics';
-    isPledged = widget.gift.status == 'Pledged';
+    GiftStatus giftStatus = GiftStatus.fromString(widget.gift.status);
+    isPledged = giftStatus == GiftStatus.pledged;
   }
 
   void _validateFields() {
@@ -52,9 +55,9 @@ class _GiftFormState extends State<GiftForm> {
       widget.onGiftChanged(
         widget.gift.copyWith(
           name: nameController.text,
-          description: descriptionController.text,
+          description: drift.Value(descriptionController.text),
           category: category,
-          price: double.tryParse(priceController.text),
+          price: drift.Value(double.tryParse(priceController.text)),
           status: isPledged ? 'Pledged' : 'Available',
         ),
       );
@@ -67,10 +70,11 @@ class _GiftFormState extends State<GiftForm> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     Color getStatusColor() {
-      switch (widget.gift.status) {
-        case 'Pledged':
+      GiftStatus status = GiftStatus.fromString(widget.gift.status);
+      switch (status) {
+        case GiftStatus.pledged:
           return isDarkMode ? Colors.tealAccent : Colors.teal;
-        case 'Available':
+        case GiftStatus.available:
           return isDarkMode ? Colors.lightGreenAccent : Colors.lightGreen;
         default:
           return theme.colorScheme.surfaceContainerHighest;

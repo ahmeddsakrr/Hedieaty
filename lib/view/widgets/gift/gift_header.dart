@@ -38,7 +38,7 @@ class GiftHeader extends StatelessWidget {
             right: 16,
             child: FloatingActionButton(
               onPressed: () {
-                // Code to open image picker and upload image
+                // TODO : code to open image picker and upload image
               },
               backgroundColor: theme.colorScheme.primary,
               child: const Icon(Icons.camera_alt),

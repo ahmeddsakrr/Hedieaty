@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../old_models/old_gift.dart';
+import 'package:hedieaty/controller/enums/gift_status.dart';
+import 'package:hedieaty/data/local/database/app_database.dart';
 import '../../../controller/utils/date_utils.dart';
 
 class GiftListItem extends StatelessWidget {
-  final OldGift gift;
+  final Gift gift;
   final Animation<double>? animation;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
@@ -32,10 +33,11 @@ class GiftListItem extends StatelessWidget {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     Color getStatusColor() {
-      switch (gift.status) {
-        case 'Pledged':
+      GiftStatus status = GiftStatus.fromString(gift.status);
+      switch (status) {
+        case GiftStatus.pledged:
           return isDarkMode ? Colors.tealAccent : Colors.teal;
-        case 'Available':
+        case GiftStatus.available:
           return isDarkMode ? Colors.lightGreenAccent : Colors.lightGreen;
         default:
           return theme.colorScheme.surfaceContainerHighest;
