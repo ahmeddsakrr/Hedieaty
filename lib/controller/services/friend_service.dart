@@ -1,20 +1,21 @@
+import 'package:hedieaty/controller/services/user_service.dart';
+
 import '../../data/local/database/app_database.dart';
 import '../../data/repositories/friend_repository.dart';
-import '../../data/repositories/user_repository.dart';
 
 class FriendService {
   final FriendRepository _friendRepository;
-  final UserRepository _userRepository;
+  final UserService _userService;
 
   FriendService(AppDatabase db)
       : _friendRepository = FriendRepository(db),
-        _userRepository = UserRepository(db);
+        _userService = UserService(db);
 
   /// Fetch all friends for a specific user ID.
   Future<List<User>> getFriendsForUser(String userId) async {
     final friends = await _friendRepository.getAllFriendsForUser(userId);
     final users = await Future.wait(
-      friends.map((friend) => _userRepository.getUserByPhoneNumber(friend.friendUserId)),
+      friends.map((friend) => _userService.getUser(friend.friendUserId)),
     );
     return users.whereType<User>().toList(); // Exclude null users
   }
