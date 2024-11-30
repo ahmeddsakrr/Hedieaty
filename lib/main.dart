@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'data/local/database/app_database.dart';
 import 'data/local/database/database_seeder.dart';
@@ -7,12 +8,13 @@ import 'view/screens/auth/auth_page.dart';
 import 'controller/utils/navigation_utils.dart';
 
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   // final db = AppDatabase();
   //
   // final seeder = DatabaseSeeder(db);
   // await seeder.seed(); // Run this only in debug mode or for testing
 
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
