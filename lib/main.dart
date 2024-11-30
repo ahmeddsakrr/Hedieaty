@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'data/local/database/app_database.dart';
 import 'data/local/database/database_seeder.dart';
@@ -14,7 +15,9 @@ void main() async {
   // final seeder = DatabaseSeeder(db);
   // await seeder.seed(); // Run this only in debug mode or for testing
 
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
