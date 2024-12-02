@@ -1,4 +1,4 @@
-import '../../../controller/utils/date_utils.dart';
+import 'package:hedieaty/controller/utils/date_utils.dart';
 
 class RemoteEvent {
   final int id;
