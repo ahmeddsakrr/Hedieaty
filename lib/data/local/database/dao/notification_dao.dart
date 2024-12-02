@@ -19,4 +19,8 @@ class NotificationDao {
   Future<void> insertOrUpdateNotification(Notification notification) async {
     await _db.into(_db.notifications).insertOnConflictUpdate(notification);
   }
+
+  Future<void> deleteNotification(int notificationId) async {
+    await (_db.delete(_db.notifications)..where((n) => n.id.equals(notificationId))).go();
+  }
 }
