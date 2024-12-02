@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/gift.dart';
 
@@ -36,5 +38,9 @@ class GiftDAO {
         .map((docSnapshot) {
         return Gift.fromMap(docSnapshot.data()!);
     });
+  }
+
+  Future<void> updateGiftStatus(int giftId, String status) async {
+    await _firestore.collection('gifts').doc(giftId.toString()).update({'status': status});
   }
 }

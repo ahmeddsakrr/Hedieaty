@@ -50,4 +50,10 @@ class GiftRepository {
   Stream<RemoteGift.Gift> getGift(int giftId) {
     return _remoteGiftDao.getGift(giftId);
   }
+
+  Future<void> updateGiftStatus(int giftId, String status) async {
+    await _remoteGiftDao.updateGiftStatus(giftId, status);
+    final gift = await getGift(giftId).first;
+    await _localGiftDao.insertOrUpdateGift(GiftAdapter.fromRemote(gift));
+  }
 }
