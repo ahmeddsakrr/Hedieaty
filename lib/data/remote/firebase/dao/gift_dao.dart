@@ -24,4 +24,9 @@ class GiftDAO {
   Future<void> deleteGift(int giftId) async {
     await _firestore.collection('gifts').doc(giftId.toString()).delete();
   }
+
+  Future<Gift> getGift(int giftId) async {
+    final querySnapshot = await _firestore.collection('gifts').doc(giftId.toString()).get();
+    return Gift.fromMap(querySnapshot.data()!);
+  }
 }
