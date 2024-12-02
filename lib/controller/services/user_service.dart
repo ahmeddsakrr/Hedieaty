@@ -14,4 +14,8 @@ class UserService {
   Future<void> updateUser(RemoteUser.User updatedUser) async {
     await _userRepository.updateUser(updatedUser);
   }
+
+  String getUserPassword(String phoneNumber) {
+    return _userRepository.getUserPassword(phoneNumber);
+  }
 }

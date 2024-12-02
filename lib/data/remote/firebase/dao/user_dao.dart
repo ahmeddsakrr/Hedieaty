@@ -23,4 +23,22 @@ class UserDAO {
   Future<void> deleteUser(String phoneNumber) async {
     await _firestore.collection('users').doc(phoneNumber).delete();
   }
+
+  String getUserPassword(String phoneNumber) {
+    try {
+      final doc = _firestore.collection('users').doc(phoneNumber).get();
+      doc.then((snapshot) {
+        if (snapshot.exists) {
+          final data = snapshot.data();
+          if (data != null && data.containsKey('password')) {
+            return data['password'] as String;
+          }
+        }
+        return 'password not found';
+      });
+    } catch (e) {
+      return 'password not found';
+    }
+    return 'password not found';
+  }
 }

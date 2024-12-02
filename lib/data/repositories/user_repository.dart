@@ -39,4 +39,8 @@ class UserRepository {
     final localUser = UserAdapter.fromRemote(user);
     await _localUserDao.insertOrUpdateUser(localUser);
   }
+
+  String getUserPassword(String phoneNumber) {
+    return _remoteUserDao.getUserPassword(phoneNumber);
+  }
 }
