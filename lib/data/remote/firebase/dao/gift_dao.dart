@@ -8,13 +8,16 @@ class GiftDAO {
     await _firestore.collection('gifts').doc(gift.id.toString()).set(gift.toMap());
   }
 
-  Future<List<Gift>> getGiftsByEvent(int eventId) async {
-    final querySnapshot = await _firestore
+  Stream<List<Gift>> getGiftsByEvent(int eventId) {
+    return _firestore
         .collection('gifts')
         .where('event_id', isEqualTo: eventId)
-        .get();
-
-    return querySnapshot.docs.map((doc) => Gift.fromMap(doc.data())).toList();
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs
+          .map((doc) => Gift.fromMap(doc.data()))
+          .toList();
+    });
   }
 
   Future<void> updateGift(Gift gift) async {
@@ -25,8 +28,13 @@ class GiftDAO {
     await _firestore.collection('gifts').doc(giftId.toString()).delete();
   }
 
-  Future<Gift> getGift(int giftId) async {
-    final querySnapshot = await _firestore.collection('gifts').doc(giftId.toString()).get();
-    return Gift.fromMap(querySnapshot.data()!);
+  Stream<Gift> getGift(int giftId) {
+    return _firestore
+        .collection('gifts')
+        .doc(giftId.toString())
+        .snapshots()
+        .map((docSnapshot) {
+        return Gift.fromMap(docSnapshot.data()!);
+    });
   }
 }

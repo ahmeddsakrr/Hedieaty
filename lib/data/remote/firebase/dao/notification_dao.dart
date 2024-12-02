@@ -11,15 +11,16 @@ class NotificationDAO {
         .set(notification.toMap());
   }
 
-  Future<List<Notification>> getNotificationsByUser(String userId) async {
-    final querySnapshot = await _firestore
+  Stream<List<Notification>> getNotificationsByUser(String userId) {
+    return _firestore
         .collection('notifications')
         .where('user_id', isEqualTo: userId)
-        .get();
-
-    return querySnapshot.docs
-        .map((doc) => Notification.fromMap(doc.data()))
-        .toList();
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs
+          .map((doc) => Notification.fromMap(doc.data()))
+          .toList();
+    });
   }
 
   Future<void> updateNotification(Notification notification) async {

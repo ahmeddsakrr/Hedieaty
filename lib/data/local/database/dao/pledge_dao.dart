@@ -14,8 +14,8 @@ class PledgeDao {
     return _db.select(_db.pledges).watch();
   }
 
-  Future<List<Pledge>> getPledgesForUser(String phoneNumber) {
-    return (_db.select(_db.pledges)..where((p) => p.userId.equals(phoneNumber))).get();
+  Stream<List<Pledge>> getPledgesForUser(String phoneNumber) {
+    return (_db.select(_db.pledges)..where((p) => p.userId.equals(phoneNumber))).watch();
   }
 
   Future<void> deletePledge(String phoneNumber, int giftId) async {

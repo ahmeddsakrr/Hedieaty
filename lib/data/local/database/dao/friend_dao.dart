@@ -13,8 +13,8 @@ class FriendDao {
   }
 
   /// Find all friends for a specific user by their phone number
-  Future<List<Friend>> findFriendsByUserPhoneNumber(String phoneNumber) {
-    return (_db.select(_db.friends)..where((f) => f.userId.equals(phoneNumber))).get();
+  Stream<List<Friend>> findFriendsByUserPhoneNumber(String phoneNumber) {
+    return (_db.select(_db.friends)..where((f) => f.userId.equals(phoneNumber))).watch();
   }
 
   Future<void> insertOrUpdateFriend(Friend friend) async {

@@ -8,13 +8,16 @@ class FriendDAO {
     await _firestore.collection('friends').doc(friend.id.toString()).set(friend.toMap());
   }
 
-  Future<List<Friend>> getFriendsByUser(String userId) async {
-    final querySnapshot = await _firestore
+  Stream<List<Friend>> getFriendsByUser(String userId) {
+    return _firestore
         .collection('friends')
         .where('user_id', isEqualTo: userId)
-        .get();
-
-    return querySnapshot.docs.map((doc) => Friend.fromMap(doc.data())).toList();
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs
+          .map((doc) => Friend.fromMap(doc.data()))
+          .toList();
+    });
   }
 
   Future<void> removeFriend(int friendId) async {

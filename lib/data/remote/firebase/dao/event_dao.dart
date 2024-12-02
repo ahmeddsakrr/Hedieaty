@@ -8,14 +8,18 @@ class EventDAO {
     await _firestore.collection('events').doc(event.id.toString()).set(event.toMap());
   }
 
-  Future<List<Event>> getEventsByUser(String userId) async {
-    final querySnapshot = await _firestore
+  Stream<List<Event>> getEventsByUser(String userId) {
+    return _firestore
         .collection('events')
         .where('user_id', isEqualTo: userId)
-        .get();
-
-    return querySnapshot.docs.map((doc) => Event.fromMap(doc.data())).toList();
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs
+          .map((doc) => Event.fromMap(doc.data()))
+          .toList();
+    });
   }
+
 
   Future<void> updateEvent(Event event) async {
     await _firestore.collection('events').doc(event.id.toString()).update(event.toMap());

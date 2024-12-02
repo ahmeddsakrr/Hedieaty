@@ -12,8 +12,8 @@ class GiftDao {
     return _db.select(_db.gifts).watch();
   }
 
-  Future<List<Gift>> getGiftsForEvent(int eventId) {
-    return (_db.select(_db.gifts)..where((g) => g.eventId.equals(eventId))).get();
+  Stream<List<Gift>> getGiftsForEvent(int eventId) {
+    return (_db.select(_db.gifts)..where((g) => g.eventId.equals(eventId))).watch();
   }
 
   Future<void> updateGift(Gift updatedGift) async {
@@ -24,8 +24,8 @@ class GiftDao {
     await (_db.delete(_db.gifts)..where((g) => g.id.equals(giftId))).go();
   }
 
-  Future<Gift> getGift(int giftId) async {
-    return (_db.select(_db.gifts)..where((g) => g.id.equals(giftId))).getSingle();
+  Stream<Gift> getGift(int giftId) {
+    return (_db.select(_db.gifts)..where((g) => g.id.equals(giftId))).watchSingle();
   }
 
   Future<void> insertOrUpdateGift(Gift gift) async {

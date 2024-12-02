@@ -12,8 +12,8 @@ class NotificationDao {
     return _db.select(_db.notifications).watch();
   }
 
-  Future<List<Notification>> getNotificationsForUser(String phoneNumber) {
-    return (_db.select(_db.notifications)..where((n) => n.userId.equals(phoneNumber))).get();
+  Stream<List<Notification>> getNotificationsForUser(String phoneNumber) {
+    return (_db.select(_db.notifications)..where((n) => n.userId.equals(phoneNumber))).watch();
   }
 
   Future<void> insertOrUpdateNotification(Notification notification) async {
