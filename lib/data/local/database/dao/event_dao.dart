@@ -35,4 +35,8 @@ class EventDao {
   Future<Event> getEvent(int eventId) async {
     return (_db.select(_db.events)..where((e) => e.id.equals(eventId))).getSingle();
   }
+
+  Future<void> insertOrUpdateEvent(Event event) async {
+    await _db.into(_db.events).insertOnConflictUpdate(event);
+  }
 }

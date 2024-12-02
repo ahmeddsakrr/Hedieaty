@@ -21,4 +21,8 @@ class PledgeDao {
   Future<void> deletePledge(String phoneNumber, int giftId) async {
     await (_db.delete(_db.pledges)..where((p) => p.userId.equals(phoneNumber) & p.giftId.equals(giftId))).go();
   }
+
+  Future<void> insertOrUpdatePledge(Pledge pledge) async {
+    await _db.into(_db.pledges).insertOnConflictUpdate(pledge);
+  }
 }

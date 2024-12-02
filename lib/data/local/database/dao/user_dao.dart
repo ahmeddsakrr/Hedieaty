@@ -19,4 +19,8 @@ class UserDao {
   Future<void> updateUser(User updatedUser) async {
     await _db.update(_db.users).replace(updatedUser);
   }
+
+  Future<void> insertOrUpdateUser(User user) async {
+    await _db.into(_db.users).insertOnConflictUpdate(user);
+  }
 }

@@ -16,4 +16,8 @@ class FriendDao {
   Stream<List<Friend>> findFriendsByUserPhoneNumber(String phoneNumber) {
     return (_db.select(_db.friends)..where((f) => f.userId.equals(phoneNumber))).watch();
   }
+
+  Future<void> insertOrUpdateFriend(Friend friend) async {
+    await _db.into(_db.friends).insertOnConflictUpdate(friend);
+  }
 }

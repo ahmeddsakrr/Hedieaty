@@ -27,4 +27,8 @@ class GiftDao {
   Future<Gift> getGift(int giftId) async {
     return (_db.select(_db.gifts)..where((g) => g.id.equals(giftId))).getSingle();
   }
+
+  Future<void> insertOrUpdateGift(Gift gift) async {
+    await _db.into(_db.gifts).insertOnConflictUpdate(gift);
+  }
 }

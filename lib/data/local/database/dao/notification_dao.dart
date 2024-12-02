@@ -15,4 +15,8 @@ class NotificationDao {
   Future<List<Notification>> getNotificationsForUser(String phoneNumber) {
     return (_db.select(_db.notifications)..where((n) => n.userId.equals(phoneNumber))).get();
   }
+
+  Future<void> insertOrUpdateNotification(Notification notification) async {
+    await _db.into(_db.notifications).insertOnConflictUpdate(notification);
+  }
 }
