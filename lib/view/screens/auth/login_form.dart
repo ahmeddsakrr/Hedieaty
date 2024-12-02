@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../data/local/database/app_database.dart';
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
+import '../../../controller/services/auth_service.dart';
 
 class LoginForm extends StatefulWidget {
   final VoidCallback onAuthComplete;
@@ -16,9 +18,21 @@ class _LoginFormState extends State<LoginForm> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _login() {
+  final AuthService _authService = AuthService(AppDatabase());
+
+  void _login() async {
     if (_formKey.currentState!.validate()) {
-      widget.onAuthComplete();
+      final phone = _phoneController.text.trim();
+      final password = _passwordController.text.trim();
+
+      final user = await _authService.login(phone, password);
+      if (user != null) {
+        widget.onAuthComplete();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Invalid phone number or password")),
+        );
+      }
     }
   }
 

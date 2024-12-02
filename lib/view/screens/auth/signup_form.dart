@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-
+import '../../../data/local/database/app_database.dart';
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
-
+import '../../../controller/services/auth_service.dart';
 
 class SignupForm extends StatefulWidget {
   final VoidCallback onAuthComplete;
@@ -20,9 +20,23 @@ class _SignupFormState extends State<SignupForm> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _signup() {
+  final AuthService _authService = AuthService(AppDatabase());
+
+  void _signup() async {
     if (_formKey.currentState!.validate()) {
-      widget.onAuthComplete();
+      final name = _nameController.text.trim();
+      final email = _emailController.text.trim();
+      final phone = _phoneController.text.trim();
+      final password = _passwordController.text.trim();
+
+      final user = await _authService.signup(name, email, phone, password);
+      if (user != null) {
+        widget.onAuthComplete();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Signup failed, try again")),
+        );
+      }
     }
   }
 
