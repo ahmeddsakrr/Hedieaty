@@ -1,6 +1,6 @@
 import 'package:hedieaty/controller/utils/date_utils.dart';
 
-class RemoteNotification {
+class Notification {
   final int id;
   final String userId;
   final String type;
@@ -8,7 +8,7 @@ class RemoteNotification {
   final bool isRead;
   final DateTime createdAt;
 
-  RemoteNotification({
+  Notification({
     required this.id,
     required this.userId,
     required this.type,
@@ -28,8 +28,8 @@ class RemoteNotification {
     };
   }
 
-  factory RemoteNotification.fromMap(Map<String, dynamic> map) {
-    return RemoteNotification(
+  factory Notification.fromMap(Map<String, dynamic> map) {
+    return Notification(
       id: map['id'],
       userId: map['user_id'],
       type: map['type'],

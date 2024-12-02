@@ -1,13 +1,13 @@
 import 'package:hedieaty/controller/utils/date_utils.dart';
 
-class RemoteEvent {
+class Event {
   final int id;
   final String userId;
   final String name;
   final String category;
   final DateTime eventDate;
 
-  RemoteEvent({
+  Event({
     required this.id,
     required this.userId,
     required this.name,
@@ -25,8 +25,8 @@ class RemoteEvent {
     };
   }
 
-  factory RemoteEvent.fromMap(Map<String, dynamic> map) {
-    return RemoteEvent(
+  factory Event.fromMap(Map<String, dynamic> map) {
+    return Event(
       id: map['id'],
       userId: map['user_id'],
       name: map['name'],
