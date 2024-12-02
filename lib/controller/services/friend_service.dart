@@ -2,6 +2,7 @@ import 'package:hedieaty/controller/services/user_service.dart';
 
 import '../../data/local/database/app_database.dart';
 import '../../data/repositories/friend_repository.dart';
+import '../../data/remote/firebase/models/user.dart' as RemoteUser;
 
 class FriendService {
   final FriendRepository _friendRepository;
@@ -12,23 +13,26 @@ class FriendService {
         _userService = UserService(db);
 
   /// Fetch all friends for a specific user ID.
-  Future<List<User>> getFriendsForUser(String userId) async {
-    final friends = await _friendRepository.getAllFriendsForUser(userId);
-    final users = await Future.wait(
-      friends.map((friend) => _userService.getUser(friend.friendUserId)),
-    );
-    return users.whereType<User>().toList(); // Exclude null users
+  Stream<List<RemoteUser.User>> getFriendsForUser(String userId) {
+    return _friendRepository.getAllFriendsForUser(userId).asyncMap((friends) async {
+      final users = await Future.wait(
+        friends.map((friend) => _userService.getUser(friend.friendUserId)),
+      );
+      return users.whereType<RemoteUser.User>().toList();
+    });
   }
 
   /// Search friends by name or phone number.
-  Future<List<User>> searchFriends(String userId, String query) async {
-    final friends = await getFriendsForUser(userId);
+  Stream<List<RemoteUser.User>> searchFriends(String userId, String query) {
     final lowerQuery = query.toLowerCase();
 
-    return friends.where((user) {
-      final name = user.name.toLowerCase();
-      final phoneNumber = user.phoneNumber.toLowerCase();
-      return name.contains(lowerQuery) || phoneNumber.contains(lowerQuery);
-    }).toList();
+    return getFriendsForUser(userId).map((friends) {
+      return friends.where((user) {
+        final name = user.name.toLowerCase();
+        final phoneNumber = user.phoneNumber.toLowerCase();
+        return name.contains(lowerQuery) || phoneNumber.contains(lowerQuery);
+      }).toList();
+    });
   }
+
 }
