@@ -1,5 +1,4 @@
-import 'package:hedieaty/data/local/database/app_database.dart';
-
+import '../../data/remote/firebase/models/gift.dart';
 import 'gift_sort_strategy.dart';
 
 class GiftSortContext {

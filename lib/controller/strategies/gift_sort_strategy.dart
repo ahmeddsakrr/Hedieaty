@@ -1,4 +1,4 @@
-import 'package:hedieaty/data/local/database/app_database.dart';
+import '../../data/remote/firebase/models/gift.dart';
 
 
 abstract class GiftSortStrategy {
