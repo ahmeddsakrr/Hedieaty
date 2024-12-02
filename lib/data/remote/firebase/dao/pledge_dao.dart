@@ -17,7 +17,13 @@ class PledgeDAO {
     return querySnapshot.docs.map((doc) => Pledge.fromMap(doc.data())).toList();
   }
 
-  Future<void> deletePledge(int pledgeId) async {
-    await _firestore.collection('pledges').doc(pledgeId.toString()).delete();
+  Future<void> deletePledge(String userId, int pledgeId) async {
+    final querySnapshot = await _firestore
+        .collection('pledges')
+        .where('user_id', isEqualTo: userId)
+        .where('id', isEqualTo: pledgeId)
+        .get();
+
+    await querySnapshot.docs.first.reference.delete();
   }
 }
