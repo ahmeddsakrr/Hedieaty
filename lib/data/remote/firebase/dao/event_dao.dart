@@ -28,4 +28,14 @@ class EventDAO {
   Future<void> deleteEvent(int eventId) async {
     await _firestore.collection('events').doc(eventId.toString()).delete();
   }
+
+  Stream<Event> getEvent(int eventId) {
+    return _firestore
+        .collection('events')
+        .doc(eventId.toString())
+        .snapshots()
+        .map((docSnapshot) {
+      return Event.fromMap(docSnapshot.data()!);
+    });
+  }
 }

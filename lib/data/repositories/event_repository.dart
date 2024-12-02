@@ -44,7 +44,7 @@ class EventRepository {
     await _localEventDao.deleteEvent(eventId);
   }
 
-  Stream<Event> getEvent(int eventId) {
-    return _localEventDao.getEvent(eventId);
+  Stream<RemoteEvent.Event> getEvent(int eventId) {
+    return _remoteEventDao.getEvent(eventId);
   }
 }
