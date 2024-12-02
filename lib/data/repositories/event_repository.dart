@@ -16,19 +16,22 @@ class EventRepository {
     await _localEventDao.insertOrUpdateEvent(localEvent);
   }
 
-  Future<List<RemoteEvent.Event>> getEventsForUser(String userId) async {
-    try {
-      final remoteEvents = await _remoteEventDao.getEventsByUser(userId);
-      for (final remoteEvent in remoteEvents) {
+  Stream<List<RemoteEvent.Event>> getEventsForUser(String userId) {
+    return _remoteEventDao
+        .getEventsByUser(userId)
+        .handleError((error) {
+          return _localEventDao
+          .findEventsByUserPhoneNumber(userId)
+          .map((localEvents) => localEvents.map((e) => EventAdapter.fromLocal(e)).toList());
+    }).map((remoteEvents) {
+        for (final remoteEvent in remoteEvents) {
         final localEvent = EventAdapter.fromRemote(remoteEvent);
-        await _localEventDao.insertOrUpdateEvent(localEvent);
+        _localEventDao.insertOrUpdateEvent(localEvent);
       }
       return remoteEvents;
-    } catch (e) {
-      final localEvents = await _localEventDao.findEventsByUserPhoneNumber(userId);
-      return localEvents.map((e) => EventAdapter.fromLocal(e)).toList();
-    }
+    });
   }
+
 
   Future<void> updateEvent(RemoteEvent.Event event) async {
     await _remoteEventDao.updateEvent(event);
@@ -41,7 +44,7 @@ class EventRepository {
     await _localEventDao.deleteEvent(eventId);
   }
 
-  Future<Event> getEvent(int eventId) async {
-    return await _localEventDao.getEvent(eventId);
+  Stream<Event> getEvent(int eventId) {
+    return _localEventDao.getEvent(eventId);
   }
 }

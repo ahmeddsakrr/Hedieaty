@@ -15,19 +15,22 @@ class NotificationRepository {
     await _localNotificationDao.insertOrUpdateNotification(localNotification);
   }
 
-  Future<List<RemoteNotification.Notification>> getNotifications(String userId) async {
-    try {
-      final remoteNotifications = await _remoteNotificationDao.getNotificationsByUser(userId);
+  Stream<List<RemoteNotification.Notification>> getNotifications(String userId) {
+    return _remoteNotificationDao
+        .getNotificationsByUser(userId)
+        .handleError((error) {
+      return _localNotificationDao
+          .getNotificationsForUser(userId)
+          .map((localNotifications) => localNotifications.map((n) => NotificationAdapter.fromLocal(n)).toList());
+    }).map((remoteNotifications) {
       for (final remoteNotification in remoteNotifications) {
         final localNotification = NotificationAdapter.fromRemote(remoteNotification);
-        await _localNotificationDao.insertOrUpdateNotification(localNotification);
+        _localNotificationDao.insertOrUpdateNotification(localNotification);
       }
       return remoteNotifications;
-    } catch (e) {
-      final localNotifications = await _localNotificationDao.getNotificationsForUser(userId);
-      return localNotifications.map((n) => NotificationAdapter.fromLocal(n)).toList();
-    }
+    });
   }
+
 
   Future<void> deleteNotification(int notificationId) async {
     await _remoteNotificationDao.deleteNotification(notificationId);

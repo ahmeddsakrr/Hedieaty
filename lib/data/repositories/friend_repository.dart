@@ -15,17 +15,20 @@ class FriendRepository {
     await _localFriendDao.insertOrUpdateFriend(localFriend);
   }
 
-  Future<List<RemoteFriend.Friend>> getAllFriendsForUser(String userId) async {
-    try {
-      final remoteFriends = await _remoteFriendDao.getFriendsByUser(userId);
+  Stream<List<RemoteFriend.Friend>> getAllFriendsForUser(String userId) {
+    return _remoteFriendDao
+        .getFriendsByUser(userId)
+        .handleError((error) {
+      return _localFriendDao
+          .findFriendsByUserPhoneNumber(userId)
+          .map((localFriends) => localFriends.map((f) => FriendAdapter.fromLocal(f)).toList());
+    }).map((remoteFriends) {
       for (final remoteFriend in remoteFriends) {
         final localFriend = FriendAdapter.fromRemote(remoteFriend);
-        await _localFriendDao.insertOrUpdateFriend(localFriend);
+        _localFriendDao.insertOrUpdateFriend(localFriend);
       }
       return remoteFriends;
-    } catch (e) {
-      final localFriends = await _localFriendDao.findFriendsByUserPhoneNumber(userId);
-      return localFriends.map((f) => FriendAdapter.fromLocal(f)).toList();
-    }
+    });
   }
+
 }

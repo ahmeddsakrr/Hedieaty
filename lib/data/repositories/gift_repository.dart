@@ -19,19 +19,22 @@ class GiftRepository {
     return _localGiftDao.watchAllGifts();
   }
 
-  Future<List<RemoteGift.Gift>> getGiftsForEvent(int eventId) async {
-    try {
-      final remoteGifts = await _remoteGiftDao.getGiftsByEvent(eventId);
+  Stream<List<RemoteGift.Gift>> getGiftsForEvent(int eventId) {
+    return _remoteGiftDao
+        .getGiftsByEvent(eventId)
+        .handleError((error) {
+      return _localGiftDao
+          .getGiftsForEvent(eventId)
+          .map((localGifts) => localGifts.map((g) => GiftAdapter.fromLocal(g)).toList());
+    }).map((remoteGifts) {
       for (final remoteGift in remoteGifts) {
         final localGift = GiftAdapter.fromRemote(remoteGift);
-        await _localGiftDao.insertOrUpdateGift(localGift);
+        _localGiftDao.insertOrUpdateGift(localGift);
       }
       return remoteGifts;
-    } catch (e) {
-      final localGifts = await _localGiftDao.getGiftsForEvent(eventId);
-      return localGifts.map((g) => GiftAdapter.fromLocal(g)).toList();
-    }
+    });
   }
+
 
   Future<void> updateGift(RemoteGift.Gift gift) async {
     await _remoteGiftDao.updateGift(gift);
@@ -44,7 +47,7 @@ class GiftRepository {
     await _localGiftDao.deleteGift(giftId);
   }
 
-  Future<RemoteGift.Gift> getGift(int giftId) async {
-    return await _remoteGiftDao.getGift(giftId);
+  Stream<RemoteGift.Gift> getGift(int giftId) {
+    return _remoteGiftDao.getGift(giftId);
   }
 }

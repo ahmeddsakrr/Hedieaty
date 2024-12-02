@@ -15,19 +15,22 @@ class PledgeRepository {
     await _localPledgeDao.insertOrUpdatePledge(localPledge);
   }
 
-  Future<List<RemotePledge.Pledge>> getPledgesForUser(String userId) async {
-    try {
-      final remotePledges = await _remotePledgeDao.getPledgesByUser(userId);
+  Stream<List<RemotePledge.Pledge>> getPledgesForUser(String userId) {
+    return _remotePledgeDao
+        .getPledgesByUser(userId)
+        .handleError((error) {
+      return _localPledgeDao
+          .getPledgesForUser(userId)
+          .map((localPledges) => localPledges.map((p) => PledgeAdapter.fromLocal(p)).toList());
+    }).map((remotePledges) {
       for (final remotePledge in remotePledges) {
         final localPledge = PledgeAdapter.fromRemote(remotePledge);
-        await _localPledgeDao.insertOrUpdatePledge(localPledge);
+        _localPledgeDao.insertOrUpdatePledge(localPledge);
       }
       return remotePledges;
-    } catch (e) {
-      final localPledges = await _localPledgeDao.getPledgesForUser(userId);
-      return localPledges.map((p) => PledgeAdapter.fromLocal(p)).toList();
-    }
+    });
   }
+
 
   Future<void> deletePledge(String phoneNumber, int giftId) async {
     await _remotePledgeDao.deletePledge(phoneNumber, giftId);
