@@ -1,6 +1,6 @@
 import 'package:hedieaty/controller/enums/event_status.dart';
 
-import '../../data/local/database/app_database.dart';
+import '../../data/remote/firebase/models/event.dart';
 import 'event_sort_strategy.dart';
 
 class SortByEventStatus implements EventSortStrategy {

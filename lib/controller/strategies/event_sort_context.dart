@@ -1,5 +1,5 @@
-import '../../data/local/database/app_database.dart';
 import 'event_sort_strategy.dart';
+import '../../data/remote/firebase/models/event.dart';
 
 class EventSortContext {
   EventSortStrategy? _strategy;
