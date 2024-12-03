@@ -13,9 +13,10 @@ class PledgeService {
 
   Stream<List<RemoteGift.Gift>> getPledgedGiftsForUser(String phoneNumber) async* {
     await for (final pledges in _pledgeRepository.getPledgesForUser(phoneNumber)) {
-      final giftFutures = pledges.map((pledge) => _giftService.getGift(pledge.giftId).first);
-      final gifts = await Future.wait(giftFutures);
-      yield gifts.whereType<RemoteGift.Gift>().toList();
+      final giftStreams = pledges.map((pledge) => _giftService.getGift(pledge.giftId));
+      await for (final gift in Stream.fromIterable(giftStreams).asyncMap((giftStream) => giftStream.first)) {
+        yield [gift].whereType<RemoteGift.Gift>().toList();
+      }
     }
   }
 
@@ -25,9 +26,9 @@ class PledgeService {
     await for (final pledgedGifts in getPledgedGiftsForUser(phoneNumber)) {
       final filteredGifts = pledgedGifts.where((gift) {
         final name = gift.name.toLowerCase();
-        final description = gift.description.toLowerCase() ?? '';
+        final description = gift.description.toLowerCase();
         final category = gift.category.toLowerCase();
-        final price = gift.price.toString() ?? '';
+        final price = gift.price.toString();
         final status = gift.status.toLowerCase();
 
         return name.contains(lowerQuery) ||
