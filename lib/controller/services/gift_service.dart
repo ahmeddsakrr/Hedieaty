@@ -35,16 +35,20 @@ class GiftService {
     return _giftRepository.getGift(giftId);
   }
 
-  Future<RemoteUser.User?> getUserForGift(int giftId) async {
-    final gift = await getGift(giftId).first;
-    final event = await _eventService.getEvent(gift.eventId).first;
-    return await _userService.getUser(event.userId);
+  Stream<RemoteUser.User?> getUserForGift(int giftId) async* {
+    await for (final gift in getGift(giftId)) {
+      final eventStream = _eventService.getEvent(gift.eventId);
+      await for (final event in eventStream) {
+        yield* Stream.fromFuture(_userService.getUser(event.userId));
+      }
+    }
   }
 
-
-  Future<Stream<RemoteEvent.Event>> getEventForGift(int giftId) async {
-    final gift =  await getGift(giftId).first;
-    return await _eventService.getEvent(gift.eventId);
+  Stream<RemoteEvent.Event> getEventForGift(int giftId) async* {
+    await for (final gift in getGift(giftId)) {
+      final eventStream = _eventService.getEvent(gift.eventId);
+      yield* eventStream;
+    }
   }
 
   Future<void> updateGiftStatus(int giftId, GiftStatus status) async {
