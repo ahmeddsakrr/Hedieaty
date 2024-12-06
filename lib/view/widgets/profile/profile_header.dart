@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/services/user_service.dart';
 import 'profile_info_field.dart';
 import 'package:hedieaty/data/local/database/app_database.dart';
+import '../../../data/remote/firebase/models/user.dart' as RemoteUser;
 
 const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
@@ -52,10 +53,11 @@ class _ProfileHeaderState extends State<ProfileHeader> {
   }
 
   Future<void> _saveUserProfile() async {
-    final updatedUser = User(
+    final updatedUser = RemoteUser.User(
       name: nameController.text,
       phoneNumber: phoneController.text,
       email: emailController.text,
+      password: _userService.getUserPassword(placeholderUserId),
     );
     await _userService.updateUser(updatedUser);
   }

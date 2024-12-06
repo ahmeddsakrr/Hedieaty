@@ -4,6 +4,8 @@ import 'package:hedieaty/controller/services/gift_service.dart';
 import 'package:hedieaty/controller/utils/date_utils.dart';
 import '../../../data/local/database/app_database.dart';
 import '../gift/gift_list_item.dart';
+import '../../../data/remote/firebase/models/event.dart' as RemoteEvent;
+import '../../../data/remote/firebase/models/gift.dart' as RemoteGift;
 
 const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
@@ -17,8 +19,8 @@ class EventExpandableList extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: FutureBuilder<List<Event>>(
-        future: _eventService.getEventsForUser(placeholderUserId),
+      child: StreamBuilder<List<RemoteEvent.Event>>(
+        stream: _eventService.getEventsForUser(placeholderUserId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -36,8 +38,8 @@ class EventExpandableList extends StatelessWidget {
             physics: const ClampingScrollPhysics(),
             itemBuilder: (context, index) {
               final event = events[index];
-              return FutureBuilder<List<Gift>>(
-                future: _giftService.getGiftsForEvent(event.id),
+              return StreamBuilder<List<RemoteGift.Gift>>(
+                stream: _giftService.getGiftsForEvent(event.id),
                 builder: (context, giftSnapshot) {
                   if (giftSnapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
@@ -64,7 +66,7 @@ class EventExpandableList extends StatelessWidget {
 class EventItem extends StatefulWidget {
   final String eventName;
   final String eventDate;
-  final List<Gift> gifts;
+  final List<RemoteGift.Gift> gifts;
 
   const EventItem({
     super.key,
