@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/services/event_service.dart';
-import '../../../data/local/database/app_database.dart';
+import '../../../data/local/database/app_database.dart' as local;
 import '../../../controller/services/friend_service.dart';
 import '../../components/custom_search_bar.dart';
 import '../../widgets/friend/friend_list_item.dart';
 import '../event/event_list_page.dart';
 import '../profile/profile_page.dart';
 import '../../../controller/utils/navigation_utils.dart';
+import '../../../data/remote/firebase/models/user.dart';
 
 const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
@@ -20,54 +21,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final FriendService _friendService = FriendService(AppDatabase());
-  final EventService _eventService = EventService(AppDatabase());
+  final FriendService _friendService = FriendService(local.AppDatabase());
+  final EventService _eventService = EventService(local.AppDatabase());
   List<User> friends = [];
   List<User> filteredFriends = [];
   String searchQuery = "";
   bool isLoading = true;
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchFriends();
+
+  Stream<List<User>> _fetchFriends() {
+    return _friendService.getFriendsForUser(placeholderUserId);
   }
 
-  Future<void> _fetchFriends() async {
-    try {
-      final friendList = await _friendService.getFriendsForUser(placeholderUserId);
-      setState(() {
-        friends = friendList;
-        filteredFriends = friends;
-        isLoading = false;
-      });
-    } catch (e) {
-      print("Error fetching friends: $e");
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  void _searchFriends(String query) async {
-    setState(() {
-      searchQuery = query;
-    });
-
+  Stream<List<User>> _searchFriends(String query) {
     if (query.isEmpty) {
-      setState(() {
-        filteredFriends = friends;
-      });
+      return _fetchFriends();
     } else {
-      final searchedFriends = await _friendService.searchFriends(placeholderUserId, query);
-      setState(() {
-        filteredFriends = searchedFriends;
-      });
+      return _friendService.searchFriends(placeholderUserId, query);
     }
   }
 
-  Future<int> _getEventCountForFriend(String phoneNumber) async {
-    return await _eventService.getEventCountForUser(phoneNumber);
+  Stream<int> _getEventCountForFriend(String phoneNumber) {
+    return _eventService.getEventCountForUser(phoneNumber);
   }
 
   @override
@@ -90,9 +65,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: SafeArea(
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
+        child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -107,40 +80,59 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             CustomSearchBar(
-              onSearch: _searchFriends,
+              onSearch: (query) {
+                setState(() {
+                  searchQuery = query;
+                });
+              },
               hintText: "Search friends...",
             ),
             Expanded(
-              child: filteredFriends.isEmpty
-                  ? Center(
-                child: Text(
-                  'No friends found matching "$searchQuery".',
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
-                    fontSize: 16,
-                  ),
-                ),
-              )
-                  : ListView.builder(
-                itemCount: filteredFriends.length,
-                itemBuilder: (context, index) {
-                  final friend = filteredFriends[index];
-                  return FutureBuilder<int>(
-                    future: _getEventCountForFriend(friend.phoneNumber),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting || snapshot.hasError) {
-                        return FriendListItem(
-                          friendName: friend.name,
-                          eventsCount: 0,
-                          onTap: () => navigateWithAnimation(context, const EventListPage()),
-                        );
-                      }
-                      final eventsCount = snapshot.data ?? 0;
+              child: StreamBuilder<List<User>>(
+                stream: _searchFriends(searchQuery),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                      return FriendListItem(
-                        friendName: friend.name,
-                        eventsCount: eventsCount,
-                        onTap: () => navigateWithAnimation(context, const EventListPage()),
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+
+                  final filteredFriends = snapshot.data ?? [];
+
+                  if (filteredFriends.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No friends found matching "$searchQuery".',
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black,
+                          fontSize: 16,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    itemCount: filteredFriends.length,
+                    itemBuilder: (context, index) {
+                      final friend = filteredFriends[index];
+                      return StreamBuilder<int>(
+                        stream: _getEventCountForFriend(friend.phoneNumber),
+                        builder: (context, eventSnapshot) {
+                          if (eventSnapshot.connectionState == ConnectionState.waiting) {
+                            return const ListTile(
+                              title: Text('Loading...'),
+                            );
+                          }
+
+                          final eventCount = eventSnapshot.data ?? 0;
+                          return FriendListItem(
+                            friendName: friend.name,
+                            eventsCount: eventCount,
+                            onTap: () => navigateWithAnimation(context, const EventListPage()),
+                          );
+                        },
                       );
                     },
                   );
