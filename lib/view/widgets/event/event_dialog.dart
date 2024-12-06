@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/enums/event_status.dart';
 
-import '../../../data/local/database/app_database.dart';
+import '../../../data/remote/firebase/models/event.dart' as RemoteEvent;
 
 const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
 
 class EventDialog extends StatefulWidget {
-  final Event? event;
-  final void Function(Event) onSave;
+  final RemoteEvent.Event? event;
+  final void Function(RemoteEvent.Event) onSave;
 
   const EventDialog({super.key, this.event, required this.onSave});
 
@@ -52,11 +52,11 @@ class _EventDialogState extends State<EventDialog> {
     });
 
     if (isNameValid && isCategoryValid && isDateValid) {
-      Event newEvent;
+      RemoteEvent.Event newEvent;
 
       if (widget.event != null) {
         // Editing an existing event
-        newEvent = Event(
+        newEvent = RemoteEvent.Event(
           name: nameController.text,
           category: categoryController.text,
           eventDate: selectedDate!,
@@ -65,7 +65,7 @@ class _EventDialogState extends State<EventDialog> {
         );
       } else {
         // Adding a new event
-        newEvent = Event(
+        newEvent = RemoteEvent.Event(
           name: nameController.text,
           category: categoryController.text,
           eventDate: selectedDate!,

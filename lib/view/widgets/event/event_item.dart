@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../data/local/database/app_database.dart';
 import '../../../controller/enums/event_status.dart';
+import '../../../data/remote/firebase/models/event.dart' as RemoteEvent;
 
 class EventItem extends StatelessWidget {
-  final Event event;
+  final RemoteEvent.Event event;
   final Animation<double> animation;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
