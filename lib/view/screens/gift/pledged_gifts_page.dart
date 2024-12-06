@@ -1,10 +1,12 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/services/gift_service.dart';
 import 'package:hedieaty/controller/services/pledge_service.dart';
-import 'package:hedieaty/data/local/database/app_database.dart';
+import 'package:hedieaty/data/local/database/app_database.dart' as local;
 import '../../components/custom_search_bar.dart';
 import '../../widgets/gift/gift_list_item.dart';
+import '../../../data/remote/firebase/models/gift.dart';
+import '../../../data/remote/firebase/models/user.dart';
+import '../../../data/remote/firebase/models/event.dart';
 
 const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
@@ -17,54 +19,30 @@ class PledgedGiftsPage extends StatefulWidget {
 
 class _PledgedGiftsPageState extends State<PledgedGiftsPage> {
   List<Gift> pledgedGifts = [];
-  final PledgeService _pledgeService = PledgeService(AppDatabase());
-  final GiftService _giftService = GiftService(AppDatabase());
+  final PledgeService _pledgeService = PledgeService(local.AppDatabase());
+  final GiftService _giftService = GiftService(local.AppDatabase());
   List<Gift> filteredGifts = [];
   String searchQuery = "";
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchPledgedGifts();
+  Stream<List<Gift>> _fetchPledgedGifts() {
+    return _pledgeService.getPledgedGiftsForUser(placeholderUserId);
   }
 
-  Future<void> _fetchPledgedGifts() async {
-    try {
-      final giftList = await _pledgeService.getPledgedGiftsForUser(placeholderUserId);
-      setState(() {
-        pledgedGifts = giftList;
-        filteredGifts = pledgedGifts;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print("Error fetching pledged gifts: $e");
-      }
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to load pledged gifts")));
-    }
-  }
 
-  Future<void> _searchGifts(String query) async {
-    setState(() {
-      searchQuery = query;
-    });
-
+  Stream<List<Gift>> _searchGifts(String query) {
     if (query.isEmpty) {
-      setState(() {
-        filteredGifts = pledgedGifts;
-      });
+      return _fetchPledgedGifts();
     } else {
-      final searchedPledgedGifts = await _pledgeService.searchPledgedGifts(placeholderUserId, query);
-      setState(() {
-        filteredGifts = searchedPledgedGifts;
-      });
+      return _pledgeService.searchPledgedGifts(placeholderUserId, query);
     }
   }
 
   void _removePledgedGift(Gift gift) {
     setState(() async {
-      _pledgeService.unpledgeGift(placeholderUserId, gift.id);
-      pledgedGifts.remove(gift);
-      filteredGifts = await _pledgeService.searchPledgedGifts(placeholderUserId, searchQuery);
+      await _pledgeService.unpledgeGift(placeholderUserId, gift.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unpledged ${gift.name}'))
+      );
     });
   }
 
@@ -102,28 +80,6 @@ class _PledgedGiftsPageState extends State<PledgedGiftsPage> {
     }
   }
 
-  Future<Map<String, dynamic>> _getGiftDetails(int giftId) async {
-    final results = await Future.wait([
-      _getFriendName(giftId),
-      _getDueDate(giftId),
-    ]);
-
-    return {
-      'friendName': results[0],
-      'dueDate': results[1],
-    };
-  }
-
-  Future<String> _getFriendName(int giftId) async {
-    final user = await _giftService.getUserForGift(giftId);
-    return user?.name ?? "Unknown Friend";
-  }
-
-  Future<DateTime> _getDueDate(int giftId) async {
-    final event = await _giftService.getEventForGift(giftId);
-    return event.eventDate;
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -139,67 +95,106 @@ class _PledgedGiftsPageState extends State<PledgedGiftsPage> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: CustomSearchBar(
-                onSearch: _searchGifts,
+                onSearch: (query) {
+                  setState(() {
+                    searchQuery = query;
+                  });
+                },
                 hintText: "Search pledged gifts...",
               ),
             ),
             const SizedBox(height: 16.0),
             Expanded(
-              child: filteredGifts.isEmpty
-                  ? Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Text(
-                    searchQuery.isEmpty
-                        ? 'You have not pledged any gifts yet.\nStart by pledging a gift for your friends!'
-                        : 'No pledged gifts found matching "$searchQuery".',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
-                    ),
-                  ),
-                ),
-              )
-                  : ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                itemCount: filteredGifts.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 16.0),
-                itemBuilder: (context, index) {
-                  final gift = filteredGifts[index];
-                  return FutureBuilder<Map<String, dynamic>>(
-                    future: _getGiftDetails(gift.id),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      }
-                      if (!snapshot.hasData) {
-                        return const Center(child: Text('No data available'));
-                      }
-                      final friendName = snapshot.data![0] as String;
-                      final dueDate = snapshot.data![1] as DateTime;
-                      return GiftListItem(
-                        gift: gift,
-                        friendName: friendName,
-                        dueDate: dueDate,
-                        customAction: MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          child: TextButton(
-                            onPressed: () => _confirmUnpledge(gift),
-                            style: ButtonStyle(
-                              foregroundColor: WidgetStateProperty.all(Colors.red),
-                              overlayColor: WidgetStateProperty.all(Colors.red.withOpacity(0.1)),
-                            ),
-                            child: const Text("Unpledge"),
+              child: StreamBuilder<List<Gift>>(
+                stream: _searchGifts(searchQuery),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  final filteredGifts = snapshot.data ?? [];
+
+                  if (filteredGifts.isEmpty) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Text(
+                          searchQuery.isEmpty
+                              ? 'You have not pledged any gifts yet.\nStart by pledging a gift for your friends!'
+                              : 'No pledged gifts found matching "$searchQuery".',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.7),
                           ),
                         ),
+                      ),
+                    );
+                  }
+                  return ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    itemCount: filteredGifts.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 16.0),
+                    itemBuilder: (context, index) {
+                      final gift = filteredGifts[index];
+                      return StreamBuilder<User?>(
+                        stream: _giftService.getUserForGift(gift.id),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const ListTile(
+                              title: Text("Loading..."),
+                            );
+                          }
+                          if (snapshot.hasError) {
+                            return ListTile(
+                              title: const Text("Error loading user"),
+                              subtitle: Text(snapshot.error.toString()),
+                            );                          }
+                          final user = snapshot.data;
+                          final friendName = user?.name ?? 'Unknown User';
+                          return StreamBuilder<Event>(
+                            stream: _giftService.getEventForGift(gift.id),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const ListTile(
+                                  title: Text("Loading..."),
+                                );
+                              }
+                              if (snapshot.hasError) {
+                                return ListTile(
+                                  title: const Text("Error loading event"),
+                                  subtitle: Text(snapshot.error.toString()),
+                                );
+                              }
+                              final event = snapshot.data;
+                              final dueDate = event?.eventDate ?? DateTime.now();
+                              return GiftListItem(
+                                gift: gift,
+                                friendName: friendName,
+                                dueDate: dueDate,
+                                customAction: MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  child: TextButton(
+                                    onPressed: () => _confirmUnpledge(gift),
+                                    style: ButtonStyle(
+                                      foregroundColor: WidgetStateProperty.all(Colors.red),
+                                      overlayColor: WidgetStateProperty.all(Colors.red.withOpacity(0.1)),
+                                    ),
+                                    child: const Text("Unpledge"),
+
+                                  )
+                                ),
+                              );
+                            },
+                          );
+                        },
                       );
                     },
                   );
                 },
-              ),
+              )
             ),
           ],
         ),
