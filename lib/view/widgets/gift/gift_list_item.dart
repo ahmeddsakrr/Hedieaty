@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/enums/gift_status.dart';
-import 'package:hedieaty/data/local/database/app_database.dart';
 import '../../../controller/utils/date_utils.dart';
+import 'package:hedieaty/data/remote/firebase//models/gift.dart';
 
 class GiftListItem extends StatelessWidget {
   final Gift gift;
@@ -105,7 +105,7 @@ class GiftListItem extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Price: \$${gift.price?.toStringAsFixed(2) ?? 'N/A'}',
+                          'Price: \$${gift.price.toStringAsFixed(2)}',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurface.withOpacity(0.8),
                             fontWeight: FontWeight.w500,

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../controller/services/gift_service.dart';
-import '../../../data/local/database/app_database.dart';
+import '../../../data/local/database/app_database.dart' as local;
 import '../../components/sort_buttons.dart';
 import '../../widgets/gift/gift_list_item.dart';
 import '../../../controller/strategies/gift_sort_strategy.dart';
@@ -11,6 +11,8 @@ import '../../../controller/strategies/sort_by_gift_status.dart';
 import '../../../controller/strategies/gift_sort_context.dart';
 import 'gift_details_page.dart';
 import '../../../controller/utils/navigation_utils.dart';
+import '../../../data/remote/firebase/models/gift.dart';
+import '../../../data/remote/firebase/models/event.dart';
 
 class GiftListPage extends StatefulWidget {
   final Event event;
@@ -22,39 +24,12 @@ class GiftListPage extends StatefulWidget {
 }
 
 class _GiftListPageState extends State<GiftListPage> {
-  final GiftService _giftService = GiftService(AppDatabase());
+  final GiftService _giftService = GiftService(local.AppDatabase());
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   List<Gift> _gifts = [];
   final GiftSortContext _sortContext = GiftSortContext();
   GiftSortStrategy? _lastUsedSortStrategy;
   bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchGifts();
-  }
-
-  Future<void> _fetchGifts() async {
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      final giftList = await _giftService.getGiftsForEvent(widget.event.id);
-      setState(() {
-        _gifts = giftList;
-        isLoading = false;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print("Error fetching gifts: $e");
-      }
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to load gifts")));
-    }
-  }
 
 
   void _sortBy(GiftSortStrategy strategy) {
@@ -68,14 +43,14 @@ class _GiftListPageState extends State<GiftListPage> {
   void _navigateToGiftDetails({Gift? gift, int? index}) async {
     final result = await navigateWithAnimation(context, GiftDetailsPage(gift: gift, isEditMode: gift != null, eventId: widget.event.id,));
     if (result != null) {
-      setState(() {
+      setState(() async{
         if (index != null) {
           // Update existing gift
-          _giftService.updateGift(result);
+          await _giftService.updateGift(result);
           _gifts[index] = result;
         } else {
           // Add new gift
-          _giftService.addGift(result);
+          await _giftService.addGift(result);
           _gifts.add(result);
           _listKey.currentState?.insertItem(_gifts.length - 1);
         }
@@ -154,33 +129,51 @@ class _GiftListPageState extends State<GiftListPage> {
           ),
           const SizedBox(height: 10.0),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: _gifts.isEmpty
-                  ? Center(
-                child: Text(
-                  'No gifts available.',
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
-                  ),
-                ),
-              )
-                  : AnimatedList(
-                key: _listKey,
-                initialItemCount: _gifts.length,
-                itemBuilder: (context, index, animation) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: GiftListItem(
-                      gift: _gifts[index],
-                      animation: animation,
-                      onEdit: () => _navigateToGiftDetails(gift: _gifts[index], index: index),
-                      onDelete: () => _showDeleteConfirmationDialog(index),
+            child: StreamBuilder<List<Gift>>(
+              stream: _giftService.getGiftsForEvent(widget.event.id),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+
+                _gifts = snapshot.data ?? [];
+                if (_lastUsedSortStrategy != null) {
+                  _sortBy(_lastUsedSortStrategy!);
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: _gifts.isEmpty
+                      ? Center(
+                    child: Text(
+                      'No gifts available.',
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white70 : Colors.black87,
+                      ),
                     ),
-                  );
-                },
-              ),
-            ),
+                  )
+                      : AnimatedList(
+                    key: _listKey,
+                    initialItemCount: _gifts.length,
+                    itemBuilder: (context, index, animation) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: GiftListItem(
+                          gift: _gifts[index],
+                          animation: animation,
+                          onEdit: () => _navigateToGiftDetails(gift: _gifts[index], index: index),
+                          onDelete: () => _showDeleteConfirmationDialog(index),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            )
           ),
         ],
       ),

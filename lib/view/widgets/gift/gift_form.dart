@@ -1,8 +1,6 @@
-import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/enums/gift_status.dart';
-import 'package:hedieaty/data/local/database/app_database.dart';
-
+import 'package:hedieaty/data/remote/firebase//models/gift.dart';
 class GiftForm extends StatefulWidget {
   final Gift gift;
   final bool isEditable;
@@ -34,8 +32,8 @@ class _GiftFormState extends State<GiftForm> {
   void initState() {
     super.initState();
     nameController = TextEditingController(text: widget.gift.name);
-    descriptionController = TextEditingController(text: widget.gift.description ?? '');
-    priceController = TextEditingController(text: widget.gift.price?.toString() ?? '');
+    descriptionController = TextEditingController(text: widget.gift.description);
+    priceController = TextEditingController(text: widget.gift.price.toString());
 
     category = categories.contains(widget.gift.category) ? widget.gift.category : 'Electronics';
     GiftStatus giftStatus = GiftStatus.fromString(widget.gift.status);
@@ -53,13 +51,15 @@ class _GiftFormState extends State<GiftForm> {
     _validateFields();
     if (isNameValid && isCategoryValid) {
       widget.onGiftChanged(
-        widget.gift.copyWith(
-          name: nameController.text,
-          description: drift.Value(descriptionController.text),
-          category: category,
-          price: drift.Value(double.tryParse(priceController.text)),
-          status: isPledged ? 'Pledged' : 'Available',
-        ),
+           Gift(
+            name: nameController.text,
+            category: category,
+            status: isPledged ? 'Pledged' : 'Available',
+            description: descriptionController.text,
+            price: double.tryParse(priceController.text) ?? 0.0,
+            id: widget.gift.id,
+            eventId: widget.gift.eventId,
+          )
       );
     }
   }
