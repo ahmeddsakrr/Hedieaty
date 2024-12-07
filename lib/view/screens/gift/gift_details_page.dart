@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/enums/gift_status.dart';
 import '../../widgets/gift/gift_header.dart';
 import '../../widgets/gift/gift_form.dart';
-import '../../../data/remote/firebase/models/gift.dart';
+import 'package:hedieaty/data/remote/firebase/models/gift.dart';
 
 class GiftDetailsPage extends StatefulWidget {
   final Gift? gift;

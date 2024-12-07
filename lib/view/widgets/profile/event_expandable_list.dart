@@ -5,7 +5,7 @@ import 'package:hedieaty/controller/utils/date_utils.dart';
 import '../../../data/local/database/app_database.dart';
 import '../gift/gift_list_item.dart';
 import '../../../data/remote/firebase/models/event.dart' as RemoteEvent;
-import '../../../data/remote/firebase/models/gift.dart' as RemoteGift;
+import 'package:hedieaty/data/remote/firebase/models/gift.dart' as RemoteGift;
 
 const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 

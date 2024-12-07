@@ -4,7 +4,7 @@ import 'package:hedieaty/controller/services/pledge_service.dart';
 import 'package:hedieaty/data/local/database/app_database.dart' as local;
 import '../../components/custom_search_bar.dart';
 import '../../widgets/gift/gift_list_item.dart';
-import '../../../data/remote/firebase/models/gift.dart';
+import 'package:hedieaty/data/remote/firebase/models/gift.dart';
 import '../../../data/remote/firebase/models/user.dart';
 import '../../../data/remote/firebase/models/event.dart';
 

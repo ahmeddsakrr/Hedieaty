@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/enums/gift_status.dart';
 import '../../../controller/utils/date_utils.dart';
-import 'package:hedieaty/data/remote/firebase//models/gift.dart';
+import 'package:hedieaty/data/remote/firebase/models/gift.dart';
 
 class GiftListItem extends StatelessWidget {
   final Gift gift;

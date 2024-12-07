@@ -11,7 +11,7 @@ import '../../../controller/strategies/sort_by_gift_status.dart';
 import '../../../controller/strategies/gift_sort_context.dart';
 import 'gift_details_page.dart';
 import '../../../controller/utils/navigation_utils.dart';
-import '../../../data/remote/firebase/models/gift.dart';
+import 'package:hedieaty/data/remote/firebase/models/gift.dart';
 import '../../../data/remote/firebase/models/event.dart';
 
 class GiftListPage extends StatefulWidget {

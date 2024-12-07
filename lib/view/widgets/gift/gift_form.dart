@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/enums/gift_status.dart';
-import 'package:hedieaty/data/remote/firebase//models/gift.dart';
+import 'package:hedieaty/data/remote/firebase/models/gift.dart';
 class GiftForm extends StatefulWidget {
   final Gift gift;
   final bool isEditable;
