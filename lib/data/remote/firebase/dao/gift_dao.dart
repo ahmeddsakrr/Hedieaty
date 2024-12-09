@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/gift.dart';
 
@@ -10,9 +8,14 @@ class GiftDAO {
     final counterDoc = _firestore.collection('counters').doc('gifts');
     return _firestore.runTransaction((transaction) async {
       final snapshot = await transaction.get(counterDoc);
-      int currentId = snapshot.exists ? snapshot['value'] as int : 0;
-      transaction.update(counterDoc, {'value': currentId + 1});
-      return currentId + 1;
+      if (!snapshot.exists) {
+        transaction.set(counterDoc, {'value': 0});
+        return 1;
+      }
+      int currentId = snapshot['value'] as int;
+      int nextId = currentId + 1;
+      transaction.update(counterDoc, {'value': nextId});
+      return nextId;
     });
   }
 
