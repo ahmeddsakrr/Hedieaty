@@ -1,7 +1,7 @@
 import 'package:hedieaty/controller/utils/date_utils.dart';
 
 class Event {
-  final int id;
+  int id;
   final String userId;
   final String name;
   final String category;

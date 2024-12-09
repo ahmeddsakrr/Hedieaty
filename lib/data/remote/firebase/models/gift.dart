@@ -1,5 +1,5 @@
 class Gift {
-  final int id;
+  int id;
   final int eventId;
   final String name;
   final String description;

@@ -1,7 +1,7 @@
 import 'package:hedieaty/controller/utils/date_utils.dart';
 
 class Pledge {
-  final int id;
+  int id;
   final int giftId;
   final String userId;
   final DateTime pledgeDate;

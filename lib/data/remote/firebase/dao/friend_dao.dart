@@ -4,7 +4,18 @@ import '../models/friend.dart';
 class FriendDAO {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  Future<int> _getNextId() async {
+    final counterDoc = _firestore.collection('counters').doc('friends');
+    return _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(counterDoc);
+      int currentId = snapshot.exists ? snapshot['value'] as int : 0;
+      transaction.update(counterDoc, {'value': currentId + 1});
+      return currentId + 1;
+    });
+  }
+
   Future<void> addFriend(Friend friend) async {
+    friend.id = await _getNextId();
     await _firestore.collection('friends').doc(friend.id.toString()).set(friend.toMap());
   }
 

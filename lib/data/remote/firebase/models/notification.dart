@@ -1,7 +1,7 @@
 import 'package:hedieaty/controller/utils/date_utils.dart';
 
 class Notification {
-  final int id;
+  int id;
   final String userId;
   final String type;
   final String message;

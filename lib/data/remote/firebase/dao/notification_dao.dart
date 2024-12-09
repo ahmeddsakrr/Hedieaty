@@ -4,7 +4,18 @@ import '../models/notification.dart';
 class NotificationDAO {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  Future<int> _getNextId() async {
+    final counterDoc = _firestore.collection('counters').doc('notifications');
+    return _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(counterDoc);
+      int currentId = snapshot.exists ? snapshot['value'] as int : 0;
+      transaction.update(counterDoc, {'value': currentId + 1});
+      return currentId + 1;
+    });
+  }
+
   Future<void> createNotification(Notification notification) async {
+    notification.id = await _getNextId();
     await _firestore
         .collection('notifications')
         .doc(notification.id.toString())

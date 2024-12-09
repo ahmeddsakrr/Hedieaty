@@ -1,5 +1,5 @@
 class Friend {
-  final int id;
+  int id;
   final String userId;
   final String friendUserId;
 
