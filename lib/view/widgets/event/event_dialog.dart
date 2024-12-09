@@ -3,14 +3,14 @@ import 'package:hedieaty/controller/enums/event_status.dart';
 
 import '../../../data/remote/firebase/models/event.dart' as RemoteEvent;
 
-const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
 
 class EventDialog extends StatefulWidget {
   final RemoteEvent.Event? event;
   final void Function(RemoteEvent.Event) onSave;
+  final String userId;
 
-  const EventDialog({super.key, this.event, required this.onSave});
+  const EventDialog({super.key, this.event, required this.onSave, required this.userId});
 
   @override
   _EventDialogState createState() => _EventDialogState();
@@ -61,7 +61,7 @@ class _EventDialogState extends State<EventDialog> {
           category: categoryController.text,
           eventDate: selectedDate!,
           id: widget.event!.id,
-          userId: widget.event!.userId,
+          userId: widget.userId,
         );
       } else {
         // Adding a new event
@@ -70,7 +70,7 @@ class _EventDialogState extends State<EventDialog> {
           category: categoryController.text,
           eventDate: selectedDate!,
           id: 0,
-          userId: placeholderUserId,
+          userId: widget.userId,
         );
       }
 

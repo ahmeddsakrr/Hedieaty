@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hedieaty/controller/services/auth_service.dart';
 import 'package:hedieaty/controller/services/event_service.dart';
 import '../../../data/local/database/app_database.dart';
 import '../../components/sort_buttons.dart';
@@ -14,7 +15,6 @@ import '../../screens/gift/gift_list_page.dart';
 import '../../../controller/utils/navigation_utils.dart';
 import '../../../data/remote/firebase/models/event.dart' as RemoteEvent;
 
-const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
 class EventListPage extends StatefulWidget {
   const EventListPage({super.key});
@@ -25,6 +25,7 @@ class EventListPage extends StatefulWidget {
 
 class _EventListPageState extends State<EventListPage> {
   final EventService _eventService = EventService(AppDatabase());
+  final AuthService _authService = AuthService(AppDatabase());
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   List<RemoteEvent.Event> _events = [];
   final EventSortContext _sortContext = EventSortContext();
@@ -40,7 +41,9 @@ class _EventListPageState extends State<EventListPage> {
     });
   }
 
-  void _showEventDialog({RemoteEvent.Event? event, int? index}) {
+  void _showEventDialog({RemoteEvent.Event? event, int? index}) async {
+    String userId;
+    userId = await _authService.getCurrentUser();
     showDialog(
       context: context,
       builder: (context) => EventDialog(
@@ -72,7 +75,7 @@ class _EventListPageState extends State<EventListPage> {
               const SnackBar(content: Text("Failed to save event")),
             );
           }
-        },
+        }, userId: userId,
       ),
     );
   }
@@ -149,7 +152,9 @@ class _EventListPageState extends State<EventListPage> {
             ),
             Expanded(
               child: StreamBuilder<List<RemoteEvent.Event>>(
-                stream: _eventService.getEventsForUser(placeholderUserId),
+                stream: _authService.getCurrentUser().then((currentUser) {
+                  return _eventService.getEventsForUser(currentUser);
+                }).asStream().asyncExpand((stream) => stream),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

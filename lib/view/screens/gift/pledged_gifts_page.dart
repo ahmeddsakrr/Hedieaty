@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hedieaty/controller/services/auth_service.dart';
 import 'package:hedieaty/controller/services/gift_service.dart';
 import 'package:hedieaty/controller/services/pledge_service.dart';
 import 'package:hedieaty/data/local/database/app_database.dart' as local;
@@ -8,7 +9,6 @@ import 'package:hedieaty/data/remote/firebase/models/gift.dart';
 import '../../../data/remote/firebase/models/user.dart';
 import '../../../data/remote/firebase/models/event.dart';
 
-const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
 class PledgedGiftsPage extends StatefulWidget {
   const PledgedGiftsPage({super.key});
@@ -21,11 +21,14 @@ class _PledgedGiftsPageState extends State<PledgedGiftsPage> {
   List<Gift> pledgedGifts = [];
   final PledgeService _pledgeService = PledgeService(local.AppDatabase());
   final GiftService _giftService = GiftService(local.AppDatabase());
+  final AuthService _authService = AuthService(local.AppDatabase());
   List<Gift> filteredGifts = [];
   String searchQuery = "";
 
   Stream<List<Gift>> _fetchPledgedGifts() {
-    return _pledgeService.getPledgedGiftsForUser(placeholderUserId);
+    return _authService.getCurrentUser().then((currentUser) {
+      return _pledgeService.getPledgedGiftsForUser(currentUser);
+    }).asStream().asyncExpand((stream) => stream);
   }
 
 
@@ -33,13 +36,16 @@ class _PledgedGiftsPageState extends State<PledgedGiftsPage> {
     if (query.isEmpty) {
       return _fetchPledgedGifts();
     } else {
-      return _pledgeService.searchPledgedGifts(placeholderUserId, query);
+      return _authService.getCurrentUser().then((currentUser) {
+        return _pledgeService.searchPledgedGifts(currentUser, query);
+      }).asStream().asyncExpand((stream) => stream);
     }
   }
 
   void _removePledgedGift(Gift gift) {
     setState(() async {
-      await _pledgeService.unpledgeGift(placeholderUserId, gift.id);
+      String userId = await _authService.getCurrentUser();
+      await _pledgeService.unpledgeGift(userId, gift.id);
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Unpledged ${gift.name}'))
       );

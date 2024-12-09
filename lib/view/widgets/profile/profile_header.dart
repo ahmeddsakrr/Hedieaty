@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/services/user_service.dart';
+import '../../../controller/services/auth_service.dart';
 import 'profile_info_field.dart';
 import 'package:hedieaty/data/local/database/app_database.dart';
 import '../../../data/remote/firebase/models/user.dart' as RemoteUser;
 
-const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
 class ProfileHeader extends StatefulWidget {
   const ProfileHeader({super.key});
@@ -21,6 +21,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
   bool isLoading = true;
 
   final UserService _userService = UserService(AppDatabase());
+  final AuthService _authService = AuthService(AppDatabase());
 
   @override
   void initState() {
@@ -30,7 +31,8 @@ class _ProfileHeaderState extends State<ProfileHeader> {
 
   Future<void> _fetchUserProfile() async {
     try {
-      final user = await _userService.getUser(placeholderUserId);
+      String userId = await _authService.getCurrentUser();
+      final user = await _userService.getUser(userId);
       if (user != null) {
         setState(() {
           nameController = TextEditingController(text: user.name);
@@ -53,11 +55,12 @@ class _ProfileHeaderState extends State<ProfileHeader> {
   }
 
   Future<void> _saveUserProfile() async {
+    String userId = await _authService.getCurrentUser();
     final updatedUser = RemoteUser.User(
       name: nameController.text,
       phoneNumber: phoneController.text,
       email: emailController.text,
-      password: _userService.getUserPassword(placeholderUserId),
+      password: _userService.getUserPassword(userId),
     );
     await _userService.updateUser(updatedUser);
   }

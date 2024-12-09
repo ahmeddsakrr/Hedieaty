@@ -4,6 +4,7 @@ import 'package:hedieaty/data/repositories/user_repository.dart';
 import '../../data/remote/firebase/models/user.dart' as RemoteUser;
 
 import '../../data/local/database/app_database.dart' as AppDatabase;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -28,6 +29,7 @@ class AuthService {
             password: password,
           ));
         }
+        await _saveCurrentUserPhoneNumber(phoneNumber);
         return firebaseUser;
       } catch (e) {
         if (kDebugMode) {
@@ -47,6 +49,7 @@ class AuthService {
           email: user.email,
           password: password,
         );
+        await _saveCurrentUserPhoneNumber(phoneNumber);
         return result.user;
       } catch (e) {
         if (kDebugMode) {
@@ -58,11 +61,17 @@ class AuthService {
     return null;
   }
 
-  User? getCurrentUser() {
-    return _auth.currentUser;
+  Future<String> getCurrentUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('current_user_phone_number') ?? '';
   }
 
   Future<void> signOut() async {
     await _auth.signOut();
+  }
+
+  Future<void> _saveCurrentUserPhoneNumber(String phoneNumber) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('current_user_phone_number', phoneNumber);
   }
 }

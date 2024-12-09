@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hedieaty/controller/services/auth_service.dart';
 import 'package:hedieaty/controller/services/event_service.dart';
 import 'package:hedieaty/controller/services/gift_service.dart';
 import 'package:hedieaty/controller/utils/date_utils.dart';
@@ -7,7 +8,6 @@ import '../gift/gift_list_item.dart';
 import '../../../data/remote/firebase/models/event.dart' as RemoteEvent;
 import 'package:hedieaty/data/remote/firebase/models/gift.dart' as RemoteGift;
 
-const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
 class EventExpandableList extends StatelessWidget {
   const EventExpandableList({super.key});
@@ -16,11 +16,14 @@ class EventExpandableList extends StatelessWidget {
   Widget build(BuildContext context) {
     final GiftService _giftService = GiftService(AppDatabase());
     final EventService _eventService = EventService(AppDatabase());
+    final AuthService _authService = AuthService(AppDatabase());
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: StreamBuilder<List<RemoteEvent.Event>>(
-        stream: _eventService.getEventsForUser(placeholderUserId),
+        stream: _authService.getCurrentUser().then((userId) {
+          return _eventService.getEventsForUser(userId);
+        }).asStream().asyncExpand((stream) => stream),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
