@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hedieaty/controller/services/auth_service.dart';
 import 'package:hedieaty/controller/services/event_service.dart';
 import '../../../data/local/database/app_database.dart' as local;
 import '../../../controller/services/friend_service.dart';
@@ -9,7 +10,6 @@ import '../profile/profile_page.dart';
 import '../../../controller/utils/navigation_utils.dart';
 import '../../../data/remote/firebase/models/user.dart';
 
-const String placeholderUserId = '1234567890'; // Placeholder for current user ID
 
 class HomePage extends StatefulWidget {
   final VoidCallback toggleTheme;
@@ -23,6 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FriendService _friendService = FriendService(local.AppDatabase());
   final EventService _eventService = EventService(local.AppDatabase());
+  final AuthService _authService = AuthService(local.AppDatabase());
   List<User> friends = [];
   List<User> filteredFriends = [];
   String searchQuery = "";
@@ -30,14 +31,18 @@ class _HomePageState extends State<HomePage> {
 
 
   Stream<List<User>> _fetchFriends() {
-    return _friendService.getFriendsForUser(placeholderUserId);
+    return _authService.getCurrentUser().then((currentUser) {
+      return _friendService.getFriendsForUser(currentUser);
+    }).asStream().asyncExpand((stream) => stream);
   }
 
   Stream<List<User>> _searchFriends(String query) {
     if (query.isEmpty) {
       return _fetchFriends();
     } else {
-      return _friendService.searchFriends(placeholderUserId, query);
+      return _authService.getCurrentUser().then((currentUser) {
+        return _friendService.searchFriends(currentUser, query);
+      }).asStream().asyncExpand((stream) => stream);
     }
   }
 
@@ -56,7 +61,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
-            onPressed: () => navigateWithAnimation(context, const ProfilePage()),
+            onPressed: () => navigateWithAnimation(context, ProfilePage()),
           ),
           IconButton(
             icon: const Icon(Icons.brightness_6),
@@ -104,7 +109,9 @@ class _HomePageState extends State<HomePage> {
                   if (filteredFriends.isEmpty) {
                     return Center(
                       child: Text(
-                        'No friends found matching "$searchQuery".',
+                        searchQuery.isEmpty
+                            ? 'You have not added any friends yet.\nStart by adding a friend to your list!'
+                            : 'No friends found matching "$searchQuery".',
                         style: TextStyle(
                           color: isDarkMode ? Colors.white : Colors.black,
                           fontSize: 16,
