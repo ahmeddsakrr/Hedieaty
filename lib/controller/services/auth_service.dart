@@ -66,7 +66,7 @@ class AuthService {
     return prefs.getString('current_user_phone_number') ?? '';
   }
 
-  Future<void> signOut() async {
+  Future<void> logOut() async {
     await _auth.signOut();
   }
 

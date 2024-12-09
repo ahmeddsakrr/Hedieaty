@@ -24,6 +24,9 @@ void main() async {
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  static _MyAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_MyAppState>();
+
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -31,7 +34,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool _isDarkTheme = false;
 
-  void _toggleTheme() {
+  void toggleTheme() {
     setState(() {
       _isDarkTheme = !_isDarkTheme;
     });
@@ -44,7 +47,7 @@ class _MyAppState extends State<MyApp> {
       home: Builder(
         builder: (context) => AuthPage(
           onAuthComplete: () {
-            navigateWithAnimation(context, HomePage(toggleTheme: _toggleTheme), replace: true);
+            navigateWithAnimation(context, HomePage(toggleTheme: toggleTheme), replace: true,);
           },
         ),
       ),

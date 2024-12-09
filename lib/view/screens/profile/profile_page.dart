@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:hedieaty/controller/services/auth_service.dart';
+import 'package:hedieaty/data/local/database/app_database.dart';
+import 'package:hedieaty/view/screens/auth/auth_page.dart';
+import '../../../main.dart';
 import '../../widgets/profile/profile_header.dart';
 import '../../widgets/profile/event_expandable_list.dart';
 import '../gift/pledged_gifts_page.dart';
 import '../../../controller/utils/navigation_utils.dart';
+import '../home/home_page.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+  ProfilePage({super.key});
+  final AuthService _authService = AuthService(AppDatabase());
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +54,29 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                _pledgedGiftsButton(context),
+                buildButton(
+                  context: context,
+                  icon: Icons.card_giftcard,
+                  text: "View My Pledged Gifts",
+                  color: theme.colorScheme.primary,
+                  onPressed: () => navigateWithAnimation(context, const PledgedGiftsPage()),
+                ),
+                const SizedBox(height: 10),
+                buildButton(
+                  context: context,
+                  icon: Icons.logout,
+                  text: "Logout",
+                  color: theme.colorScheme.error,
+                  onPressed: () {
+                    _authService.logOut();
+                    navigateWithAnimation(
+                        context,
+                        AuthPage(onAuthComplete: () {
+                          navigateWithAnimation(context,HomePage(toggleTheme: MyApp.of(context)!.toggleTheme));
+                        }),
+                        replace: true);
+                  },
+                ),
                 const SizedBox(height: 10),
               ],
             ),
@@ -58,16 +86,22 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _pledgedGiftsButton(BuildContext context) {
+  Widget buildButton({
+    required BuildContext context,
+    required IconData icon,
+    required String text,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
     final theme = Theme.of(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: ElevatedButton(
-        onPressed: () => navigateWithAnimation(context, const PledgedGiftsPage()),
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           foregroundColor: theme.colorScheme.onPrimary,
-          backgroundColor: theme.colorScheme.primary,
+          backgroundColor: color,
           padding: const EdgeInsets.symmetric(vertical: 16.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
@@ -78,10 +112,10 @@ class ProfilePage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.card_giftcard, size: 28),
+            Icon(icon, size: 28),
             const SizedBox(width: 10),
             Text(
-              "View My Pledged Gifts",
+              text,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.onPrimary,
