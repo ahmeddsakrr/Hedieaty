@@ -1,14 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/services/auth_service.dart';
 import 'package:hedieaty/controller/services/event_service.dart';
+import 'package:hedieaty/controller/services/user_service.dart';
 import '../../../data/local/database/app_database.dart' as local;
 import '../../../controller/services/friend_service.dart';
 import '../../components/custom_search_bar.dart';
 import '../../widgets/friend/friend_list_item.dart';
+import '../../widgets/home/add_friend_dialog.dart';
 import '../event/event_list_page.dart';
 import '../profile/profile_page.dart';
 import '../../../controller/utils/navigation_utils.dart';
 import '../../../data/remote/firebase/models/user.dart';
+import 'package:hedieaty/data/remote/firebase/models/friend.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -24,6 +28,7 @@ class _HomePageState extends State<HomePage> {
   final FriendService _friendService = FriendService(local.AppDatabase());
   final EventService _eventService = EventService(local.AppDatabase());
   final AuthService _authService = AuthService(local.AppDatabase());
+  final UserService _userService = UserService(local.AppDatabase());
   List<User> friends = [];
   List<User> filteredFriends = [];
   String searchQuery = "";
@@ -49,6 +54,47 @@ class _HomePageState extends State<HomePage> {
   Stream<int> _getEventCountForFriend(String phoneNumber) {
     return _eventService.getEventCountForUser(phoneNumber);
   }
+
+  Future<void> _addFriend(Friend friend) async {
+    try {
+      await _friendService.addFriend(friend);
+      String friendName = await _userService.getUser(friend.friendUserId).then((value) => value?.name) ?? '';
+      _showSuccessNotification(friendName);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error adding friend: $e');
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to add friend')),
+      );
+    }
+  }
+
+  void _showSuccessNotification(String friendName) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Friend $friendName was added successfully!',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        elevation: 8,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -150,8 +196,24 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add Friends action
+        onPressed: () async {
+          final userId = await _authService.getCurrentUser();
+          if (userId.isNotEmpty) {
+            showDialog(
+              context: context,
+              builder: (context) => AddFriendDialog(
+                onSave: _addFriend,
+                userId: userId,
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Failed to fetch user ID'),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
         },
         child: const Icon(Icons.person_add),
       ),

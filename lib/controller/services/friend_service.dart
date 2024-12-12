@@ -3,6 +3,7 @@ import 'package:hedieaty/controller/services/user_service.dart';
 import '../../data/local/database/app_database.dart';
 import '../../data/repositories/friend_repository.dart';
 import '../../data/remote/firebase/models/user.dart' as RemoteUser;
+import '../../data/remote/firebase/models/friend.dart' as RemoteFriend;
 
 class FriendService {
   final FriendRepository _friendRepository;
@@ -35,4 +36,13 @@ class FriendService {
     });
   }
 
+  Future<void> addFriend(RemoteFriend.Friend friend) async {
+    await _friendRepository.addFriend(friend);
+    final reverseFriend = RemoteFriend.Friend(
+      id: 0, // will be set in the DAO
+      userId: friend.friendUserId,
+      friendUserId: friend.userId,
+    );
+    await _friendRepository.addFriend(reverseFriend);
+  }
 }
