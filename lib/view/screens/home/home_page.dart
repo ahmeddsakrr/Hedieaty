@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
-            onPressed: () => navigateWithAnimation(context, ProfilePage()),
+            onPressed: () => navigateWithAnimation(ProfilePage()),
           ),
           IconButton(
             icon: const Icon(Icons.brightness_6),
@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: () => navigateWithAnimation(context, const EventListPage()),
+                onPressed: () => navigateWithAnimation(const EventListPage()),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: theme.colorScheme.onPrimary,
                   backgroundColor: theme.colorScheme.primary,
@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> {
                           return FriendListItem(
                             friendName: friend.name,
                             eventsCount: eventCount,
-                            onTap: () => navigateWithAnimation(context, const EventListPage()),
+                            onTap: () => navigateWithAnimation(const EventListPage()),
                           );
                         },
                       );

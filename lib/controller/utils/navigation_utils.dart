@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
+
 
 Future<T?> navigateWithAnimation<T>(
-    BuildContext context,
     Widget page, {
       bool replace = false,
     }) {
+  final navigator = navigatorKey.currentState!;
   final pageRoute = PageRouteBuilder<T>(
     transitionDuration: const Duration(milliseconds: 400),
     reverseTransitionDuration: const Duration(milliseconds: 400),
@@ -31,8 +33,8 @@ Future<T?> navigateWithAnimation<T>(
   );
 
   if (replace) {
-    return Navigator.of(context).pushReplacement<T, T>(pageRoute);
+    return navigator.pushReplacement<T, T>(pageRoute);
   } else {
-    return Navigator.of(context).push<T>(pageRoute);
+    return navigator.push<T>(pageRoute);
   }
 }

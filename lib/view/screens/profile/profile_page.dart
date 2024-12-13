@@ -59,7 +59,7 @@ class ProfilePage extends StatelessWidget {
                   icon: Icons.card_giftcard,
                   text: "View My Pledged Gifts",
                   color: theme.colorScheme.primary,
-                  onPressed: () => navigateWithAnimation(context, const PledgedGiftsPage()),
+                  onPressed: () => navigateWithAnimation(const PledgedGiftsPage()),
                 ),
                 const SizedBox(height: 10),
                 buildButton(
@@ -68,13 +68,17 @@ class ProfilePage extends StatelessWidget {
                   text: "Logout",
                   color: theme.colorScheme.error,
                   onPressed: () {
+                    final toggleTheme = MyApp.of(context)!.toggleTheme;
                     _authService.logOut();
                     navigateWithAnimation(
-                        context,
-                        AuthPage(onAuthComplete: () {
-                          navigateWithAnimation(context,HomePage(toggleTheme: MyApp.of(context)!.toggleTheme));
-                        }),
-                        replace: true);
+                      AuthPage(onAuthComplete: () {
+                        navigateWithAnimation(
+                          HomePage(toggleTheme: toggleTheme),
+                          replace: true,
+                        );
+                      }),
+                      replace: true,
+                    );
                   },
                 ),
                 const SizedBox(height: 10),

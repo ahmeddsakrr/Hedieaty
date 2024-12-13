@@ -8,6 +8,8 @@ import 'view/screens/home/home_page.dart';
 import 'view/screens/auth/auth_page.dart';
 import 'controller/utils/navigation_utils.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // final db = AppDatabase();
@@ -43,15 +45,16 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       theme: _isDarkTheme ? AppTheme.darkTheme : AppTheme.lightTheme,
-      home: Builder(
-        builder: (context) => AuthPage(
-          onAuthComplete: () {
-            navigateWithAnimation(context, HomePage(toggleTheme: toggleTheme), replace: true,);
-          },
-        ),
+      home: AuthPage(
+        onAuthComplete: () {
+          navigateWithAnimation(
+            HomePage(toggleTheme: toggleTheme),
+            replace: true,
+          );
+        },
       ),
-
     );
   }
 }

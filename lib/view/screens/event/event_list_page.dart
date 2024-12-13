@@ -185,7 +185,7 @@ class _EventListPageState extends State<EventListPage> {
                         animation: animation,
                         onEdit: () => _showEventDialog(event: events[index], index: index),
                         onDelete: () => _showDeleteConfirmationDialog(index),
-                        onTap: () => navigateWithAnimation(context, GiftListPage(event: events[index])),
+                        onTap: () => navigateWithAnimation(GiftListPage(event: events[index])),
                       );
                     },
                   );

@@ -41,7 +41,7 @@ class _GiftListPageState extends State<GiftListPage> {
   }
 
   void _navigateToGiftDetails({Gift? gift, int? index}) async {
-    final result = await navigateWithAnimation(context, GiftDetailsPage(gift: gift, isEditMode: gift != null, eventId: widget.event.id,));
+    final result = await navigateWithAnimation(GiftDetailsPage(gift: gift, isEditMode: gift != null, eventId: widget.event.id,));
     if (result != null) {
       setState(() async{
         if (index != null) {
