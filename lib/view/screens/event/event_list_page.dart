@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:hedieaty/controller/services/auth_service.dart';
 import 'package:hedieaty/controller/services/event_service.dart';
+import 'package:hedieaty/controller/services/user_service.dart';
 import '../../../data/local/database/app_database.dart';
 import '../../components/sort_buttons.dart';
 import '../../widgets/event/event_item.dart';
@@ -17,7 +17,9 @@ import '../../../data/remote/firebase/models/event.dart' as RemoteEvent;
 
 
 class EventListPage extends StatefulWidget {
-  const EventListPage({super.key});
+  final String userId;
+  final bool canManageEvents;
+  const EventListPage({super.key, required this.userId, required this.canManageEvents});
 
   @override
   _EventListPageState createState() => _EventListPageState();
@@ -25,7 +27,6 @@ class EventListPage extends StatefulWidget {
 
 class _EventListPageState extends State<EventListPage> {
   final EventService _eventService = EventService(AppDatabase());
-  final AuthService _authService = AuthService(AppDatabase());
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   List<RemoteEvent.Event> _events = [];
   final EventSortContext _sortContext = EventSortContext();
@@ -42,8 +43,6 @@ class _EventListPageState extends State<EventListPage> {
   }
 
   void _showEventDialog({RemoteEvent.Event? event, int? index}) async {
-    String userId;
-    userId = await _authService.getCurrentUser();
     showDialog(
       context: context,
       builder: (context) => EventDialog(
@@ -75,7 +74,7 @@ class _EventListPageState extends State<EventListPage> {
               const SnackBar(content: Text("Failed to save event")),
             );
           }
-        }, userId: userId,
+        }, userId: widget.userId,
       ),
     );
   }
@@ -118,6 +117,7 @@ class _EventListPageState extends State<EventListPage> {
           onEdit: () {},
           onDelete: () {},
           onTap: () {},
+          canManageEvents: widget.canManageEvents,
         );
       });
       setState(() {});
@@ -136,10 +136,11 @@ class _EventListPageState extends State<EventListPage> {
       appBar: AppBar(
         title: const Text("Event List"),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => _showEventDialog(),
-          ),
+          if (widget.canManageEvents)
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () => _showEventDialog(),
+            ),
         ],
       ),
       body: SafeArea(
@@ -152,9 +153,7 @@ class _EventListPageState extends State<EventListPage> {
             ),
             Expanded(
               child: StreamBuilder<List<RemoteEvent.Event>>(
-                stream: _authService.getCurrentUser().then((currentUser) {
-                  return _eventService.getEventsForUser(currentUser);
-                }).asStream().asyncExpand((stream) => stream),
+                stream: _eventService.getEventsForUser(widget.userId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -165,7 +164,7 @@ class _EventListPageState extends State<EventListPage> {
                   if (snapshot.data == null || snapshot.data!.isEmpty) {
                     return Center(
                       child: Text(
-                        'No events available. Add a new event to get started!',
+                        widget.canManageEvents ? 'No events available. Add a new event to get started!' : 'No events found.',
                         style: TextStyle(
                           color: isDarkMode ? Colors.white70 : Colors.black87,
                         ),
@@ -185,7 +184,8 @@ class _EventListPageState extends State<EventListPage> {
                         animation: animation,
                         onEdit: () => _showEventDialog(event: events[index], index: index),
                         onDelete: () => _showDeleteConfirmationDialog(index),
-                        onTap: () => navigateWithAnimation(GiftListPage(event: events[index])),
+                        onTap: () => navigateWithAnimation(GiftListPage(event: events[index], canManageGifts: widget.canManageEvents,)),
+                        canManageEvents: widget.canManageEvents,
                       );
                     },
                   );

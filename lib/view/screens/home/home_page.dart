@@ -121,7 +121,10 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: () => navigateWithAnimation(const EventListPage()),
+                onPressed: () async {
+                  String userId = await _authService.getCurrentUser();
+                  navigateWithAnimation(EventListPage(userId: userId, canManageEvents: true,));
+                },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: theme.colorScheme.onPrimary,
                   backgroundColor: theme.colorScheme.primary,
@@ -183,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                           return FriendListItem(
                             friendName: friend.name,
                             eventsCount: eventCount,
-                            onTap: () => navigateWithAnimation(const EventListPage()),
+                            onTap: () => navigateWithAnimation(EventListPage(userId: friend.phoneNumber, canManageEvents: false,)),
                           );
                         },
                       );

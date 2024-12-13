@@ -10,6 +10,7 @@ class EventItem extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final VoidCallback onTap;
+  final bool canManageEvents;
 
   const EventItem({
     super.key,
@@ -18,6 +19,7 @@ class EventItem extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     required this.onTap,
+    required this.canManageEvents,
   });
 
   @override
@@ -97,14 +99,18 @@ class EventItem extends StatelessWidget {
                       const SizedBox(width: 16),
                       Row(
                         children: [
-                          IconButton(
-                            icon: Icon(Icons.edit, color: theme.colorScheme.onSurface),
-                            onPressed: onEdit,
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.delete, color: theme.colorScheme.onSurface),
-                            onPressed: onDelete,
-                          ),
+                          if (canManageEvents)
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: onEdit,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          if (canManageEvents)
+                            IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: onDelete,
+                              color: theme.colorScheme.onSurface,
+                            ),
                         ],
                       ),
                     ],

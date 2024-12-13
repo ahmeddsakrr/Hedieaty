@@ -16,8 +16,9 @@ import '../../../data/remote/firebase/models/event.dart';
 
 class GiftListPage extends StatefulWidget {
   final Event event;
+  final bool canManageGifts;
 
-  const GiftListPage({super.key, required this.event});
+  const GiftListPage({super.key, required this.event, required this.canManageGifts});
 
   @override
   _GiftListPageState createState() => _GiftListPageState();
@@ -41,23 +42,24 @@ class _GiftListPageState extends State<GiftListPage> {
   }
 
   void _navigateToGiftDetails({Gift? gift, int? index}) async {
-    final result = await navigateWithAnimation(GiftDetailsPage(gift: gift, isEditMode: gift != null, eventId: widget.event.id,));
+    final result = await navigateWithAnimation(
+      GiftDetailsPage(
+        gift: gift,
+        isEditMode: gift != null,
+        eventId: widget.event.id,
+      ),
+    );
     if (result != null) {
-      setState(() async{
-        if (index != null) {
-          // Update existing gift
-          await _giftService.updateGift(result);
-          _gifts[index] = result;
-        } else {
-          // Add new gift
-          await _giftService.addGift(result);
-          _gifts.add(result);
-          _listKey.currentState?.insertItem(_gifts.length - 1);
-        }
-        if (_lastUsedSortStrategy != null) {
-          _sortBy(_lastUsedSortStrategy!);
-        }
-      });
+      if (index != null) {
+        // Update existing gift
+        await _giftService.updateGift(result);
+      } else {
+        // Add new gift
+        await _giftService.addGift(result);
+      }
+      if (_lastUsedSortStrategy != null) {
+        _sortBy(_lastUsedSortStrategy!);
+      }
     }
   }
 
@@ -99,9 +101,9 @@ class _GiftListPageState extends State<GiftListPage> {
       setState(() {});
     } catch (e) {
       if (kDebugMode) {
-        print("Error deleting event: $e");
+        print("Error deleting gift: $e");
       }
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to delete event")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to delete gift")));
     }
   }
 
@@ -113,10 +115,11 @@ class _GiftListPageState extends State<GiftListPage> {
       appBar: AppBar(
         title: Text("${widget.event.name} - Gift List"),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => _navigateToGiftDetails(),
-          ),
+          if (widget.canManageGifts)
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () => _navigateToGiftDetails(),
+            ),
         ],
       ),
       body: Column(
@@ -167,6 +170,7 @@ class _GiftListPageState extends State<GiftListPage> {
                           animation: animation,
                           onEdit: () => _navigateToGiftDetails(gift: _gifts[index], index: index),
                           onDelete: () => _showDeleteConfirmationDialog(index),
+                          showActions: widget.canManageGifts,
                         ),
                       );
                     },
