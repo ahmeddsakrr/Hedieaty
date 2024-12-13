@@ -123,7 +123,6 @@ class _GiftListPageState extends State<GiftListPage> {
   Future<void> _removeGift(int index) async {
     final removedGift = _gifts[index];
     try {
-      await _giftService.deleteGift(removedGift.id);
       _listKey.currentState?.removeItem(
         index,
             (context, animation) => GiftListItem(
@@ -133,17 +132,17 @@ class _GiftListPageState extends State<GiftListPage> {
           onDelete: () {},
         ),
       );
-      setState(() {
-        _gifts.removeAt(index);
-        // Reapply sorting after deletion
-        if (_lastUsedSortStrategy != null) {
-          _sortBy(_lastUsedSortStrategy!);
-        }
-      });
+      _gifts.removeAt(index);
+      await _giftService.deleteGift(removedGift.id);
+      if (_lastUsedSortStrategy != null) {
+        _sortBy(_lastUsedSortStrategy!);
+      }
     } catch (e) {
       if (kDebugMode) {
         print("Error deleting gift: $e");
       }
+      _gifts.insert(index, removedGift);
+      _listKey.currentState?.insertItem(index);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Failed to delete gift")),
       );

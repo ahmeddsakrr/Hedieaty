@@ -26,7 +26,7 @@ class _GiftFormState extends State<GiftForm> {
   bool isNameValid = true;
   bool isCategoryValid = true;
 
-  final List<String> categories = ['Electronics', 'Books', 'Clothes', 'Toys'];
+  final List<String> categories = ['Electronics', 'Books', 'Clothes', 'Toys', 'Other'];
 
   @override
   void initState() {
