@@ -36,6 +36,18 @@ class EventDAO {
     });
   }
 
+  Stream<List<Event>> getPublishedEventsForUser(String userId) {
+    return _firestore
+        .collection('events')
+        .where('user_id', isEqualTo: userId)
+        .where('is_published', isEqualTo: true)
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs
+          .map((doc) => Event.fromMap(doc.data()))
+          .toList();
+    });
+  }
 
   Future<void> updateEvent(Event event) async {
     await _firestore.collection('events').doc(event.id.toString()).update(event.toMap());

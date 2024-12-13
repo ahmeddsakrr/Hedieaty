@@ -9,6 +9,7 @@ class EventAdapter {
       name: event.name,
       category: event.category,
       eventDate: event.eventDate,
+      isPublished: event.isPublished
     );
   }
 
@@ -19,6 +20,7 @@ class EventAdapter {
       name: event.name,
       category: event.category,
       eventDate: event.eventDate,
+      isPublished: event.isPublished
     );
   }
 }

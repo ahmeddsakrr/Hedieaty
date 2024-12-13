@@ -11,6 +11,8 @@ class EventItem extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onTap;
   final bool canManageEvents;
+  final VoidCallback onPublish;
+  final bool isPublished;
 
   const EventItem({
     super.key,
@@ -20,6 +22,8 @@ class EventItem extends StatelessWidget {
     required this.onDelete,
     required this.onTap,
     required this.canManageEvents,
+    required this.onPublish,
+    required this.isPublished,
   });
 
   @override
@@ -30,11 +34,11 @@ class EventItem extends StatelessWidget {
     Color getStatusColor() {
       switch (EventStatus.fromDateTime(event.eventDate)) {
         case EventStatus.upcoming:
-          return isDarkMode ? Colors.amber.shade500 : Colors.amber.shade200;
+          return isDarkMode ? Colors.amber.shade900 : Colors.amber.shade600;
         case EventStatus.current:
           return isDarkMode ? Colors.amber.shade700 : Colors.amber.shade400;
         case EventStatus.past:
-          return isDarkMode ? Colors.amber.shade900 : Colors.amber.shade600;
+          return isDarkMode ? Colors.amber.shade500 : Colors.amber.shade200;
         default:
           return theme.colorScheme.surfaceContainerHighest;
       }
@@ -104,12 +108,21 @@ class EventItem extends StatelessWidget {
                               icon: const Icon(Icons.edit),
                               onPressed: onEdit,
                               color: theme.colorScheme.onSurface,
+                              tooltip: "Edit Event",
                             ),
                           if (canManageEvents)
                             IconButton(
                               icon: const Icon(Icons.delete),
                               onPressed: onDelete,
                               color: theme.colorScheme.onSurface,
+                              tooltip: "Delete Event",
+                            ),
+                          if (canManageEvents && !isPublished)
+                            IconButton(
+                              icon: const Icon(Icons.publish),
+                              onPressed: onPublish,
+                              color: theme.colorScheme.onSurface,
+                              tooltip: "Publish Event",
                             ),
                         ],
                       ),

@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart';
+
 import '../app_database.dart';
 
 class EventDao {
@@ -18,6 +20,10 @@ class EventDao {
 
   Stream<List<Event>> findEventsByUserPhoneNumber(String phoneNumber) {
     return (_db.select(_db.events)..where((e) => e.userId.equals(phoneNumber))).watch();
+  }
+
+  Stream<List<Event>> findPublishedEventsByUserPhoneNumber(String phoneNumber) {
+    return (_db.select(_db.events)..where((e) => e.userId.equals(phoneNumber) & e.isPublished.equals(true))).watch();
   }
 
   Future<void> updateEvent(Event updatedEvent) async {

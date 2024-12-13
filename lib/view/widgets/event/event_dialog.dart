@@ -62,6 +62,7 @@ class _EventDialogState extends State<EventDialog> {
           eventDate: selectedDate!,
           id: widget.event!.id,
           userId: widget.userId,
+          isPublished: widget.event!.isPublished,
         );
       } else {
         // Adding a new event
@@ -71,6 +72,7 @@ class _EventDialogState extends State<EventDialog> {
           eventDate: selectedDate!,
           id: 0,
           userId: widget.userId,
+          isPublished: false,
         );
       }
 

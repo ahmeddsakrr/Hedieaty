@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/services/event_service.dart';
-import 'package:hedieaty/controller/services/user_service.dart';
 import '../../../data/local/database/app_database.dart';
 import '../../components/sort_buttons.dart';
 import '../../widgets/event/event_item.dart';
@@ -118,6 +117,8 @@ class _EventListPageState extends State<EventListPage> {
           onDelete: () {},
           onTap: () {},
           canManageEvents: widget.canManageEvents,
+          onPublish: () {},
+          isPublished: false,
         );
       });
       setState(() {});
@@ -128,6 +129,44 @@ class _EventListPageState extends State<EventListPage> {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to delete event")));
     }
   }
+
+  void publishEvent(int eventId, String eventName) async{
+    try {
+      _eventService.publishEvent(eventId);
+      _showSuccessNotification(eventName);
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error publishing event: $e");
+      }
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to publish event")));
+    }
+  }
+
+  void _showSuccessNotification(String eventName) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Event $eventName was published successfully!',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        elevation: 8,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -153,7 +192,7 @@ class _EventListPageState extends State<EventListPage> {
             ),
             Expanded(
               child: StreamBuilder<List<RemoteEvent.Event>>(
-                stream: _eventService.getEventsForUser(widget.userId),
+                stream: widget.canManageEvents ? _eventService.getEventsForUser(widget.userId) : _eventService.getPublishedEventsForUser(widget.userId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -186,6 +225,8 @@ class _EventListPageState extends State<EventListPage> {
                         onDelete: () => _showDeleteConfirmationDialog(index),
                         onTap: () => navigateWithAnimation(GiftListPage(event: events[index], canManageGifts: widget.canManageEvents,)),
                         canManageEvents: widget.canManageEvents,
+                        onPublish: () => publishEvent(events[index].id, events[index].name),
+                        isPublished: events[index].isPublished,
                       );
                     },
                   );

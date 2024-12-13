@@ -10,8 +10,12 @@ class EventService {
     return _eventRepository.getEventsForUser(phoneNumber);
   }
 
+  Stream<List<RemoteEvent.Event>> getPublishedEventsForUser(String phoneNumber)  {
+    return _eventRepository.getPublishedEventsForUser(phoneNumber);
+  }
+
   Stream<int> getEventCountForUser(String phoneNumber) {
-    return getEventsForUser(phoneNumber).map((eventsForFriend) {
+    return getPublishedEventsForUser(phoneNumber).map((eventsForFriend) {
       return eventsForFriend.where((event) => event.eventDate.isAfter(DateTime.now())).length;
     });
   }
@@ -33,4 +37,10 @@ class EventService {
     return _eventRepository.getEvent(eventId);
   }
 
+  void publishEvent(int eventId) async {
+    final eventStream = getEvent(eventId);
+    final event = await eventStream.first;
+    event.isPublished = true;
+    await updateEvent(event);
+  }
 }

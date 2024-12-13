@@ -7,4 +7,5 @@ class Events extends Table {
   TextColumn get name => text()();
   TextColumn get category => text()();
   DateTimeColumn get eventDate => dateTime()();
+  BoolColumn get isPublished => boolean().withDefault(const Constant(false))();
 }

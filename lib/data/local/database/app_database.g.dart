@@ -545,8 +545,19 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
   late final GeneratedColumn<DateTime> eventDate = GeneratedColumn<DateTime>(
       'event_date', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _isPublishedMeta =
+      const VerificationMeta('isPublished');
   @override
-  List<GeneratedColumn> get $columns => [id, userId, name, category, eventDate];
+  late final GeneratedColumn<bool> isPublished = GeneratedColumn<bool>(
+      'is_published', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("is_published" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, userId, name, category, eventDate, isPublished];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -584,6 +595,12 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
     } else if (isInserting) {
       context.missing(_eventDateMeta);
     }
+    if (data.containsKey('is_published')) {
+      context.handle(
+          _isPublishedMeta,
+          isPublished.isAcceptableOrUnknown(
+              data['is_published']!, _isPublishedMeta));
+    }
     return context;
   }
 
@@ -603,6 +620,8 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
           .read(DriftSqlType.string, data['${effectivePrefix}category'])!,
       eventDate: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}event_date'])!,
+      isPublished: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_published'])!,
     );
   }
 
@@ -618,12 +637,14 @@ class Event extends DataClass implements Insertable<Event> {
   final String name;
   final String category;
   final DateTime eventDate;
+  final bool isPublished;
   const Event(
       {required this.id,
       required this.userId,
       required this.name,
       required this.category,
-      required this.eventDate});
+      required this.eventDate,
+      required this.isPublished});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -632,6 +653,7 @@ class Event extends DataClass implements Insertable<Event> {
     map['name'] = Variable<String>(name);
     map['category'] = Variable<String>(category);
     map['event_date'] = Variable<DateTime>(eventDate);
+    map['is_published'] = Variable<bool>(isPublished);
     return map;
   }
 
@@ -642,6 +664,7 @@ class Event extends DataClass implements Insertable<Event> {
       name: Value(name),
       category: Value(category),
       eventDate: Value(eventDate),
+      isPublished: Value(isPublished),
     );
   }
 
@@ -654,6 +677,7 @@ class Event extends DataClass implements Insertable<Event> {
       name: serializer.fromJson<String>(json['name']),
       category: serializer.fromJson<String>(json['category']),
       eventDate: serializer.fromJson<DateTime>(json['eventDate']),
+      isPublished: serializer.fromJson<bool>(json['isPublished']),
     );
   }
   @override
@@ -665,6 +689,7 @@ class Event extends DataClass implements Insertable<Event> {
       'name': serializer.toJson<String>(name),
       'category': serializer.toJson<String>(category),
       'eventDate': serializer.toJson<DateTime>(eventDate),
+      'isPublished': serializer.toJson<bool>(isPublished),
     };
   }
 
@@ -673,13 +698,15 @@ class Event extends DataClass implements Insertable<Event> {
           String? userId,
           String? name,
           String? category,
-          DateTime? eventDate}) =>
+          DateTime? eventDate,
+          bool? isPublished}) =>
       Event(
         id: id ?? this.id,
         userId: userId ?? this.userId,
         name: name ?? this.name,
         category: category ?? this.category,
         eventDate: eventDate ?? this.eventDate,
+        isPublished: isPublished ?? this.isPublished,
       );
   Event copyWithCompanion(EventsCompanion data) {
     return Event(
@@ -688,6 +715,8 @@ class Event extends DataClass implements Insertable<Event> {
       name: data.name.present ? data.name.value : this.name,
       category: data.category.present ? data.category.value : this.category,
       eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
+      isPublished:
+          data.isPublished.present ? data.isPublished.value : this.isPublished,
     );
   }
 
@@ -698,13 +727,15 @@ class Event extends DataClass implements Insertable<Event> {
           ..write('userId: $userId, ')
           ..write('name: $name, ')
           ..write('category: $category, ')
-          ..write('eventDate: $eventDate')
+          ..write('eventDate: $eventDate, ')
+          ..write('isPublished: $isPublished')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, userId, name, category, eventDate);
+  int get hashCode =>
+      Object.hash(id, userId, name, category, eventDate, isPublished);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -713,7 +744,8 @@ class Event extends DataClass implements Insertable<Event> {
           other.userId == this.userId &&
           other.name == this.name &&
           other.category == this.category &&
-          other.eventDate == this.eventDate);
+          other.eventDate == this.eventDate &&
+          other.isPublished == this.isPublished);
 }
 
 class EventsCompanion extends UpdateCompanion<Event> {
@@ -722,12 +754,14 @@ class EventsCompanion extends UpdateCompanion<Event> {
   final Value<String> name;
   final Value<String> category;
   final Value<DateTime> eventDate;
+  final Value<bool> isPublished;
   const EventsCompanion({
     this.id = const Value.absent(),
     this.userId = const Value.absent(),
     this.name = const Value.absent(),
     this.category = const Value.absent(),
     this.eventDate = const Value.absent(),
+    this.isPublished = const Value.absent(),
   });
   EventsCompanion.insert({
     this.id = const Value.absent(),
@@ -735,6 +769,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
     required String name,
     required String category,
     required DateTime eventDate,
+    this.isPublished = const Value.absent(),
   })  : userId = Value(userId),
         name = Value(name),
         category = Value(category),
@@ -745,6 +780,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
     Expression<String>? name,
     Expression<String>? category,
     Expression<DateTime>? eventDate,
+    Expression<bool>? isPublished,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -752,6 +788,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
       if (name != null) 'name': name,
       if (category != null) 'category': category,
       if (eventDate != null) 'event_date': eventDate,
+      if (isPublished != null) 'is_published': isPublished,
     });
   }
 
@@ -760,13 +797,15 @@ class EventsCompanion extends UpdateCompanion<Event> {
       Value<String>? userId,
       Value<String>? name,
       Value<String>? category,
-      Value<DateTime>? eventDate}) {
+      Value<DateTime>? eventDate,
+      Value<bool>? isPublished}) {
     return EventsCompanion(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       name: name ?? this.name,
       category: category ?? this.category,
       eventDate: eventDate ?? this.eventDate,
+      isPublished: isPublished ?? this.isPublished,
     );
   }
 
@@ -788,6 +827,9 @@ class EventsCompanion extends UpdateCompanion<Event> {
     if (eventDate.present) {
       map['event_date'] = Variable<DateTime>(eventDate.value);
     }
+    if (isPublished.present) {
+      map['is_published'] = Variable<bool>(isPublished.value);
+    }
     return map;
   }
 
@@ -798,7 +840,8 @@ class EventsCompanion extends UpdateCompanion<Event> {
           ..write('userId: $userId, ')
           ..write('name: $name, ')
           ..write('category: $category, ')
-          ..write('eventDate: $eventDate')
+          ..write('eventDate: $eventDate, ')
+          ..write('isPublished: $isPublished')
           ..write(')'))
         .toString();
   }
@@ -2380,8 +2423,7 @@ final class $$FriendsTableReferences
   static $UsersTable _userIdTable(_$AppDatabase db) => db.users.createAlias(
       $_aliasNameGenerator(db.friends.userId, db.users.phoneNumber));
 
-  $$UsersTableProcessedTableManager? get userId {
-    if ($_item.userId == null) return null;
+  $$UsersTableProcessedTableManager get userId {
     final manager = $$UsersTableTableManager($_db, $_db.users)
         .filter((f) => f.phoneNumber($_item.userId!));
     final item = $_typedResult.readTableOrNull(_userIdTable($_db));
@@ -2394,8 +2436,7 @@ final class $$FriendsTableReferences
       db.users.createAlias(
           $_aliasNameGenerator(db.friends.friendUserId, db.users.phoneNumber));
 
-  $$UsersTableProcessedTableManager? get friendUserId {
-    if ($_item.friendUserId == null) return null;
+  $$UsersTableProcessedTableManager get friendUserId {
     final manager = $$UsersTableTableManager($_db, $_db.users)
         .filter((f) => f.phoneNumber($_item.friendUserId!));
     final item = $_typedResult.readTableOrNull(_friendUserIdTable($_db));
@@ -2676,6 +2717,7 @@ typedef $$EventsTableCreateCompanionBuilder = EventsCompanion Function({
   required String name,
   required String category,
   required DateTime eventDate,
+  Value<bool> isPublished,
 });
 typedef $$EventsTableUpdateCompanionBuilder = EventsCompanion Function({
   Value<int> id,
@@ -2683,6 +2725,7 @@ typedef $$EventsTableUpdateCompanionBuilder = EventsCompanion Function({
   Value<String> name,
   Value<String> category,
   Value<DateTime> eventDate,
+  Value<bool> isPublished,
 });
 
 final class $$EventsTableReferences
@@ -2692,8 +2735,7 @@ final class $$EventsTableReferences
   static $UsersTable _userIdTable(_$AppDatabase db) => db.users.createAlias(
       $_aliasNameGenerator(db.events.userId, db.users.phoneNumber));
 
-  $$UsersTableProcessedTableManager? get userId {
-    if ($_item.userId == null) return null;
+  $$UsersTableProcessedTableManager get userId {
     final manager = $$UsersTableTableManager($_db, $_db.users)
         .filter((f) => f.phoneNumber($_item.userId!));
     final item = $_typedResult.readTableOrNull(_userIdTable($_db));
@@ -2737,6 +2779,9 @@ class $$EventsTableFilterComposer
 
   ColumnFilters<DateTime> get eventDate => $composableBuilder(
       column: $table.eventDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isPublished => $composableBuilder(
+      column: $table.isPublished, builder: (column) => ColumnFilters(column));
 
   $$UsersTableFilterComposer get userId {
     final $$UsersTableFilterComposer composer = $composerBuilder(
@@ -2801,6 +2846,9 @@ class $$EventsTableOrderingComposer
   ColumnOrderings<DateTime> get eventDate => $composableBuilder(
       column: $table.eventDate, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get isPublished => $composableBuilder(
+      column: $table.isPublished, builder: (column) => ColumnOrderings(column));
+
   $$UsersTableOrderingComposer get userId {
     final $$UsersTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -2842,6 +2890,9 @@ class $$EventsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get eventDate =>
       $composableBuilder(column: $table.eventDate, builder: (column) => column);
+
+  GeneratedColumn<bool> get isPublished => $composableBuilder(
+      column: $table.isPublished, builder: (column) => column);
 
   $$UsersTableAnnotationComposer get userId {
     final $$UsersTableAnnotationComposer composer = $composerBuilder(
@@ -2913,6 +2964,7 @@ class $$EventsTableTableManager extends RootTableManager<
             Value<String> name = const Value.absent(),
             Value<String> category = const Value.absent(),
             Value<DateTime> eventDate = const Value.absent(),
+            Value<bool> isPublished = const Value.absent(),
           }) =>
               EventsCompanion(
             id: id,
@@ -2920,6 +2972,7 @@ class $$EventsTableTableManager extends RootTableManager<
             name: name,
             category: category,
             eventDate: eventDate,
+            isPublished: isPublished,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -2927,6 +2980,7 @@ class $$EventsTableTableManager extends RootTableManager<
             required String name,
             required String category,
             required DateTime eventDate,
+            Value<bool> isPublished = const Value.absent(),
           }) =>
               EventsCompanion.insert(
             id: id,
@@ -2934,6 +2988,7 @@ class $$EventsTableTableManager extends RootTableManager<
             name: name,
             category: category,
             eventDate: eventDate,
+            isPublished: isPublished,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) =>
@@ -3028,8 +3083,7 @@ final class $$GiftsTableReferences
   static $EventsTable _eventIdTable(_$AppDatabase db) => db.events
       .createAlias($_aliasNameGenerator(db.gifts.eventId, db.events.id));
 
-  $$EventsTableProcessedTableManager? get eventId {
-    if ($_item.eventId == null) return null;
+  $$EventsTableProcessedTableManager get eventId {
     final manager = $$EventsTableTableManager($_db, $_db.events)
         .filter((f) => f.id($_item.eventId!));
     final item = $_typedResult.readTableOrNull(_eventIdTable($_db));
@@ -3394,8 +3448,7 @@ final class $$PledgesTableReferences
   static $GiftsTable _giftIdTable(_$AppDatabase db) => db.gifts
       .createAlias($_aliasNameGenerator(db.pledges.giftId, db.gifts.id));
 
-  $$GiftsTableProcessedTableManager? get giftId {
-    if ($_item.giftId == null) return null;
+  $$GiftsTableProcessedTableManager get giftId {
     final manager = $$GiftsTableTableManager($_db, $_db.gifts)
         .filter((f) => f.id($_item.giftId!));
     final item = $_typedResult.readTableOrNull(_giftIdTable($_db));
@@ -3407,8 +3460,7 @@ final class $$PledgesTableReferences
   static $UsersTable _userIdTable(_$AppDatabase db) => db.users.createAlias(
       $_aliasNameGenerator(db.pledges.userId, db.users.phoneNumber));
 
-  $$UsersTableProcessedTableManager? get userId {
-    if ($_item.userId == null) return null;
+  $$UsersTableProcessedTableManager get userId {
     final manager = $$UsersTableTableManager($_db, $_db.users)
         .filter((f) => f.phoneNumber($_item.userId!));
     final item = $_typedResult.readTableOrNull(_userIdTable($_db));
@@ -3721,8 +3773,7 @@ final class $$NotificationsTableReferences
   static $UsersTable _userIdTable(_$AppDatabase db) => db.users.createAlias(
       $_aliasNameGenerator(db.notifications.userId, db.users.phoneNumber));
 
-  $$UsersTableProcessedTableManager? get userId {
-    if ($_item.userId == null) return null;
+  $$UsersTableProcessedTableManager get userId {
     final manager = $$UsersTableTableManager($_db, $_db.users)
         .filter((f) => f.phoneNumber($_item.userId!));
     final item = $_typedResult.readTableOrNull(_userIdTable($_db));

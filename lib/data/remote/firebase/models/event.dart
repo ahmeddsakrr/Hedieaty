@@ -6,6 +6,7 @@ class Event {
   final String name;
   final String category;
   final DateTime eventDate;
+  bool isPublished;
 
   Event({
     required this.id,
@@ -13,6 +14,7 @@ class Event {
     required this.name,
     required this.category,
     required this.eventDate,
+    required this.isPublished,
   });
 
   Map<String, dynamic> toMap() {
@@ -22,6 +24,7 @@ class Event {
       'name': name,
       'category': category,
       'event_date': getFormattedDate(eventDate),
+      'is_published': isPublished,
     };
   }
 
@@ -32,6 +35,7 @@ class Event {
       name: map['name'],
       category: map['category'],
       eventDate: parseFormattedDate(map['event_date']),
+      isPublished: map['is_published'],
     );
   }
 }

@@ -32,6 +32,22 @@ class EventRepository {
     });
   }
 
+  Stream<List<RemoteEvent.Event>> getPublishedEventsForUser(String userId) {
+    return _remoteEventDao
+        .getPublishedEventsForUser(userId)
+        .handleError((error) {
+      return _localEventDao
+          .findPublishedEventsByUserPhoneNumber(userId)
+          .map((localEvents) => localEvents.map((e) => EventAdapter.fromLocal(e)).toList());
+    }).map((remoteEvents) {
+      for (final remoteEvent in remoteEvents) {
+        final localEvent = EventAdapter.fromRemote(remoteEvent);
+        _localEventDao.insertOrUpdateEvent(localEvent);
+      }
+      return remoteEvents;
+    });
+  }
+
 
   Future<void> updateEvent(RemoteEvent.Event event) async {
     await _remoteEventDao.updateEvent(event);
