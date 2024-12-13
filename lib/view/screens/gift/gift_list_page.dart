@@ -32,6 +32,40 @@ class _GiftListPageState extends State<GiftListPage> {
   GiftSortStrategy? _lastUsedSortStrategy;
   bool isLoading = true;
 
+  void _syncGifts(List<Gift> newGifts) {
+    final oldGifts = _gifts;
+
+    if (_lastUsedSortStrategy != null) {
+      _sortContext.setSortStrategy(_lastUsedSortStrategy!);
+      newGifts = _sortContext.sortGifts(newGifts);
+    }
+
+    final diff = newGifts.length - oldGifts.length;
+
+    // Update _gifts list
+    _gifts = newGifts;
+
+    if (diff > 0) {
+      // Add new items with animation
+      for (int i = oldGifts.length; i < newGifts.length; i++) {
+        _listKey.currentState?.insertItem(i);
+      }
+    } else if (diff < 0) {
+      // Remove extra items with animation
+      for (int i = oldGifts.length - 1; i >= newGifts.length; i--) {
+        final removedGift = oldGifts[i];
+        _listKey.currentState?.removeItem(
+          i,
+              (context, animation) => GiftListItem(
+            gift: removedGift,
+            animation: animation,
+            onEdit: () {},
+            onDelete: () {},
+          ),
+        );
+      }
+    }
+  }
 
   void _sortBy(GiftSortStrategy strategy) {
     setState(() {
@@ -41,7 +75,7 @@ class _GiftListPageState extends State<GiftListPage> {
     });
   }
 
-  void _navigateToGiftDetails({Gift? gift, int? index}) async {
+  Future<void> _navigateToGiftDetails({Gift? gift, int? index}) async {
     final result = await navigateWithAnimation(
       GiftDetailsPage(
         gift: gift,
@@ -86,24 +120,33 @@ class _GiftListPageState extends State<GiftListPage> {
     );
   }
 
-  _removeGift(int index) async {
+  Future<void> _removeGift(int index) async {
+    final removedGift = _gifts[index];
     try {
-      await _giftService.deleteGift(_gifts[index].id);
-      final removedGift = _gifts.removeAt(index);
-      _listKey.currentState?.removeItem(index, (context, animation) {
-        return GiftListItem(
+      await _giftService.deleteGift(removedGift.id);
+      _listKey.currentState?.removeItem(
+        index,
+            (context, animation) => GiftListItem(
           gift: removedGift,
           animation: animation,
           onEdit: () {},
           onDelete: () {},
-        );
+        ),
+      );
+      setState(() {
+        _gifts.removeAt(index);
+        // Reapply sorting after deletion
+        if (_lastUsedSortStrategy != null) {
+          _sortBy(_lastUsedSortStrategy!);
+        }
       });
-      setState(() {});
     } catch (e) {
       if (kDebugMode) {
         print("Error deleting gift: $e");
       }
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to delete gift")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to delete gift")),
+      );
     }
   }
 
@@ -143,10 +186,8 @@ class _GiftListPageState extends State<GiftListPage> {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 }
 
-                _gifts = snapshot.data ?? [];
-                if (_lastUsedSortStrategy != null) {
-                  _sortBy(_lastUsedSortStrategy!);
-                }
+                final giftsFromStream = snapshot.data ?? [];
+                _syncGifts(giftsFromStream);
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -168,8 +209,10 @@ class _GiftListPageState extends State<GiftListPage> {
                         child: GiftListItem(
                           gift: _gifts[index],
                           animation: animation,
-                          onEdit: () => _navigateToGiftDetails(gift: _gifts[index], index: index),
-                          onDelete: () => _showDeleteConfirmationDialog(index),
+                          onEdit: () => _navigateToGiftDetails(
+                              gift: _gifts[index], index: index),
+                          onDelete: () =>
+                              _showDeleteConfirmationDialog(index),
                           showActions: widget.canManageGifts,
                         ),
                       );
@@ -177,7 +220,7 @@ class _GiftListPageState extends State<GiftListPage> {
                   ),
                 );
               },
-            )
+            ),
           ),
         ],
       ),
