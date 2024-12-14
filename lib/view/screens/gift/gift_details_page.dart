@@ -8,8 +8,9 @@ class GiftDetailsPage extends StatefulWidget {
   final Gift? gift;
   final bool isEditMode;
   final eventId;
+  final bool viewOnly;
 
-  const GiftDetailsPage({super.key, this.gift, required this.isEditMode, required this.eventId});
+  const GiftDetailsPage({super.key, this.gift, required this.isEditMode, required this.eventId, required this.viewOnly});
 
   @override
   _GiftDetailsPageState createState() => _GiftDetailsPageState();
@@ -37,7 +38,7 @@ class _GiftDetailsPageState extends State<GiftDetailsPage> {
         );
     GiftStatus status = GiftStatus.fromString(editableGift.status);
     isLockedStatus = status == GiftStatus.pledged;
-    isLocked = widget.isEditMode && isLockedStatus;
+    isLocked = widget.isEditMode && isLockedStatus || widget.viewOnly;
   }
 
   void _saveGift() {

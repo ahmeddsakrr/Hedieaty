@@ -8,6 +8,7 @@ class GiftListItem extends StatelessWidget {
   final Animation<double>? animation;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
+  final VoidCallback? onTap;
   final bool showActions;
 
   final String? friendName;
@@ -25,6 +26,7 @@ class GiftListItem extends StatelessWidget {
     this.friendName,
     this.dueDate,
     this.customAction,
+    this.onTap,
   });
 
   @override
@@ -50,7 +52,7 @@ class GiftListItem extends StatelessWidget {
       color: theme.colorScheme.surface,
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () {},
+        onTap: onTap,
         splashColor: theme.colorScheme.primary.withOpacity(0.2),
         child: Padding(
           padding: const EdgeInsets.all(16.0),

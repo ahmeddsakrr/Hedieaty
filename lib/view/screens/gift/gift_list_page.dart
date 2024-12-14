@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hedieaty/controller/services/auth_service.dart';
+import 'package:hedieaty/controller/services/pledge_service.dart';
 import '../../../controller/services/gift_service.dart';
 import '../../../data/local/database/app_database.dart' as local;
 import '../../components/sort_buttons.dart';
@@ -13,6 +15,7 @@ import 'gift_details_page.dart';
 import '../../../controller/utils/navigation_utils.dart';
 import 'package:hedieaty/data/remote/firebase/models/gift.dart';
 import '../../../data/remote/firebase/models/event.dart';
+import 'package:hedieaty/data/remote/firebase/models/pledge.dart';
 
 class GiftListPage extends StatefulWidget {
   final Event event;
@@ -26,6 +29,8 @@ class GiftListPage extends StatefulWidget {
 
 class _GiftListPageState extends State<GiftListPage> {
   final GiftService _giftService = GiftService(local.AppDatabase());
+  final PledgeService _pledgeService = PledgeService(local.AppDatabase());
+  final AuthService _authService = AuthService(local.AppDatabase());
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   List<Gift> _gifts = [];
   final GiftSortContext _sortContext = GiftSortContext();
@@ -75,12 +80,13 @@ class _GiftListPageState extends State<GiftListPage> {
     });
   }
 
-  Future<void> _navigateToGiftDetails({Gift? gift, int? index}) async {
+  Future<void> _navigateToGiftDetails({Gift? gift, int? index, bool viewOnly = false}) async {
     final result = await navigateWithAnimation(
       GiftDetailsPage(
         gift: gift,
         isEditMode: gift != null,
         eventId: widget.event.id,
+        viewOnly: viewOnly,
       ),
     );
     if (result != null) {
@@ -149,6 +155,49 @@ class _GiftListPageState extends State<GiftListPage> {
     }
   }
 
+  Future<void> _confirmPledge(Gift gift) async {
+    final shouldPledge = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Pledge Gift'),
+          content: Text('Are you sure you want to pledge the gift "${gift.name}"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              style: ButtonStyle(
+                foregroundColor: WidgetStateProperty.all(Colors.grey),
+                overlayColor: WidgetStateProperty.all(Colors.grey.withOpacity(0.1)),
+              ),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ButtonStyle(
+                foregroundColor: WidgetStateProperty.all(Colors.teal),
+                overlayColor: WidgetStateProperty.all(Colors.teal.withOpacity(0.1)),
+              ),
+              child: const Text('Pledge'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldPledge == true) {
+      Pledge pledge = Pledge(
+        giftId: gift.id,
+        userId: await _authService.getCurrentUser(),
+        id: 0,
+        pledgeDate: DateTime.now(),
+      );
+      _pledgeService.pledgeGift(pledge);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Pledged ${gift.name}'))
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -203,6 +252,8 @@ class _GiftListPageState extends State<GiftListPage> {
                     key: _listKey,
                     initialItemCount: _gifts.length,
                     itemBuilder: (context, index, animation) {
+                      final theme = Theme.of(context);
+                      final isDarkMode = theme.brightness == Brightness.dark;
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: GiftListItem(
@@ -213,6 +264,20 @@ class _GiftListPageState extends State<GiftListPage> {
                           onDelete: () =>
                               _showDeleteConfirmationDialog(index),
                           showActions: widget.canManageGifts,
+                          customAction: _pledgeService.isUnpledged(_gifts[index]) && !widget.canManageGifts
+                              ? MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: TextButton(
+                              onPressed: () => _confirmPledge(_gifts[index]),
+                              style: ButtonStyle(
+                                foregroundColor: WidgetStateProperty.all(isDarkMode ? Colors.tealAccent : Colors.teal),
+                                overlayColor: WidgetStateProperty.all(isDarkMode ? Colors.tealAccent.withOpacity(0.1) : Colors.teal.withOpacity(0.1)),
+                              ),
+                              child: const Text("Pledge"),
+                            ),
+                          )
+                              : null,
+                          onTap: widget.canManageGifts ? null : () => _navigateToGiftDetails(gift: _gifts[index], index: index, viewOnly: true),
                         ),
                       );
                     },

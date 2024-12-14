@@ -42,14 +42,22 @@ class _PledgedGiftsPageState extends State<PledgedGiftsPage> {
     }
   }
 
-  void _removePledgedGift(Gift gift) {
-    setState(() async {
-      String userId = await _authService.getCurrentUser();
-      await _pledgeService.unpledgeGift(userId, gift.id);
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Unpledged ${gift.name}'))
-      );
-    });
+  // void _removePledgedGift(Gift gift) {
+  //   setState(() async {
+  //     String userId = await _authService.getCurrentUser();
+  //     await _pledgeService.unpledgeGift(userId, gift.id);
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Unpledged ${gift.name}'))
+  //     );
+  //   });
+  // }
+
+  void _removePledgedGift(Gift gift) async{
+    String userId = await _authService.getCurrentUser();
+    await _pledgeService.unpledgeGift(userId, gift.id);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Unpledged ${gift.name}'))
+    );
   }
 
   Future<void> _confirmUnpledge(Gift gift) async {
@@ -180,17 +188,27 @@ class _PledgedGiftsPageState extends State<PledgedGiftsPage> {
                                 gift: gift,
                                 friendName: friendName,
                                 dueDate: dueDate,
-                                customAction: MouseRegion(
-                                  cursor: SystemMouseCursors.click,
-                                  child: TextButton(
-                                    onPressed: () => _confirmUnpledge(gift),
-                                    style: ButtonStyle(
-                                      foregroundColor: WidgetStateProperty.all(Colors.red),
-                                      overlayColor: WidgetStateProperty.all(Colors.red.withOpacity(0.1)),
-                                    ),
-                                    child: const Text("Unpledge"),
-
-                                  )
+                                customAction: StreamBuilder<bool>(
+                                  stream: _pledgeService.isUnpledgeable(gift),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState == ConnectionState.waiting || snapshot.hasError) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    if (snapshot.data == true) {
+                                      return MouseRegion(
+                                        cursor: SystemMouseCursors.click,
+                                        child: TextButton(
+                                          onPressed: () => _confirmUnpledge(gift),
+                                          style: ButtonStyle(
+                                            foregroundColor: WidgetStateProperty.all(Colors.red),
+                                            overlayColor: WidgetStateProperty.all(Colors.red.withOpacity(0.1)),
+                                          ),
+                                          child: const Text("Unpledge"),
+                                        ),
+                                      );
+                                    }
+                                    return const SizedBox.shrink();
+                                  },
                                 ),
                               );
                             },
