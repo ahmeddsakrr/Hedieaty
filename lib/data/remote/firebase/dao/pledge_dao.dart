@@ -36,11 +36,11 @@ class PledgeDAO {
     });
   }
 
-  Future<void> deletePledge(String userId, int pledgeId) async {
+  Future<void> deletePledge(String userId, int giftId) async {
     final querySnapshot = await _firestore
         .collection('pledges')
         .where('user_id', isEqualTo: userId)
-        .where('id', isEqualTo: pledgeId)
+        .where('gift_id', isEqualTo: giftId)
         .get();
 
     await querySnapshot.docs.first.reference.delete();

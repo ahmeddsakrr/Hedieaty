@@ -42,16 +42,6 @@ class _PledgedGiftsPageState extends State<PledgedGiftsPage> {
     }
   }
 
-  // void _removePledgedGift(Gift gift) {
-  //   setState(() async {
-  //     String userId = await _authService.getCurrentUser();
-  //     await _pledgeService.unpledgeGift(userId, gift.id);
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Unpledged ${gift.name}'))
-  //     );
-  //   });
-  // }
-
   void _removePledgedGift(Gift gift) async{
     String userId = await _authService.getCurrentUser();
     await _pledgeService.unpledgeGift(userId, gift.id);
