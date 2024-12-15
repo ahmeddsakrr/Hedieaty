@@ -96,6 +96,8 @@ class GiftListItem extends StatelessWidget {
                             color: theme.colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                           ),
+                          overflow: TextOverflow.ellipsis, // Handles text overflow gracefully
+                          maxLines: 2, // Limit the number of lines to prevent excessive wrapping
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -104,6 +106,8 @@ class GiftListItem extends StatelessWidget {
                             color: theme.colorScheme.onSurface.withOpacity(0.8),
                             fontWeight: FontWeight.w500,
                           ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -112,6 +116,8 @@ class GiftListItem extends StatelessWidget {
                             color: theme.colorScheme.onSurface.withOpacity(0.8),
                             fontWeight: FontWeight.w500,
                           ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                         const SizedBox(height: 4),
                         Row(
@@ -122,11 +128,15 @@ class GiftListItem extends StatelessWidget {
                               color: getStatusColor(),
                             ),
                             const SizedBox(width: 6),
-                            Text(
-                              'Status: ${gift.status}',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: getStatusColor(),
-                                fontWeight: FontWeight.bold,
+                            Flexible(
+                              child: Text(
+                                'Status: ${gift.status}',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: getStatusColor(),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
                             ),
                           ],
@@ -140,6 +150,8 @@ class GiftListItem extends StatelessWidget {
                                 color: theme.colorScheme.onSurface.withOpacity(0.8),
                                 fontWeight: FontWeight.w500,
                               ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                           ),
                         if (dueDate != null)
@@ -151,6 +163,8 @@ class GiftListItem extends StatelessWidget {
                                 color: theme.colorScheme.onSurface.withOpacity(0.8),
                                 fontWeight: FontWeight.w500,
                               ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
                             ),
                           ),
                       ],
