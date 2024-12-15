@@ -263,8 +263,8 @@ class _GiftListPageState extends State<GiftListPage> {
                               gift: _gifts[index], index: index),
                           onDelete: () =>
                               _showDeleteConfirmationDialog(index),
-                          showActions: widget.canManageGifts,
-                          customAction: _pledgeService.isUnpledged(_gifts[index]) && !widget.canManageGifts
+                          showActions: widget.canManageGifts && _pledgeService.isAvailable(_gifts[index]),
+                          customAction: _pledgeService.isAvailable(_gifts[index]) && !widget.canManageGifts
                               ? MouseRegion(
                             cursor: SystemMouseCursors.click,
                             child: TextButton(

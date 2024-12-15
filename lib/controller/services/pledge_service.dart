@@ -61,7 +61,7 @@ class PledgeService {
     await _giftService.updateGiftStatus(gift.id, GiftStatus.pledged);
   }
 
-  bool isUnpledged(RemoteGift.Gift gift) {
+  bool isAvailable(RemoteGift.Gift gift) {
     return gift.status == GiftStatus.available.name;
   }
 
