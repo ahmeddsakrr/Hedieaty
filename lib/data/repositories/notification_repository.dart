@@ -36,4 +36,10 @@ class NotificationRepository {
     await _remoteNotificationDao.deleteNotification(notificationId);
     await _localNotificationDao.deleteNotification(notificationId);
   }
+
+  Future<void> updateNotification(RemoteNotification.Notification notification) async {
+    await _remoteNotificationDao.updateNotification(notification);
+    final localNotification = NotificationAdapter.fromRemote(notification);
+    await _localNotificationDao.insertOrUpdateNotification(localNotification);
+  }
 }

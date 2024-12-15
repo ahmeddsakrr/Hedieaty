@@ -5,7 +5,7 @@ class Notification {
   final String userId;
   final String type;
   final String message;
-  final bool isRead;
+  bool isRead;
   final DateTime createdAt;
 
   Notification({
