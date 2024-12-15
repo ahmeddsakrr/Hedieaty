@@ -96,8 +96,8 @@ class GiftListItem extends StatelessWidget {
                             color: theme.colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                           ),
-                          overflow: TextOverflow.ellipsis, // Handles text overflow gracefully
-                          maxLines: 2, // Limit the number of lines to prevent excessive wrapping
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
                         ),
                         const SizedBox(height: 8),
                         Text(
