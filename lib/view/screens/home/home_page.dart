@@ -6,6 +6,7 @@ import 'package:hedieaty/controller/services/user_service.dart';
 import '../../../data/local/database/app_database.dart' as local;
 import '../../../controller/services/friend_service.dart';
 import '../../components/custom_search_bar.dart';
+import '../../components/notification.dart';
 import '../../widgets/friend/friend_list_item.dart';
 import '../../widgets/home/add_friend_dialog.dart';
 import '../event/event_list_page.dart';
@@ -60,7 +61,7 @@ class _HomePageState extends State<HomePage> {
     try {
       await _friendService.addFriend(friend);
       String friendName = await _userService.getUser(friend.friendUserId).then((value) => value?.name) ?? '';
-      _showSuccessNotification(friendName);
+      NotificationHelper.showNotification(context, 'Friend $friendName was added successfully!',);
     } catch (e) {
       if (kDebugMode) {
         print('Error adding friend: $e');
@@ -70,32 +71,6 @@ class _HomePageState extends State<HomePage> {
       );
     }
   }
-
-  void _showSuccessNotification(String friendName) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Friend $friendName was added successfully!',
-                style: const TextStyle(color: Colors.white, fontSize: 16),
-              ),
-            ),
-          ],
-        ),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-        elevation: 8,
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
-
 
   @override
   Widget build(BuildContext context) {
