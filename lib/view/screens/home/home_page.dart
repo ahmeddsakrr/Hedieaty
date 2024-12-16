@@ -13,6 +13,7 @@ import '../profile/profile_page.dart';
 import '../../../controller/utils/navigation_utils.dart';
 import '../../../data/remote/firebase/models/user.dart';
 import 'package:hedieaty/data/remote/firebase/models/friend.dart';
+import '../notifications/notification_list_page.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -113,6 +114,13 @@ class _HomePageState extends State<HomePage> {
             icon: const Icon(Icons.brightness_6),
             onPressed: widget.toggleTheme,
           ),
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () async {
+              String userId = await _authService.getCurrentUser();
+              navigateWithAnimation(NotificationsListPage(userId: userId));
+            },
+          )
         ],
       ),
       body: SafeArea(
