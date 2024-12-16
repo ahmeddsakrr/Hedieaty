@@ -27,4 +27,8 @@ class NotificationService {
     notification.isRead = true;
     await _notificationRepository.updateNotification(notification);
   }
+
+  Stream<RemoteNotification.Notification?> getNewNotificationStream(String userId) {
+    return _notificationRepository.getUnreadNotificationStream(userId);
+  }
 }

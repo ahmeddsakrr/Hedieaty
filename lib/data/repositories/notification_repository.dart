@@ -42,4 +42,14 @@ class NotificationRepository {
     final localNotification = NotificationAdapter.fromRemote(notification);
     await _localNotificationDao.insertOrUpdateNotification(localNotification);
   }
+
+  Stream<RemoteNotification.Notification?> getUnreadNotificationStream(String userId) {
+    return getNotifications(userId).map((notifications) {
+      try {
+        return notifications.firstWhere((n) => !n.isRead);
+      } catch (e) {
+        return null;
+      }
+    }).distinct();
+  }
 }
