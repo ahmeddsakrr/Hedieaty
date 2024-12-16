@@ -68,6 +68,8 @@ class AuthService {
 
   Future<void> logOut() async {
     await _auth.signOut();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('current_user_phone_number');
   }
 
   Future<void> _saveCurrentUserPhoneNumber(String phoneNumber) async {
