@@ -9,6 +9,7 @@ class GlobalNotificationListener {
   final StreamController<String> _notificationQueue = StreamController<String>.broadcast();
 
   DateTime _loginTime;
+  final Set<int> _displayedNotificationIds = {};
 
   GlobalNotificationListener(this._notificationService) : _loginTime = DateTime.now();
 
@@ -17,14 +18,13 @@ class GlobalNotificationListener {
     _loginTime = DateTime.now();
     _notificationService.getNotifications(userId).listen((notifications) {
       for (var notification in notifications) {
-        print('Notification received: ${notification.message}, createdAt: ${notification.createdAt}');
-        print('Login time: $_loginTime');
-
+        if (_displayedNotificationIds.contains(notification.id)) {
+          continue;
+        }
         if (notification.createdAt.isAfter(_loginTime)) {
           print('New notification: ${notification.message}');
+          _displayedNotificationIds.add(notification.id);
           _notificationQueue.add(notification.message);
-        } else {
-          print('Old notification ignored: ${notification.message}');
         }
       }
     });
@@ -45,5 +45,6 @@ class GlobalNotificationListener {
 
   void dispose() {
     _notificationQueue.close();
+    _displayedNotificationIds.clear();
   }
 }
