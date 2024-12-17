@@ -1,82 +1,49 @@
-import 'package:flutter/material.dart';
-import 'package:hedieaty/controller/services/auth_service.dart';
-import 'package:hedieaty/data/local/database/app_database.dart';
+import 'dart:async';
+import 'package:hedieaty/controller/services/notification_service.dart';
 
-import '../../../controller/services/notification_service.dart';
-import 'package:hedieaty/data/remote/firebase/models/notification.dart' as RemoteNotification;
-
+import '../../../main.dart';
 import '../../components/notification.dart';
 
-class GlobalNotificationListener extends StatefulWidget {
-  final NotificationService notificationService;
-  final Widget child;
-  // final String userId;
+class GlobalNotificationListener {
+  final NotificationService _notificationService;
+  final StreamController<String> _notificationQueue = StreamController<String>.broadcast();
 
-  const GlobalNotificationListener({
-    super.key,
-    required this.notificationService,
-    required this.child,
-    // required this.userId,
-  });
+  DateTime _loginTime;
 
-  @override
-  _GlobalNotificationListenerState createState() =>
-      _GlobalNotificationListenerState();
-}
+  GlobalNotificationListener(this._notificationService) : _loginTime = DateTime.now();
 
-class _GlobalNotificationListenerState
-    extends State<GlobalNotificationListener> {
-  final List<RemoteNotification.Notification> _notificationQueue = [];
-  final AuthService _authService = AuthService(AppDatabase());
-  bool _isShowingNotification = false;
+  void startListening(String userId) {
+    print('Starting notification listener for user $userId');
+    _loginTime = DateTime.now();
+    _notificationService.getNotifications(userId).listen((notifications) {
+      for (var notification in notifications) {
+        print('Notification received: ${notification.message}, createdAt: ${notification.createdAt}');
+        print('Login time: $_loginTime');
 
-  @override
-  void initState() {
-    super.initState();
-    _listenForNotifications();
-  }
-
-  void _listenForNotifications() async {
-    String userId = await _authService.getCurrentUser();
-    widget.notificationService
-        .getNewNotificationStream(userId)
-        .listen((notification) {
-      if (notification != null) {
-        _enqueueNotification(notification);
+        if (notification.createdAt.isAfter(_loginTime)) {
+          print('New notification: ${notification.message}');
+          _notificationQueue.add(notification.message);
+        } else {
+          print('Old notification ignored: ${notification.message}');
+        }
       }
     });
+    _processQueue();
   }
 
-  void _enqueueNotification(RemoteNotification.Notification notification) {
-    _notificationQueue.add(notification);
-    if (!_isShowingNotification) {
-      _showNextNotification();
+  void _processQueue() async {
+    await for (var message in _notificationQueue.stream) {
+      if (navigatorKey.currentContext != null) {
+        NotificationHelper.showNotification(
+          navigatorKey.currentContext!,
+          message,
+        );
+      }
+      await Future.delayed(const Duration(seconds: 3));
     }
   }
 
-  void _showNextNotification() async {
-    if (_notificationQueue.isEmpty) return;
-
-    setState(() => _isShowingNotification = true);
-
-    final nextNotification = _notificationQueue.removeAt(0);
-    NotificationHelper.showNotification(
-      context,
-      nextNotification.message,
-      isSuccess: true,
-    );
-
-    await Future.delayed(const Duration(seconds: 3));
-
-    if (_notificationQueue.isNotEmpty) {
-      _showNextNotification();
-    } else {
-      setState(() => _isShowingNotification = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.child;
+  void dispose() {
+    _notificationQueue.close();
   }
 }

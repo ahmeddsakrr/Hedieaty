@@ -80,7 +80,7 @@ class PledgeService {
       giftId: pledge.giftId,
       newStatus: GiftStatus.pledged,
       notificationType: NotificationType.giftPledged,
-      notificationMessage: "Your gift '{giftName}' has been successfully pledged.",
+      notificationMessage: "Your gift '{giftName}' has been pledged.",
     );
   }
 

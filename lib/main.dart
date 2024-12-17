@@ -10,6 +10,7 @@ import 'view/screens/home/home_page.dart';
 import 'view/screens/auth/auth_page.dart';
 import 'controller/utils/navigation_utils.dart';
 import 'controller/services/notification_service.dart';
+import 'package:hedieaty/controller/services/auth_service.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -44,6 +45,21 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _isDarkTheme = false;
+  late final NotificationService _notificationService;
+  late final AuthService _authService;
+  late final GlobalNotificationListener _globalNotificationListener;
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationService = NotificationService(AppDatabase());
+    _globalNotificationListener = GlobalNotificationListener(_notificationService);
+    _authService = AuthService(AppDatabase());
+  }
+
+  void _startNotificationListener(String userId) {
+    _globalNotificationListener.startListening(userId);
+  }
 
   void toggleTheme() {
     setState(() {
@@ -53,23 +69,26 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final notificationService = NotificationService(AppDatabase());
 
     return MaterialApp(
       navigatorKey: navigatorKey,
       theme: _isDarkTheme ? AppTheme.darkTheme : AppTheme.lightTheme,
-      home: GlobalNotificationListener(
-        notificationService: notificationService,
-        // userId: 'currentUserId',
-        child: AuthPage(
-          onAuthComplete: () {
-            navigateWithAnimation(
-              HomePage(toggleTheme: toggleTheme),
-              replace: true,
-            );
-          },
-        ),
+      home: AuthPage(
+        onAuthComplete: () async {
+          String userId = await _authService.getCurrentUser();
+          _startNotificationListener(userId);
+          navigateWithAnimation(
+            HomePage(toggleTheme: toggleTheme),
+            replace: true,
+          );
+        },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _globalNotificationListener.dispose();
+    super.dispose();
   }
 }

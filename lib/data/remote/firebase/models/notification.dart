@@ -1,4 +1,4 @@
-import 'package:hedieaty/controller/utils/date_utils.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Notification {
   int id;
@@ -6,7 +6,7 @@ class Notification {
   final String type;
   final String message;
   bool isRead;
-  final DateTime createdAt;
+  DateTime createdAt;
 
   Notification({
     required this.id,
@@ -24,7 +24,7 @@ class Notification {
       'type': type,
       'message': message,
       'is_read': isRead,
-      'created_at': getFormattedDate(createdAt),
+      'created_at': createdAt,
     };
   }
 
@@ -35,7 +35,7 @@ class Notification {
       type: map['type'],
       message: map['message'],
       isRead: map['is_read'],
-      createdAt: parseFormattedDate(map['created_at']),
+      createdAt: (map['created_at'] as Timestamp).toDate(),
     );
   }
 }
