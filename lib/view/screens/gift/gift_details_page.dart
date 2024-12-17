@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/enums/gift_status.dart';
+import '../../components/notification.dart';
 import '../../widgets/gift/gift_header.dart';
 import '../../widgets/gift/gift_form.dart';
 import 'package:hedieaty/data/remote/firebase/models/gift.dart';
@@ -57,12 +58,7 @@ class _GiftDetailsPageState extends State<GiftDetailsPage> {
   }
 
   void _showValidationError() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please fill out all fields.'),
-        backgroundColor: Colors.redAccent,
-      ),
-    );
+    NotificationHelper.showNotification(context, 'Please fill out all fields', isSuccess: false);
   }
 
   @override

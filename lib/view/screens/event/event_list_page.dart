@@ -70,9 +70,7 @@ class _EventListPageState extends State<EventListPage> {
             if (kDebugMode) {
               print("Error saving event: $e");
             }
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Failed to save event")),
-            );
+            NotificationHelper.showNotification(context, 'Failed to save event', isSuccess: false);
           }
         }, userId: widget.userId,
       ),
@@ -127,7 +125,7 @@ class _EventListPageState extends State<EventListPage> {
       if (kDebugMode) {
         print("Error deleting event: $e");
       }
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to delete event")));
+      NotificationHelper.showNotification(context, 'Failed to delete event', isSuccess: false);
     }
   }
 
@@ -139,7 +137,7 @@ class _EventListPageState extends State<EventListPage> {
       if (kDebugMode) {
         print("Error publishing event: $e");
       }
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to publish event")));
+      NotificationHelper.showNotification(context, 'Failed to publish event', isSuccess: false);
     }
   }
 

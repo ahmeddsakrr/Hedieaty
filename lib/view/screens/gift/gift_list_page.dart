@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/services/auth_service.dart';
 import 'package:hedieaty/controller/services/pledge_service.dart';
+import 'package:hedieaty/view/components/notification.dart';
 import '../../../controller/services/gift_service.dart';
 import '../../../data/local/database/app_database.dart' as local;
 import '../../components/sort_buttons.dart';
@@ -149,9 +150,7 @@ class _GiftListPageState extends State<GiftListPage> {
       }
       _gifts.insert(index, removedGift);
       _listKey.currentState?.insertItem(index);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to delete gift")),
-      );
+      NotificationHelper.showNotification(context, 'Failed to delete gift', isSuccess: false);
     }
   }
 
@@ -192,9 +191,7 @@ class _GiftListPageState extends State<GiftListPage> {
         pledgeDate: DateTime.now(),
       );
       _pledgeService.pledgeGift(pledge);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pledged ${gift.name}'))
-      );
+      NotificationHelper.showNotification(context, 'Pledged ${gift.name}');
     }
   }
 

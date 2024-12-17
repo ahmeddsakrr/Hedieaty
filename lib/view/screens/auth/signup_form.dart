@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hedieaty/view/components/notification.dart';
 import '../../../data/local/database/app_database.dart';
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
@@ -33,9 +34,7 @@ class _SignupFormState extends State<SignupForm> {
       if (user != null) {
         widget.onAuthComplete();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Signup failed, try again")),
-        );
+        NotificationHelper.showNotification(context, 'Signup failed, try again', isSuccess: false);
       }
     }
   }

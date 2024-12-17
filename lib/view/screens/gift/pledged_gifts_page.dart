@@ -3,6 +3,7 @@ import 'package:hedieaty/controller/services/auth_service.dart';
 import 'package:hedieaty/controller/services/gift_service.dart';
 import 'package:hedieaty/controller/services/pledge_service.dart';
 import 'package:hedieaty/data/local/database/app_database.dart' as local;
+import 'package:hedieaty/view/components/notification.dart';
 import '../../components/custom_search_bar.dart';
 import '../../widgets/gift/gift_list_item.dart';
 import 'package:hedieaty/data/remote/firebase/models/gift.dart';
@@ -45,9 +46,7 @@ class _PledgedGiftsPageState extends State<PledgedGiftsPage> {
   void _removePledgedGift(Gift gift) async{
     String userId = await _authService.getCurrentUser();
     await _pledgeService.unpledgeGift(userId, gift.id);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Unpledged ${gift.name}'))
-    );
+    NotificationHelper.showNotification(context, 'Unpledged ${gift.name}', isSuccess: true);
   }
 
   Future<void> _confirmUnpledge(Gift gift) async {

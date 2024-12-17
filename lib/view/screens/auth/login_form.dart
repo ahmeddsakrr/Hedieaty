@@ -3,6 +3,7 @@ import '../../../data/local/database/app_database.dart';
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
 import '../../../controller/services/auth_service.dart';
+import 'package:hedieaty/view/components/notification.dart';
 
 class LoginForm extends StatefulWidget {
   final VoidCallback onAuthComplete;
@@ -29,9 +30,7 @@ class _LoginFormState extends State<LoginForm> {
       if (user != null) {
         widget.onAuthComplete();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Invalid phone number or password")),
-        );
+        NotificationHelper.showNotification(context, 'Invalid phone number or password', isSuccess: false);
       }
     }
   }

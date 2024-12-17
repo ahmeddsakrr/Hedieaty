@@ -66,9 +66,7 @@ class _HomePageState extends State<HomePage> {
       if (kDebugMode) {
         print('Error adding friend: $e');
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to add friend')),
-      );
+      NotificationHelper.showNotification(context, 'Failed to add friend', isSuccess: false);
     }
   }
 
@@ -193,12 +191,7 @@ class _HomePageState extends State<HomePage> {
               ),
             );
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Failed to fetch user ID'),
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
+            NotificationHelper.showNotification(context, 'Failed to fetch user ID', isSuccess: false);
           }
         },
         child: const Icon(Icons.person_add),
