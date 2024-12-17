@@ -39,4 +39,14 @@ class FriendDAO {
   Future<void> removeFriend(int friendId) async {
     await _firestore.collection('friends').doc(friendId.toString()).delete();
   }
+
+  Future<bool> isFriend(String userId, String friendUserId) async {
+    final snapshot = await _firestore
+        .collection('friends')
+        .where('user_id', isEqualTo: userId)
+        .where('friend_user_id', isEqualTo: friendUserId)
+        .limit(1)
+        .get();
+    return snapshot.docs.isNotEmpty;
+  }
 }

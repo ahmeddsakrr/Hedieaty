@@ -59,6 +59,25 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _addFriend(Friend friend) async {
     try {
+      String currentUserId = await _authService.getCurrentUser();
+      final currentUser = await _userService.getUser(currentUserId);
+      if (currentUser == null) {
+        NotificationHelper.showNotification(context, 'Failed to retrieve your account information.', isSuccess: false,);
+        return;
+      }
+      if (friend.friendUserId == currentUser.phoneNumber) {
+        NotificationHelper.showNotification(context, 'You cannot add yourself as a friend.', isSuccess: false,);
+        return;
+      }
+      final friendUser = await _userService.getUser(friend.friendUserId);
+      if (friendUser == null) {
+        NotificationHelper.showNotification(context, 'The entered phone number does not exist.', isSuccess: false,);
+        return;
+      }
+      if (await _friendService.isFriend(currentUserId, friend.friendUserId)) {
+        NotificationHelper.showNotification(context, 'This user is already your friend.', isSuccess: false,);
+        return;
+      }
       await _friendService.addFriend(friend);
       String friendName = await _userService.getUser(friend.friendUserId).then((value) => value?.name) ?? '';
       NotificationHelper.showNotification(context, 'Friend $friendName was added successfully!',);

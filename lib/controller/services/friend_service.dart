@@ -45,4 +45,8 @@ class FriendService {
     );
     await _friendRepository.addFriend(reverseFriend);
   }
+
+  Future<bool> isFriend(String userId, String friendUserId) async {
+    return _friendRepository.isFriend(userId, friendUserId);
+  }
 }

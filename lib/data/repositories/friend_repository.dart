@@ -31,4 +31,8 @@ class FriendRepository {
     });
   }
 
+  Future<bool> isFriend(String userId, String friendUserId) async {
+    return _remoteFriendDao.isFriend(userId, friendUserId);
+  }
+
 }
