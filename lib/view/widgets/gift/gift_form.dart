@@ -25,6 +25,7 @@ class _GiftFormState extends State<GiftForm> {
   bool isPledged = false;
   bool isNameValid = true;
   bool isCategoryValid = true;
+  bool isPriceValid = true;
 
   final List<String> categories = ['Electronics', 'Books', 'Clothes', 'Toys', 'Other'];
 
@@ -44,22 +45,24 @@ class _GiftFormState extends State<GiftForm> {
     setState(() {
       isNameValid = nameController.text.isNotEmpty;
       isCategoryValid = categories.contains(category);
+      final priceValue = double.tryParse(priceController.text);
+      isPriceValid = priceValue != null && priceValue >= 0;
     });
   }
 
   void _notifyGiftChanged() {
     _validateFields();
-    if (isNameValid && isCategoryValid) {
+    if (isNameValid && isCategoryValid && isPriceValid) {
       widget.onGiftChanged(
-           Gift(
-            name: nameController.text,
-            category: category,
-            status: isPledged ? 'Pledged' : 'Available',
-            description: descriptionController.text,
-            price: double.tryParse(priceController.text) ?? 0.0,
-            id: widget.gift.id,
-            eventId: widget.gift.eventId,
-          )
+        Gift(
+          name: nameController.text,
+          category: category,
+          status: isPledged ? 'Pledged' : 'Available',
+          description: descriptionController.text,
+          price: double.parse(priceController.text),
+          id: widget.gift.id,
+          eventId: widget.gift.eventId,
+        ),
       );
     }
   }
@@ -126,9 +129,19 @@ class _GiftFormState extends State<GiftForm> {
           TextField(
             controller: priceController,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Price', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+              labelText: 'Price',
+              border: const OutlineInputBorder(),
+              errorText: isPriceValid ? null : 'Please enter a valid number >= 0',
+            ),
             enabled: widget.isEditable,
-            onChanged: (value) => _notifyGiftChanged(),
+            onChanged: (value) {
+              final priceValue = double.tryParse(value);
+              setState(() {
+                isPriceValid = priceValue != null && priceValue >= 0;
+              });
+              _notifyGiftChanged();
+            },
           ),
           const SizedBox(height: 16),
           Row(

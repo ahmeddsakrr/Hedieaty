@@ -82,11 +82,25 @@ class _EventDialogState extends State<EventDialog> {
   }
 
   Future<void> _selectDate() async {
+    final DateTime now = DateTime.now();
+    DateTime firstDate = DateTime(2000);
+    DateTime lastDate = DateTime(2100);
+
+    if (selectedStatus == EventStatus.current.name) {
+      firstDate = now;
+      lastDate = now;
+    } else if (selectedStatus == EventStatus.past.name) {
+      firstDate = DateTime(2000);
+      lastDate = now.subtract(const Duration(days: 1));
+    } else if (selectedStatus == EventStatus.upcoming.name) {
+      firstDate = now.add(const Duration(days: 1));
+      lastDate = DateTime(2100);
+    }
     final pickedDate = await showDatePicker(
       context: context,
-      initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      initialDate: selectedDate ?? now,
+      firstDate: firstDate,
+      lastDate: lastDate,
     );
     if (pickedDate != null) {
       setState(() {
@@ -128,12 +142,20 @@ class _EventDialogState extends State<EventDialog> {
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
               value: selectedStatus,
-              items: ['Upcoming', 'Current', 'Past']
+              items: [EventStatus.upcoming.name, EventStatus.current.name, EventStatus.past.name]
                   .map((status) => DropdownMenuItem(value: status, child: Text(status)))
                   .toList(),
               onChanged: (value) {
                 setState(() {
                   selectedStatus = value!;
+                  if (selectedStatus == EventStatus.current.name) {
+                    selectedDate = DateTime.now();
+                  } else if (selectedStatus == EventStatus.past.name) {
+                    selectedDate = DateTime.now().subtract(const Duration(days: 1));
+                  } else if (selectedStatus == EventStatus.upcoming.name) {
+                    selectedDate = DateTime.now().add(const Duration(days: 1));
+                  }
+                  isDateValid = true; // Reset validation state
                 });
               },
               decoration: InputDecoration(

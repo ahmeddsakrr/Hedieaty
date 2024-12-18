@@ -63,7 +63,7 @@ class _SignupFormState extends State<SignupForm> {
             keyboardType: TextInputType.emailAddress,
             controller: _emailController,
             validator: (value) {
-              if (value == null || value.isEmpty) {
+              if (value == null || value.isEmpty || !value.contains('@')) {
                 return 'Please enter your email';
               }
               return null;
@@ -78,6 +78,8 @@ class _SignupFormState extends State<SignupForm> {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your phone number';
+              } else if (RegExp(r'[a-zA-Z]').hasMatch(value)) {
+                return 'Please enter a valid phone number';
               }
               return null;
             },
