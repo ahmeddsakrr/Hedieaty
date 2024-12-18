@@ -1,10 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/services/user_service.dart';
+import 'package:hedieaty/view/components/notification.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../../controller/services/auth_service.dart';
+import '../../../controller/services/imgbb_service.dart';
 import 'profile_info_field.dart';
 import 'package:hedieaty/data/local/database/app_database.dart';
 import '../../../data/remote/firebase/models/user.dart' as RemoteUser;
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 
 class ProfileHeader extends StatefulWidget {
@@ -18,10 +23,12 @@ class _ProfileHeaderState extends State<ProfileHeader> {
   late TextEditingController nameController;
   late TextEditingController phoneController;
   late TextEditingController emailController;
+  String? profilePicUrl;
   bool isLoading = true;
 
   final UserService _userService = UserService(AppDatabase());
   final AuthService _authService = AuthService(AppDatabase());
+  final ImgbbService _imgbbService = ImgbbService();
 
   @override
   void initState() {
@@ -38,10 +45,11 @@ class _ProfileHeaderState extends State<ProfileHeader> {
           nameController = TextEditingController(text: user.name);
           phoneController = TextEditingController(text: user.phoneNumber);
           emailController = TextEditingController(text: user.email);
+          profilePicUrl = user.profilePictureUrl;
           isLoading = false;
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("User not found")));
+        NotificationHelper.showNotification(context, "Failed to fetch profile", isSuccess: false);
       }
     } catch (e) {
       if (kDebugMode) {
@@ -50,7 +58,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
       setState(() {
         isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to load profile details")));
+      NotificationHelper.showNotification(context, "Failed to fetch profile", isSuccess: false);
     }
   }
 
@@ -65,6 +73,31 @@ class _ProfileHeaderState extends State<ProfileHeader> {
     await _userService.updateUser(updatedUser);
   }
 
+  Future<void> _updateProfilePicture() async {
+    try {
+      if (await Permission.photos.request().isGranted) {
+        final ImagePicker picker = ImagePicker();
+        final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+        if (image != null) {
+          final url = await _imgbbService.uploadImage(image.path);
+          if (url != null) {
+            String userId = await _authService.getCurrentUser();
+            await _userService.updateUserProfilePicture(userId, url);
+            setState(() {
+              profilePicUrl = url;
+            });
+            NotificationHelper.showNotification(context, "Profile picture updated successfully");
+          }
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error uploading profile picture: $e");
+      }
+      NotificationHelper.showNotification(context, "Failed to update profile picture", isSuccess: false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -73,9 +106,15 @@ class _ProfileHeaderState extends State<ProfileHeader> {
 
     return Column(
       children: [
-        const CircleAvatar(
-          radius: 50,
-          backgroundImage: AssetImage('images/user.jpg'),
+        GestureDetector(
+          onTap: _updateProfilePicture,
+          child: CircleAvatar(
+            radius: 50,
+            backgroundImage: profilePicUrl != null
+                ? NetworkImage(profilePicUrl!)
+                : const AssetImage('images/user.jpg') as ImageProvider,
+            child: const Icon(Icons.camera_alt, color: Colors.white),
+          ),
         ),
         const SizedBox(height: 10),
         ProfileInfoField(

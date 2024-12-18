@@ -186,6 +186,7 @@ class _HomePageState extends State<HomePage> {
                           return FriendListItem(
                             friendName: friend.name,
                             eventsCount: eventCount,
+                            profileImageUrl: friend.profilePictureUrl,
                             onTap: () => navigateWithAnimation(EventListPage(userId: friend.phoneNumber, canManageEvents: false,)),
                           );
                         },

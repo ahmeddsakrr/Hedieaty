@@ -18,4 +18,12 @@ class UserService {
   String getUserPassword(String phoneNumber) {
     return _userRepository.getUserPassword(phoneNumber);
   }
+
+  Future<void> updateUserProfilePicture(String userId, String url) async {
+    RemoteUser.User? user = await getUser(userId);
+    if (user != null) {
+      user.profilePictureUrl = url;
+      await updateUser(user);
+    }
+  }
 }
