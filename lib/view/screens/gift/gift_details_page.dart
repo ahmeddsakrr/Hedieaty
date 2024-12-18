@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hedieaty/controller/enums/gift_status.dart';
+import 'package:hedieaty/controller/services/imgbb_service.dart';
 import '../../components/notification.dart';
 import '../../widgets/gift/gift_header.dart';
 import '../../widgets/gift/gift_form.dart';
@@ -18,6 +19,7 @@ class GiftDetailsPage extends StatefulWidget {
 }
 
 class _GiftDetailsPageState extends State<GiftDetailsPage> {
+  final ImgbbService _imgbbService = ImgbbService();
   late Gift editableGift;
   bool isLocked = false;
   bool isLockedStatus = false;
@@ -74,6 +76,12 @@ class _GiftDetailsPageState extends State<GiftDetailsPage> {
               GiftHeader(
                 imageUrl: editableGift.imageUrl,
                 isEditable: !isLocked,
+                onImageSelected: (imagePath) async {
+                  final imageUrl = await _imgbbService.uploadImage(imagePath);
+                  setState(() {
+                    editableGift.imageUrl = imageUrl;
+                  });
+                },
               ),
               GiftForm(
                 gift: editableGift,
