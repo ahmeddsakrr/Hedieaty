@@ -9,7 +9,6 @@ import 'profile_info_field.dart';
 import 'package:hedieaty/data/local/database/app_database.dart';
 import '../../../data/remote/firebase/models/user.dart' as RemoteUser;
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
 
 class ProfileHeader extends StatefulWidget {
@@ -113,7 +112,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
             backgroundImage: profilePicUrl != null
                 ? NetworkImage(profilePicUrl!)
                 : const AssetImage('images/user.jpg') as ImageProvider,
-            child: const Icon(Icons.camera_alt, color: Colors.white),
+            child: null,
           ),
         ),
         const SizedBox(height: 10),
