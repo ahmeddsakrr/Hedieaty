@@ -70,14 +70,18 @@ class ProfilePage extends StatelessWidget {
                   onPressed: () {
                     final toggleTheme = MyApp.of(context)!.toggleTheme;
                     _authService.logOut();
-                    navigateWithAnimation(
-                      AuthPage(onAuthComplete: () {
-                        navigateWithAnimation(
-                          HomePage(toggleTheme: toggleTheme),
-                          replace: true,
-                        );
-                      }),
-                      replace: true,
+                    navigatorKey.currentState!.pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) => AuthPage(
+                          onAuthComplete: () {
+                            navigateWithAnimation(
+                              HomePage(toggleTheme: toggleTheme),
+                              replace: true,
+                            );
+                          },
+                        ),
+                      ),
+                          (route) => false,
                     );
                   },
                 ),
