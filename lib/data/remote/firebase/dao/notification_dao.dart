@@ -31,6 +31,7 @@ class NotificationDAO {
     return _firestore
         .collection('notifications')
         .where('user_id', isEqualTo: userId)
+        .orderBy('created_at', descending: true)
         .snapshots()
         .map((querySnapshot) {
       return querySnapshot.docs

@@ -1,6 +1,7 @@
 enum NotificationType {
   giftPledged,
   giftUnpledged,
+  friendRequest,
 }
 
 extension NotificationTypeExtension on NotificationType {
@@ -10,6 +11,8 @@ extension NotificationTypeExtension on NotificationType {
         return "Gift Pledged";
       case NotificationType.giftUnpledged:
         return "Gift Unpledged";
+      case NotificationType.friendRequest:
+        return "Friend Request";
     }
   }
 }

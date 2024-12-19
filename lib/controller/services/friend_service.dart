@@ -1,17 +1,22 @@
+import 'package:hedieaty/controller/enums/notification_type.dart';
 import 'package:hedieaty/controller/services/user_service.dart';
 
 import '../../data/local/database/app_database.dart';
 import '../../data/repositories/friend_repository.dart';
 import '../../data/remote/firebase/models/user.dart' as RemoteUser;
 import '../../data/remote/firebase/models/friend.dart' as RemoteFriend;
+import '../../data/remote/firebase/models/notification.dart' as RemoteNotification;
+import 'package:hedieaty/controller/services/notification_service.dart';
 
 class FriendService {
   final FriendRepository _friendRepository;
   final UserService _userService;
+  final NotificationService _notificationService;
 
   FriendService(AppDatabase db)
       : _friendRepository = FriendRepository(db),
-        _userService = UserService(db);
+        _userService = UserService(db),
+        _notificationService = NotificationService(db);
 
   /// Fetch all friends for a specific user ID.
   Stream<List<RemoteUser.User>> getFriendsForUser(String userId) {
@@ -44,6 +49,16 @@ class FriendService {
       friendUserId: friend.userId,
     );
     await _friendRepository.addFriend(reverseFriend);
+    String name = (await _userService.getUser(friend.userId))?.name ?? '';
+    final notification = RemoteNotification.Notification(
+      id: 0,
+      userId: friend.friendUserId,
+      type: NotificationType.friendRequest.name,
+      message: 'You have been added as a friend by $name',
+      isRead: false,
+      createdAt: DateTime.now(),
+    );
+    await _notificationService.createNotification(notification);
   }
 
   Future<bool> isFriend(String userId, String friendUserId) async {
