@@ -46,7 +46,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool _isDarkTheme = false;
+  bool isDarkTheme = false;
   late final NotificationService _notificationService;
   late final AuthService _authService;
   GlobalNotificationListener? _globalNotificationListener;
@@ -71,7 +71,7 @@ class _MyAppState extends State<MyApp> {
 
   void toggleTheme() {
     setState(() {
-      _isDarkTheme = !_isDarkTheme;
+      isDarkTheme = !isDarkTheme;
     });
   }
 
@@ -80,7 +80,7 @@ class _MyAppState extends State<MyApp> {
 
     return MaterialApp(
       navigatorKey: navigatorKey,
-      theme: _isDarkTheme ? AppTheme.darkTheme : AppTheme.lightTheme,
+      theme: isDarkTheme ? AppTheme.darkTheme : AppTheme.lightTheme,
       home: AuthPage(
         onAuthComplete: () async {
           String userId = await _authService.getCurrentUser();

@@ -72,6 +72,10 @@ class ProfilePage extends StatelessWidget {
                   color: theme.colorScheme.error,
                   onPressed: () {
                     final toggleTheme = MyApp.of(context)!.toggleTheme;
+                    MyApp.of(context)!.isDarkTheme = false;
+                    MyApp.of(context)!.setState(() {
+                      MyApp.of(context)!.isDarkTheme = false;
+                    });
                     MyApp.of(context)!.stopNotificationListener();
                     _authService.logOut();
                     navigatorKey.currentState!.pushAndRemoveUntil(
