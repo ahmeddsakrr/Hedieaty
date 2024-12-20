@@ -17,9 +17,9 @@ function Log-Message {
 
 if (Test-Path $OUTPUT_VIDEO) { Remove-Item $OUTPUT_VIDEO }
 
-# Start recording on the device
 Log-Message "Starting screen recording..."
-$recordingProcess = Start-Process -FilePath adb -ArgumentList "-s $DeviceId shell screenrecord -- size $DeviceSize --time-limit 180 $ON_DEVICE_OUTPUT_FILE" -PassThru -NoNewWindow
+$adbCommand = "adb -s $DeviceId shell `"screenrecord --size $DeviceSize --time-limit 180 $ON_DEVICE_OUTPUT_FILE`""
+$recordingProcess = Start-Process -FilePath "powershell" -ArgumentList "-Command", $adbCommand -PassThru -NoNewWindow
 
 Start-Sleep -Seconds 5
 
@@ -34,8 +34,16 @@ try {
     $testOutput = & flutter drive --device-id=$DeviceId --driver=$DRIVER_PATH --target=$TEST_PATH
 } catch {
     Log-Message "Flutter drive test failed. Error: $_"
+    # Kill the recording process before exiting
+    $recordingProcess | Stop-Process -Force
     exit 1
 }
+
+# Give the recording a moment to finish
+Start-Sleep -Seconds 2
+
+# Kill the recording process to ensure it stops properly
+$recordingProcess | Stop-Process -Force
 
 # Determine test status
 $status = if ($testOutput -match "All tests passed.") { "Pass" } else { "Fail" }
@@ -48,11 +56,14 @@ $testOutput | Out-File -FilePath $OUTPUT_LOG_PATH
 # Pull the video file from the device
 Log-Message "Pulling video from device..."
 try {
-    adb -s $DeviceId pull "$ON_DEVICE_OUTPUT_FILE" "$OUTPUT_VIDEO"
-    Log-Message "Video pulled successfully."
+    & adb -s $DeviceId pull $ON_DEVICE_OUTPUT_FILE $OUTPUT_VIDEO
+    if ($LASTEXITCODE -eq 0) {
+        Log-Message "Video pulled successfully."
+    } else {
+        throw "adb pull command failed with exit code $LASTEXITCODE"
+    }
 } catch {
     Log-Message "Failed to pull video file. Error: $_"
-    $recordingProcess | Stop-Process -Force
     exit 1
 }
 
