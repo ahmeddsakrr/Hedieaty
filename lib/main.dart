@@ -49,18 +49,24 @@ class _MyAppState extends State<MyApp> {
   bool _isDarkTheme = false;
   late final NotificationService _notificationService;
   late final AuthService _authService;
-  late final GlobalNotificationListener _globalNotificationListener;
+  GlobalNotificationListener? _globalNotificationListener;
 
   @override
   void initState() {
     super.initState();
     _notificationService = NotificationService(AppDatabase());
-    _globalNotificationListener = GlobalNotificationListener(_notificationService);
     _authService = AuthService(AppDatabase());
   }
 
-  void _startNotificationListener(String userId) {
-    _globalNotificationListener.startListening(userId);
+  void startNotificationListener(String userId) {
+    _globalNotificationListener?.dispose();
+    _globalNotificationListener = GlobalNotificationListener(_notificationService);
+    _globalNotificationListener!.startListening(userId);
+  }
+
+  void stopNotificationListener() {
+    _globalNotificationListener?.dispose();
+    _globalNotificationListener = null;
   }
 
   void toggleTheme() {
@@ -78,7 +84,7 @@ class _MyAppState extends State<MyApp> {
       home: AuthPage(
         onAuthComplete: () async {
           String userId = await _authService.getCurrentUser();
-          _startNotificationListener(userId);
+          startNotificationListener(userId);
           navigateWithAnimation(
             HomePage(toggleTheme: toggleTheme),
             replace: true,
@@ -90,7 +96,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
-    _globalNotificationListener.dispose();
+    stopNotificationListener();
     super.dispose();
   }
 }
