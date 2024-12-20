@@ -1,12 +1,11 @@
-# Enhanced PowerShell Script for Flutter E2E Testing
-
 # Set variables
 $ON_DEVICE_OUTPUT_FILE = "/sdcard/test_video.mp4"
 $OUTPUT_VIDEO = "e2e_test_video.mp4"
-$DRIVER_PATH = "./test_driver/integration_test_driver.dart"
-$TEST_PATH = "./integration_test/end_to_end_test.dart"
+$DRIVER_PATH = "test_driver/integration_test_driver.dart"
+$TEST_PATH = "integration_test/end_to_end_test.dart"
 $DeviceId = "emulator-5554"
 $HTML_OUTPUT = "e2e_test_results.html"
+$DeviceSize = "1080x1920"
 $OUTPUT_LOG_PATH = "e2e_test_output.log"
 
 # Helper function to write to log and console
@@ -16,9 +15,14 @@ function Log-Message {
     $message | Out-File -FilePath $OUTPUT_LOG_PATH -Append
 }
 
+if (Test-Path $OUTPUT_VIDEO) { Remove-Item $OUTPUT_VIDEO }
+
 # Start recording on the device
 Log-Message "Starting screen recording..."
-$recordingProcess = Start-Process -NoNewWindow -FilePath adb -ArgumentList "shell screenrecord $ON_DEVICE_OUTPUT_FILE" -PassThru
+$recordingProcess = Start-Process -FilePath adb -ArgumentList "-s $DeviceId shell screenrecord -- size $DeviceSize --time-limit 180 $ON_DEVICE_OUTPUT_FILE" -PassThru -NoNewWindow
+
+Start-Sleep -Seconds 5
+
 if (-not $recordingProcess) {
     Log-Message "Failed to start screen recording. Exiting."
     exit 1
@@ -41,14 +45,10 @@ Log-Message "Test status: $status"
 Log-Message "Saving test output to log file..."
 $testOutput | Out-File -FilePath $OUTPUT_LOG_PATH
 
-# Wait for the recording process to finish
-Log-Message "Waiting for screen recording to finish..."
-Start-Sleep -Seconds 120
-
 # Pull the video file from the device
 Log-Message "Pulling video from device..."
 try {
-    adb pull $ON_DEVICE_OUTPUT_FILE $OUTPUT_VIDEO -ErrorAction Stop
+    adb -s $DeviceId pull "$ON_DEVICE_OUTPUT_FILE" "$OUTPUT_VIDEO"
     Log-Message "Video pulled successfully."
 } catch {
     Log-Message "Failed to pull video file. Error: $_"
@@ -56,9 +56,6 @@ try {
     exit 1
 }
 
-# Stop the recording process
-Log-Message "Stopping screen recording..."
-$recordingProcess | Stop-Process -Force
 
 # Generate HTML report
 Log-Message "Generating HTML report..."
