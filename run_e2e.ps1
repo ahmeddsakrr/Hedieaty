@@ -17,9 +17,23 @@ function Log-Message {
 
 if (Test-Path $OUTPUT_VIDEO) { Remove-Item $OUTPUT_VIDEO }
 
+# Ensure no existing screenrecord process is running
+Log-Message "Checking for existing screenrecord processes..."
+$existingRecording = & adb -s $DeviceId shell "ps | grep screenrecord"
+if ($existingRecording) {
+    Log-Message "Killing existing screenrecord process..."
+    & adb -s $DeviceId shell "killall screenrecord"
+    Start-Sleep -Seconds 2
+}
+
+# Clear any existing recording file
+Log-Message "Clearing any existing recording file..."
+& adb -s $DeviceId shell "rm -f $ON_DEVICE_OUTPUT_FILE"
+
+# Start recording on the device with proper format
 Log-Message "Starting screen recording..."
-$adbCommand = "adb -s $DeviceId shell `"screenrecord --size $DeviceSize --time-limit 180 $ON_DEVICE_OUTPUT_FILE`""
-$recordingProcess = Start-Process -FilePath "powershell" -ArgumentList "-Command", $adbCommand -PassThru -NoNewWindow
+$adbCommand = "adb -s $DeviceId shell `"screenrecord --bit-rate 6000000 --size $DeviceSize --time-limit 180 $ON_DEVICE_OUTPUT_FILE`""
+$recordingProcess = Start-Process -FilePath "powershell" -ArgumentList "-Command", $adbCommand -PassThru -WindowStyle Hidden
 
 Start-Sleep -Seconds 5
 
@@ -34,16 +48,53 @@ try {
     $testOutput = & flutter drive --device-id=$DeviceId --driver=$DRIVER_PATH --target=$TEST_PATH
 } catch {
     Log-Message "Flutter drive test failed. Error: $_"
-    # Kill the recording process before exiting
     $recordingProcess | Stop-Process -Force
     exit 1
 }
 
-# Give the recording a moment to finish
+# Give the recording time to finalize
+Log-Message "Finalizing recording..."
+Start-Sleep -Seconds 5
+
+# Properly stop the recording
+Log-Message "Stopping screen recording..."
+& adb -s $DeviceId shell "killall screenrecord"
 Start-Sleep -Seconds 2
 
-# Kill the recording process to ensure it stops properly
-$recordingProcess | Stop-Process -Force
+# Verify the video file exists on device
+$fileExists = & adb -s $DeviceId shell "ls $ON_DEVICE_OUTPUT_FILE 2>/dev/null"
+if (-not $fileExists) {
+    Log-Message "Video file not found on device. Recording may have failed."
+    exit 1
+}
+
+# Get file size to verify it's not empty
+$fileSize = & adb -s $DeviceId shell "stat -f %z $ON_DEVICE_OUTPUT_FILE"
+if ([int]$fileSize -lt 1024) {
+    Log-Message "Video file appears to be empty or too small."
+    exit 1
+}
+
+# Pull the video file from the device
+Log-Message "Pulling video from device..."
+try {
+    & adb -s $DeviceId pull $ON_DEVICE_OUTPUT_FILE $OUTPUT_VIDEO
+    if ($LASTEXITCODE -eq 0) {
+        Log-Message "Video pulled successfully."
+
+        # Verify local file exists and has content
+        if ((Test-Path $OUTPUT_VIDEO) -and ((Get-Item $OUTPUT_VIDEO).length -gt 1024)) {
+            Log-Message "Video file verified successfully."
+        } else {
+            throw "Local video file is missing or empty"
+        }
+    } else {
+        throw "adb pull command failed with exit code $LASTEXITCODE"
+    }
+} catch {
+    Log-Message "Failed to pull video file. Error: $_"
+    exit 1
+}
 
 # Determine test status
 $status = if ($testOutput -match "All tests passed.") { "Pass" } else { "Fail" }
