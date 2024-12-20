@@ -60,9 +60,7 @@ class _GiftListPageState extends State<GiftListPage> {
       // Remove extra items with animation
       for (int i = oldGifts.length - 1; i >= newGifts.length; i--) {
         final removedGift = oldGifts[i];
-        _listKey.currentState?.removeItem(
-          i,
-              (context, animation) => GiftListItem(
+        _listKey.currentState?.removeItem(i, (context, animation) => GiftListItem(
             gift: removedGift,
             animation: animation,
             onEdit: () {},
@@ -258,10 +256,8 @@ class _GiftListPageState extends State<GiftListPage> {
                         child: GiftListItem(
                           gift: _gifts[index],
                           animation: animation,
-                          onEdit: () => _navigateToGiftDetails(
-                              gift: _gifts[index], index: index),
-                          onDelete: () =>
-                              _showDeleteConfirmationDialog(index),
+                          onEdit: () => _navigateToGiftDetails(gift: _gifts[index], index: index),
+                          onDelete: () => _showDeleteConfirmationDialog(index),
                           showActions: widget.canManageGifts && _pledgeService.isAvailable(_gifts[index]),
                           customAction: _pledgeService.isAvailable(_gifts[index]) && !widget.canManageGifts
                               ? MouseRegion(

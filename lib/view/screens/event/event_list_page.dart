@@ -33,6 +33,39 @@ class _EventListPageState extends State<EventListPage> {
   EventSortStrategy? _lastUsedSortStrategy;
   bool isLoading = true;
 
+  void _syncEvents(List<RemoteEvent.Event> newEvents) {
+    final oldEvents = _events;
+    if (_lastUsedSortStrategy != null) {
+      _sortContext.setSortStrategy(_lastUsedSortStrategy!);
+      newEvents = _sortContext.sortEvents(newEvents);
+    }
+
+    final diff = newEvents.length - oldEvents.length;
+
+    _events = newEvents;
+
+    if (diff > 0) {
+      for (int i = oldEvents.length; i < newEvents.length; i++) {
+        _listKey.currentState?.insertItem(i);
+      }
+    } else if (diff < 0) {
+      for (int i = oldEvents.length - 1; i >= newEvents.length; i--) {
+        final removedEvent = oldEvents[i];
+        _listKey.currentState?.removeItem(i, (context, animation) => EventItem(
+            event: removedEvent,
+            animation: animation,
+            onEdit: () {},
+            onDelete: () {},
+            onTap: () {},
+            canManageEvents: widget.canManageEvents,
+            onPublish: () {},
+            isPublished: false,
+          ),
+        );
+      }
+    }
+  }
+
 
   void _sortBy(EventSortStrategy strategy) {
     setState(() {
@@ -105,9 +138,8 @@ class _EventListPageState extends State<EventListPage> {
   }
 
   void _removeEvent(int index) async {
+    final removedEvent = _events[index];
     try {
-      await _eventService.deleteEvent(_events[index].id);
-      final removedEvent = _events.removeAt(index);
       _listKey.currentState?.removeItem(index, (context, animation) {
         return EventItem(
           event: removedEvent,
@@ -120,11 +152,17 @@ class _EventListPageState extends State<EventListPage> {
           isPublished: false,
         );
       });
-      setState(() {});
+      _events.removeAt(index);
+      await _eventService.deleteEvent(removedEvent.id);
+      if (_lastUsedSortStrategy != null) {
+        _sortBy(_lastUsedSortStrategy!);
+      }
     } catch (e) {
       if (kDebugMode) {
         print("Error deleting event: $e");
       }
+      _events.insert(index, removedEvent);
+      _listKey.currentState?.insertItem(index);
       NotificationHelper.showNotification(context, 'Failed to delete event', isSuccess: false);
     }
   }
@@ -187,21 +225,22 @@ class _EventListPageState extends State<EventListPage> {
                   }
 
                   // Data available
-                  final events = snapshot.data!;
+                  final eventsFromStream = snapshot.data ?? [];
+                  _syncEvents(eventsFromStream);
 
                   return AnimatedList(
                     key: _listKey,
-                    initialItemCount: events.length,
+                    initialItemCount: _events.length,
                     itemBuilder: (context, index, animation) {
                       return EventItem(
-                        event: events[index],
+                        event: _events[index],
                         animation: animation,
-                        onEdit: () => _showEventDialog(event: events[index], index: index),
+                        onEdit: () => _showEventDialog(event: _events[index], index: index),
                         onDelete: () => _showDeleteConfirmationDialog(index),
-                        onTap: () => navigateWithAnimation(GiftListPage(event: events[index], canManageGifts: widget.canManageEvents,)),
+                        onTap: () => navigateWithAnimation(GiftListPage(event: _events[index], canManageGifts: widget.canManageEvents,)),
                         canManageEvents: widget.canManageEvents,
-                        onPublish: () => publishEvent(events[index].id, events[index].name),
-                        isPublished: events[index].isPublished,
+                        onPublish: () => publishEvent(_events[index].id, _events[index].name),
+                        isPublished: _events[index].isPublished,
                       );
                     },
                   );
