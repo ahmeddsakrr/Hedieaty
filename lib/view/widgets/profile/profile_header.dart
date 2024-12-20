@@ -63,6 +63,12 @@ class _ProfileHeaderState extends State<ProfileHeader> {
 
   Future<void> _saveUserProfile() async {
     String userId = await _authService.getCurrentUser();
+    final fireBaseUser = await _authService.getUser();
+    if (fireBaseUser != null) {
+      if (fireBaseUser.email != emailController.text) {
+        fireBaseUser.verifyBeforeUpdateEmail(emailController.text);
+      }
+    }
     final updatedUser = RemoteUser.User(
       name: nameController.text,
       phoneNumber: phoneController.text,

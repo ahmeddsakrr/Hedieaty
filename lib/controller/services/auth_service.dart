@@ -76,4 +76,8 @@ class AuthService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('current_user_phone_number', phoneNumber);
   }
+
+  Future<User?> getUser() async {
+    return _auth.currentUser;
+  }
 }
