@@ -96,9 +96,15 @@ class _EventDialogState extends State<EventDialog> {
       firstDate = now.add(const Duration(days: 1));
       lastDate = DateTime(2100);
     }
+    DateTime initialDate = selectedDate ?? now;
+    if (initialDate.isBefore(firstDate)) {
+      initialDate = firstDate;
+    } else if (initialDate.isAfter(lastDate)) {
+      initialDate = lastDate;
+    }
     final pickedDate = await showDatePicker(
       context: context,
-      initialDate: selectedDate ?? now,
+      initialDate: initialDate,
       firstDate: firstDate,
       lastDate: lastDate,
     );
