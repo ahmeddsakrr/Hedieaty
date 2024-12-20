@@ -67,6 +67,7 @@ class _AuthPageState extends State<AuthPage> {
 
                   TextButton(
                     onPressed: toggleAuthMode,
+                    key: const Key('toggleAuthModeButton'),
                     child: Text(
                       isLogin
                           ? "Don't have an account? Sign Up"

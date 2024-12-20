@@ -102,6 +102,7 @@ class _GiftDetailsPageState extends State<GiftDetailsPage> {
         heroTag: "gift_details_save",
         onPressed: _saveGift,
         child: const Icon(Icons.save),
+        key: const Key('saveGiftButton'),
       ),
     );
   }

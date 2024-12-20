@@ -153,6 +153,7 @@ class _EventListPageState extends State<EventListPage> {
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () => _showEventDialog(),
+              key: const Key('createEventButton'),
             ),
         ],
       ),

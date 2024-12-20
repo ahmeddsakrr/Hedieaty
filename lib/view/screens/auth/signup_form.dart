@@ -55,6 +55,7 @@ class _SignupFormState extends State<SignupForm> {
               }
               return null;
             },
+            key: const Key('nameField'),
           ),
           const SizedBox(height: 10),
           CustomTextField(
@@ -68,6 +69,7 @@ class _SignupFormState extends State<SignupForm> {
               }
               return null;
             },
+            key: const Key('emailField'),
           ),
           const SizedBox(height: 10),
           CustomTextField(
@@ -83,6 +85,7 @@ class _SignupFormState extends State<SignupForm> {
               }
               return null;
             },
+            key: const Key('phoneField'),
           ),
           const SizedBox(height: 10),
           CustomTextField(
@@ -96,11 +99,13 @@ class _SignupFormState extends State<SignupForm> {
               }
               return null;
             },
+            key: const Key('passwordField'),
           ),
           const SizedBox(height: 20),
           CustomButton(
             label: 'Sign Up',
             onPressed: _signup,
+            key: const Key('submitSignUpButton'),
           ),
         ],
       ),

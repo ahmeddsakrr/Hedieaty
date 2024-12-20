@@ -101,6 +101,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () => navigateWithAnimation(ProfilePage()),
+            key: const Key('navigateToProfileButton'),
           ),
           IconButton(
             icon: const Icon(Icons.brightness_6),
@@ -131,6 +132,7 @@ class _HomePageState extends State<HomePage> {
                   textStyle: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 child: const Text("Create Your Own Event/List"),
+                key: const Key('navigateToEventListButton'),
               ),
             ),
             CustomSearchBar(
@@ -140,6 +142,7 @@ class _HomePageState extends State<HomePage> {
                 });
               },
               hintText: "Search friends...",
+              key: const Key('searchFriendsBar'),
             ),
             Expanded(
               child: StreamBuilder<List<User>>(
@@ -200,6 +203,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        key: const Key('addFriendButton'),
         onPressed: () async {
           final userId = await _authService.getCurrentUser();
           if (userId.isNotEmpty) {

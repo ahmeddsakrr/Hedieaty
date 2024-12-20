@@ -177,6 +177,7 @@ class _GiftListPageState extends State<GiftListPage> {
                 overlayColor: WidgetStateProperty.all(Colors.teal.withOpacity(0.1)),
               ),
               child: const Text('Pledge'),
+              key: const Key('confirmPledgeButton'),
             ),
           ],
         );
@@ -207,6 +208,7 @@ class _GiftListPageState extends State<GiftListPage> {
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () => _navigateToGiftDetails(),
+              key: const Key('addGiftButton'),
             ),
         ],
       ),
@@ -271,6 +273,7 @@ class _GiftListPageState extends State<GiftListPage> {
                                 overlayColor: WidgetStateProperty.all(isDarkMode ? Colors.tealAccent.withOpacity(0.1) : Colors.teal.withOpacity(0.1)),
                               ),
                               child: const Text("Pledge"),
+                              key: Key('pledgeButton'),
                             ),
                           )
                               : null,

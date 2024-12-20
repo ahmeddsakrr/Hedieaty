@@ -44,6 +44,7 @@ class _LoginFormState extends State<LoginForm> {
           CustomTextField(
             label: 'Phone Number',
             icon: Icons.phone_outlined,
+            key: const Key('loginPhoneField'),
             keyboardType: TextInputType.phone,
             controller: _phoneController,
             validator: (value) {
@@ -56,6 +57,7 @@ class _LoginFormState extends State<LoginForm> {
           const SizedBox(height: 10),
           CustomTextField(
             label: 'Password',
+            key: const Key('loginPasswordField'),
             icon: Icons.lock_outline,
             obscureText: true,
             controller: _passwordController,
@@ -70,6 +72,7 @@ class _LoginFormState extends State<LoginForm> {
           CustomButton(
             label: 'Login',
             onPressed: _login,
+            key : const Key('submitLoginButton'),
           ),
         ],
       ),

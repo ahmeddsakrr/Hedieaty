@@ -123,6 +123,7 @@ class EventItem extends StatelessWidget {
                               onPressed: onPublish,
                               color: theme.colorScheme.onSurface,
                               tooltip: "Publish Event",
+                              key: const Key('publishEventButton'),
                             ),
                         ],
                       ),

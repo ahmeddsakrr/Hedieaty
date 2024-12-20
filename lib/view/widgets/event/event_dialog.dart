@@ -127,6 +127,7 @@ class _EventDialogState extends State<EventDialog> {
                 ),
                 errorText: isNameValid ? null : 'Event name is required',
               ),
+              key: const Key('eventNameField'),
             ),
             const SizedBox(height: 10),
             TextField(
@@ -138,6 +139,7 @@ class _EventDialogState extends State<EventDialog> {
                 ),
                 errorText: isCategoryValid ? null : 'Category is required',
               ),
+              key: const Key('eventCategoryField'),
             ),
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
@@ -164,6 +166,7 @@ class _EventDialogState extends State<EventDialog> {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
               ),
+              key: const Key('eventStatusField'),
             ),
             const SizedBox(height: 10),
             Row(
@@ -180,6 +183,7 @@ class _EventDialogState extends State<EventDialog> {
                 TextButton(
                   onPressed: _selectDate,
                   child: const Text("Select Date"),
+                  key: const Key('eventDateField'),
                 ),
               ],
             ),
@@ -194,6 +198,7 @@ class _EventDialogState extends State<EventDialog> {
         ElevatedButton(
           onPressed: _save,
           child: Text(widget.event != null ? 'Save' : 'Add'),
+          key: const Key('closeEventDialogButton'),
         ),
       ],
     );

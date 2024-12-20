@@ -45,6 +45,7 @@ class _AddFriendDialogState extends State<AddFriendDialog> {
     return AlertDialog(
       title: const Text('Add Friend'),
       content: TextField(
+        key: const Key('friendPhoneNumberField'),
         controller: phoneNumberController,
         decoration: InputDecoration(
           labelText: 'Friend\'s Phone Number',

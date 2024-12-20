@@ -100,6 +100,7 @@ class _GiftFormState extends State<GiftForm> {
             ),
             enabled: widget.isEditable,
             onChanged: (value) => _notifyGiftChanged(),
+            key: const Key('giftNameField'),
           ),
           const SizedBox(height: 16),
           TextField(
@@ -108,6 +109,7 @@ class _GiftFormState extends State<GiftForm> {
             enabled: widget.isEditable,
             maxLines: 3,
             onChanged: (value) => _notifyGiftChanged(),
+            key: const Key('giftDescriptionField'),
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
@@ -134,6 +136,7 @@ class _GiftFormState extends State<GiftForm> {
               border: const OutlineInputBorder(),
               errorText: isPriceValid ? null : 'Please enter a valid number >= 0',
             ),
+            key: const Key('giftPriceField'),
             enabled: widget.isEditable,
             onChanged: (value) {
               final priceValue = double.tryParse(value);

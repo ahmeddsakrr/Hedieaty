@@ -25,6 +25,7 @@ class ProfilePage extends StatelessWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          key: const Key('profilePage'),
           child: Padding(
             padding: const EdgeInsets.only(top: 16.0),
             child: Column(
@@ -58,6 +59,7 @@ class ProfilePage extends StatelessWidget {
                   context: context,
                   icon: Icons.card_giftcard,
                   text: "View My Pledged Gifts",
+                  key: const Key('pledgedGiftsButton'),
                   color: theme.colorScheme.primary,
                   onPressed: () => navigateWithAnimation(const PledgedGiftsPage()),
                 ),
@@ -66,6 +68,7 @@ class ProfilePage extends StatelessWidget {
                   context: context,
                   icon: Icons.logout,
                   text: "Logout",
+                  key: const Key('logoutButton'),
                   color: theme.colorScheme.error,
                   onPressed: () {
                     final toggleTheme = MyApp.of(context)!.toggleTheme;
@@ -100,6 +103,7 @@ class ProfilePage extends StatelessWidget {
     required String text,
     required Color color,
     required VoidCallback onPressed,
+    required key,
   }) {
     final theme = Theme.of(context);
 
@@ -107,6 +111,7 @@ class ProfilePage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: ElevatedButton(
         onPressed: onPressed,
+        key: key,
         style: ElevatedButton.styleFrom(
           foregroundColor: theme.colorScheme.onPrimary,
           backgroundColor: color,
